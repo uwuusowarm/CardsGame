@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4241407662528483055}
   - component: {fileID: 6681472140177528146}
-  - component: {fileID: 3278471002521308535}
+  - component: {fileID: 3700884860940572870}
   m_Layer: 5
-  m_Name: Image
+  m_Name: illustration
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,7 +45,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 308799739189839927}
   m_CullTransparentMesh: 1
---- !u!114 &3278471002521308535
+--- !u!114 &3700884860940572870
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -54,7 +54,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 308799739189839927}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -65,13 +65,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: c59c7bc6740ae184c84f78ff97eba922, type: 3}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &997165152297264713
 GameObject:
   m_ObjectHideFlags: 0
@@ -106,7 +109,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 19.455658, y: 28.102486}
+  m_AnchoredPosition: {x: 18, y: 28.102486}
   m_SizeDelta: {x: 35, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4660703506832814743
@@ -718,8 +721,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.00013510387, y: 28.102486}
-  m_SizeDelta: {x: 160, y: 40}
+  m_AnchoredPosition: {x: -0.00013510387, y: 27}
+  m_SizeDelta: {x: 120, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6424702237406655885
 CanvasRenderer:
@@ -776,7 +779,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 31.05
+  m_fontSize: 23.25
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -953,7 +956,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -19.455925, y: 28.102486}
+  m_AnchoredPosition: {x: -18, y: 28.102486}
   m_SizeDelta: {x: 35, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5988980431239989037
@@ -1177,6 +1180,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardClass: Knilch
   cardName: Knilch Punch
-  attackVal: 1
-  blockVal: 1
+  leftVal: 1
+  rightVal: 1
   rangeVal: 1
+  effectName: 
+  illustrationBig: {fileID: 0}
+  iconLeft: {fileID: 0}
+  iconRight: {fileID: 0}
