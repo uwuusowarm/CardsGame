@@ -30,5 +30,15 @@ public class Main_Manu : MonoBehaviour
         SceneManager.LoadScene(3);
     }
 
+    public void BackGame()
+    {
+        SceneManager.LoadScene(4);
+    }
+
+    public void Deck1()
+    {
+        SceneManager.LoadScene(5);
+    }
+
 }
 
