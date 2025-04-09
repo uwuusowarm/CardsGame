@@ -3,39 +3,27 @@ using UnityEngine;
 
 public class DeckManager : MonoBehaviour
 {
-    public List<Card> allCards;
-    public Transform handArea;
+    public List<Card> cardDeck = new List<Card>();
+    public Transform handZone;
     public GameObject cardPrefab;
 
-    private List<Card> deck = new();
+    public static DeckManager Instance;
 
-    void Start()
+    void Awake()
     {
-        deck = new List<Card>(allCards);
-        ShuffleDeck();
-    }
-
-    public void ShuffleDeck()
-    {
-        for (int i = 0; i < deck.Count; i++)
-        {
-            Card temp = deck[i];
-            int rand = Random.Range(i, deck.Count);
-            deck[i] = deck[rand];
-            deck[rand] = temp;
-        }
+        Instance = this;
     }
 
     public void DrawCard()
     {
-        if (deck.Count == 0) return;
+        if (cardDeck.Count == 0) return;
 
-        Card cardToDraw = deck[0];
-        deck.RemoveAt(0);
+        Card card = cardDeck[0];
+        cardDeck.RemoveAt(0);
 
-        GameObject newCard = Instantiate(cardPrefab, handArea);
+        GameObject newCard = Instantiate(cardPrefab, handZone);
         CardDisplay display = newCard.GetComponent<CardDisplay>();
-        display.card = cardToDraw;
+        display.card = card;
     }
 }
 
