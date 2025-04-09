@@ -36,7 +36,7 @@ public class ClickToDamageController : MonoBehaviour
         }
         
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        Debug.DrawRay(ray.origin, ray.direction * 100f, Color.red, 2.0f);
+        Debug.DrawRay(ray.origin, ray.direction * 100f, Color.red, 5.0f);
         RaycastHit hit;
 
         Debug.Log("Casting Ray from mouse position");
