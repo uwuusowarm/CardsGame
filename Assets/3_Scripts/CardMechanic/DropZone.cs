@@ -8,10 +8,8 @@ public class DropZone : MonoBehaviour, IDropHandler
         GameObject droppedCard = eventData.pointerDrag;
         if (droppedCard == null) return;
 
-        // Elternobjekt neu setzen
         droppedCard.transform.SetParent(transform);
 
-        // Positionierung im lokalen Raum (zentrisch!)
         RectTransform cardRect = droppedCard.GetComponent<RectTransform>();
         if (cardRect != null)
         {
