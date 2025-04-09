@@ -9,10 +9,20 @@ public class CardTemplate : MonoBehaviour
 
     [Header("Card Name")] public String cardName;
 
-    [Header("Left Value")] [Range(0, 10)] public int leftVal = 1;
-
-    [Header("Right Value")] [Range(0, 10)] public int rightVal = 1;
-
+    [Header("Left Action")]
+    [Tooltip("Select the action for the left slot from the predefined list.")]
+    public ActionList actionLeft = ActionList.Attack; 
+    
+    [Tooltip("Value associated with the left action.")] [Range(0, 10)]
+    public int leftVal = 1;
+    
+    [Header("Right Action")]
+    [Tooltip("Select the action for the right slot from the predefined list.")]
+    public ActionList actionRight = ActionList.Attack; 
+    
+    [Tooltip("Value associated with the left action.")] [Range(0, 10)]
+    public int rightVal = 1;
+    
     [Header("Range Value")] [Range(1, 3)] public int rangeVal = 1;
 
     [Header("Effect")] public String effectName;
@@ -20,7 +30,7 @@ public class CardTemplate : MonoBehaviour
     [Header("Illustration")] public Sprite illustrationBig;
     
     [Header("Icons")] public Sprite iconLeft; public Sprite iconRight;
-
+    
     private TextMeshProUGUI valLeftText;
     private TextMeshProUGUI valRightText;
     private TextMeshProUGUI effectNameText;
@@ -28,8 +38,7 @@ public class CardTemplate : MonoBehaviour
     private Image leftIconImage;
     private Image rightIconImage;
     private Image illustrationImage;
-
-
+    
     void Awake()
     {
         valLeftText = transform.Find("valLeft").GetComponent<TextMeshProUGUI>();
