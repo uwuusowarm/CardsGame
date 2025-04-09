@@ -1,56 +1,52 @@
-using TMPro;
+using TMPro; 
 using UnityEngine;
 
 public class HealthManager : MonoBehaviour
 {
-    [Header("Health Value")] [Range(0, 10)] public int health = 1;
-    
-    private TextMeshProUGUI healthText;
-    private RectTransform healthBarTransform;
-    
-    public GameObject parentObject;
+    [Header("Health Value")]
+    [Range(0, 30)]
+    public int health = 1; 
 
-    public bool takeDamage = false;
-    private int damage =1;
+    private TextMeshProUGUI healthText; 
+    private RectTransform healthBarTransform; 
+
+    private int maxHealth; 
     
-    private int maxHealth;
     void Awake()
     {
         maxHealth = health;
-        healthText = transform.Find("healthVal").GetComponent<TextMeshProUGUI>();
         
-        Transform healthBar = transform.Find("healthBar");
+        Transform textChild = transform.Find("healthVal");
+        if (textChild) healthText = textChild.GetComponent<TextMeshProUGUI>();
 
-        if (healthBar != null)
-            healthBarTransform = healthBar.GetComponent<RectTransform>();
+        Transform barChild = transform.Find("healthBar");
+        if (barChild) healthBarTransform = barChild.GetComponent<RectTransform>();
     }
+
     void Start()
     {
-        if (healthText != null) healthText.text = health.ToString();
-    }
-    
-    void Update()
-    {
-        if(takeDamage) TakeDamage(damage);
+        UpdateHealthUI(); 
     }
 
     public void TakeDamage(int damage)
     {
-        if (health > 0)
+        health -= damage; 
+
+        if (health <= 0)
         {
-            health -= damage;
-            UpdateHealthUI();
+            health = 0; 
+            if (transform.parent.gameObject != null)
+            {
+                Destroy(transform.parent.gameObject);
+            }
         }
-        else if (health <= 0)
-        {
-            Destroy(parentObject);
-        }
+        UpdateHealthUI();
     }
+
     private void UpdateHealthUI()
     {
-
         if (healthText != null)
-            healthText.text = health.ToString();
+            healthText.text = health.ToString(); 
 
         if (healthBarTransform != null)
         {
@@ -58,5 +54,4 @@ public class HealthManager : MonoBehaviour
             healthBarTransform.localScale = new Vector3(scaleX, 1f, 1f);
         }
     }
-    
 }
