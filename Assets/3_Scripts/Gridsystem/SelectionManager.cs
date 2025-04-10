@@ -9,9 +9,6 @@ public class SelectionManager : MonoBehaviour
     [SerializeField] private Camera mainCamera;
 
     public LayerMask selectionMask;
-    //public HexGrid hexGrid;
-
-    //List<Vector3Int> neighbours = new List<Vector3Int>();
 
     public UnityEvent<GameObject> OnUnitySelected;
     public UnityEvent<GameObject> TerrainSelected;

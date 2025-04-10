@@ -9,7 +9,6 @@ public class Hex : MonoBehaviour
     [SerializeField] private GlowHighlight highlight;
     private HexCoordinates hexCoordinates;
     [SerializeField] private HexType hexType;
-    //Feld belegt(test)
     private Unit unitOnHex;
 
     public Vector3Int hexCoords => hexCoordinates.GetHexCoords();
@@ -39,12 +38,10 @@ public class Hex : MonoBehaviour
     public void EnableHighlight()
     {
         highlight.ToggleGlow(true);
-        Debug.Log("Highlight enabled for " + hexCoords);
     }
     public void DisableHighlight()
     {
         highlight.ToggleGlow(false);
-        Debug.Log("Highlight disabled for " + hexCoords);
     }
 
     internal void ResetHighlight()

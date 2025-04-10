@@ -56,6 +56,7 @@ public class CardState : MonoBehaviour
         if (currentZone != DropType.Graveyard)
         {
             Debug.Log($"Karte '{cardDisplay?.card?.cardName ?? name}' von Zone '{currentZone}' zum Friedhof gesendet.");
+            UnitManager.Instance.ActivateMovement();
             GameObject graveyardObject = GameObject.Find("GraveyardZone");
 
             if (graveyardObject != null)

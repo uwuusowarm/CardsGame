@@ -7,12 +7,19 @@ public class UnitManager : MonoBehaviour
 {
     [SerializeField] private HexGrid hexGrid;
     [SerializeField] private MovementSystem movementSystem;
+    [SerializeField] private EnemyUnit enemyUnit;
+
+    public static UnitManager Instance;
 
     public bool PlayersTurn { get; private set; } = true;
 
     [SerializeField] private Unit selectedUnit;
     private Hex previouslySelectedHex;
 
+    void Awake()
+    {
+        Instance = this;
+    }
     public void HandleUnitSelected(GameObject unit)
     {
         if (PlayersTurn == false) return;
@@ -57,7 +64,15 @@ public class UnitManager : MonoBehaviour
 
         this.selectedUnit = unitReference;
         this.selectedUnit.Select();
-        movementSystem.ShowRange(this.selectedUnit, this.hexGrid);
+
+        if (hexGrid != null)
+        {
+            movementSystem.ShowRange(this.selectedUnit, this.hexGrid);
+        }
+        else
+        {
+            Debug.LogError("HexGrid reference fehlt!");
+        }
     }
 
     private void ClearOldSelection()
@@ -106,5 +121,29 @@ public class UnitManager : MonoBehaviour
     {
         selectedUnit.MovementFinished -= ResetTurn;
         PlayersTurn = true;
+        if (enemyUnit != null)
+        {
+            Debug.Log("Enemy found");
+            enemyUnit.MoveTowardsPlayer();
+        }
+        else
+        {
+            Debug.LogError("No Enemy!");
+        }
+    }
+
+    public void ActivateMovement()
+    {
+        if (PlayersTurn == false) return;
+
+        Unit[] units = FindObjectsOfType<Unit>();
+        if (units.Length == 0)
+        {
+            Debug.LogWarning("Keine Unit gefunden!");
+            return;
+        }
+
+        selectedUnit = units[0];
+        PrepareUnitForMovement(selectedUnit);
     }
 }
