@@ -1,22 +1,70 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [SelectionBase]
 public class EnemyUnit : Unit  
 {
+    private Unit playerUnit;
     private void Start()
     {
         GetComponentInChildren<Renderer>().material.color = Color.red;
-
-        HexGrid hexGrid = FindObjectOfType<HexGrid>();
-        if (hexGrid != null)
+        StartCoroutine(InitializeHexPosition());
+        playerUnit = FindObjectOfType<Unit>();
+    }
+    public void MoveTowardsPlayer()
+    {
+        if (playerUnit == null)
         {
-            Hex startHex = hexGrid.GetTileAt(hexGrid.GetClosestHex(transform.position));
-            if (startHex != null) startHex.SetUnit(this);
+            return;
         }
+
+        if (currentHex == null)
+        {
+            return;
+        }
+
+
+        Vector3Int playerHexCoords = HexGrid.Instance.GetClosestHex(playerUnit.transform.position);
+
+        Vector3Int direction = FindBestDirection(playerHexCoords, currentHex.hexCoords);
+
+        Vector3Int targetHexCoords = currentHex.hexCoords + direction;
+        Hex targetHex = HexGrid.Instance.GetTileAt(targetHexCoords);
+
+        if (targetHex == null)
+        {
+            return;
+        }
+
+        if (targetHex.IsOccupied())
+        {
+            return;
+        }
+        List<Vector3> path = new List<Vector3> { targetHex.transform.position };
+        MoveTroughPath(path);
     }
 
-    /*public override void MoveTroughPath(List<Vector3> currentPath)
+    private Vector3Int FindBestDirection(Vector3Int playerPos, Vector3Int enemyPos)
     {
-        Debug.Log("No Move");
-    }*/
+        List<Vector3Int> possibleDirections = Direction.GetDirectionList(enemyPos.z);
+        Vector3Int bestDirection = Vector3Int.zero;
+        float shortestDistance = float.MaxValue;
+
+        foreach (Vector3Int dir in possibleDirections)
+        {
+            Vector3Int neighborPos = enemyPos + dir;
+            float distance = Vector3Int.Distance(neighborPos, playerPos);
+
+            if (distance < shortestDistance)
+            {
+                Hex neighborHex = HexGrid.Instance.GetTileAt(neighborPos);
+                if (neighborHex != null && !neighborHex.IsOccupied())
+                {
+                    shortestDistance = distance;
+                    bestDirection = dir;
+                }
+            }
+        }
+        return bestDirection;
+    }
 }

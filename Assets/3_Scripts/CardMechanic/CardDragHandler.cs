@@ -115,14 +115,11 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 if (dropZone.zoneType == DropType.Player1Ablage ||
                     dropZone.zoneType == DropType.Player2Ablage ||
-                    dropZone.zoneType == DropType.Hand)
+                    dropZone.zoneType == DropType.Graveyard)
                 {
                     droppedOnValidZone = true;
                     Debug.Log($"Auf gültiger Zone ({dropZone.zoneType}) abgelegt: {dropZone.gameObject.name}");
-                }
-                else
-                {
-                     Debug.Log($"Ablegen auf Zone {dropZone.zoneType} nicht erlaubt.");
+                    return;
                 }
             }
         }

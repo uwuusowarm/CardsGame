@@ -7,8 +7,7 @@ using UnityEngine;
 public class Unit : MonoBehaviour
 {
     [SerializeField] private int movementPoints = 20;
-    //Test
-    private Hex currentHex;
+    protected Hex currentHex;
     public int MovementPoints { get => movementPoints; }
 
     [SerializeField] private float movementDuration = 1, rotationDuration = 0.3f;
@@ -16,15 +15,37 @@ public class Unit : MonoBehaviour
     private Queue<Vector3> pathPositions = new Queue<Vector3>();
     public event Action<Unit> MovementFinished;
 
-    //Test
     private void Start()
     {
-        HexGrid hexGrid = FindObjectOfType<HexGrid>();
-        currentHex = hexGrid.GetTileAt(hexGrid.GetClosestHex(transform.position));
-        currentHex.SetUnit(this);
+        StartCoroutine(InitializeHexPosition());
     }
 
-    //
+    protected IEnumerator InitializeHexPosition()
+    {
+        yield return new WaitUntil(() => HexGrid.Instance != null);
+
+        HexGrid hexGrid = HexGrid.Instance;
+        Vector3Int hexCoords = hexGrid.GetClosestHex(transform.position);
+        currentHex = hexGrid.GetTileAt(hexCoords);
+
+        if (currentHex != null)
+        {
+            if (currentHex.IsOccupied())
+            {
+                Debug.LogError($"Hex at {hexCoords} is already occupied!");
+            }
+            else
+            {
+                currentHex.SetUnit(this);
+                Debug.Log($"Unit initialized at {hexCoords}");
+            }
+        }
+        else
+        {
+            Debug.LogError($"Failed to initialize unit at {hexCoords}");
+        }
+    }
+
     private void Awake()
     {
         glowHighlight = GetComponent<GlowHighlight>();

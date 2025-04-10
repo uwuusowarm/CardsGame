@@ -10,6 +10,25 @@ public class HexGrid : MonoBehaviour
     public static float xOffset = 2f;
     public static float zOffset = 1.73f;
 
+    public static HexGrid Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        InitializeGrid();
+    }
+    private void InitializeGrid()
+    {
+    }
+
     private void Start()
     {
         foreach (Hex hex in FindObjectsOfType<Hex>())

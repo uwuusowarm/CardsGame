@@ -5,16 +5,21 @@ using UnityEngine;
 
 public class MovementSystem : MonoBehaviour
 {
-    private BFSResult movementRange = new BFSResult();
+    private BFSResult movementRange = new BFSResult(new Dictionary<Vector3Int, Vector3Int?>());
     private List<Vector3Int> currentPath = new List<Vector3Int>();
 
     public void HideRange(HexGrid hexGrid)
     {
+        if (movementRange.visitedNodesDict == null) return;
+
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
-            hexGrid.GetTileAt(hexPosition).DisableHighlight();
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            if (hex != null)
+            {
+                hex.DisableHighlight();
+            }
         }
-        movementRange = new BFSResult();
     }
 
     public void ShowRange(Unit selectedUnit, HexGrid hexGrid)
@@ -24,6 +29,14 @@ public class MovementSystem : MonoBehaviour
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
             hexGrid.GetTileAt(hexPosition).EnableHighlight();
+        }
+    }
+    public void AutoShowRange(Unit unit, HexGrid grid)
+    {
+        CalcualteRange(unit, grid);
+        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        {
+            grid.GetTileAt(hexPosition).EnableHighlight();
         }
     }
 
