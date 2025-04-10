@@ -4,12 +4,25 @@ using UnityEngine;
 [SelectionBase]
 public class EnemyUnit : Unit  
 {
+    [Header("Health")]
+    public int maxHealth = 3;
+    private int currentHealth;
+
+    [Header("Visuals")]
+    public Material normalMaterial;
+    public Material highlightMaterial;
+    private Renderer rend;
+    private bool isHighlighted = false;
+
     private Unit playerUnit;
     private void Start()
     {
         GetComponentInChildren<Renderer>().material.color = Color.red;
         StartCoroutine(InitializeHexPosition());
         playerUnit = FindObjectOfType<Unit>();
+        currentHealth = maxHealth;
+        rend = GetComponentInChildren<Renderer>();
+        rend.material = normalMaterial;
     }
     public void MoveTowardsPlayer()
     {
@@ -66,5 +79,30 @@ public class EnemyUnit : Unit
             }
         }
         return bestDirection;
+    }
+    public void ToggleHighlight()
+    {
+        isHighlighted = !isHighlighted;
+        rend.material = isHighlighted ? highlightMaterial : normalMaterial;
+    }
+
+    private void OnMouseDown()
+    {
+        if (isHighlighted)
+        {
+            TakeDamage(1);
+            ToggleHighlight();
+        }
+    }
+
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        Debug.Log($"Gegner getroffen! Verbleibende HP: {currentHealth}");
+
+        if (currentHealth <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 }
