@@ -11,7 +11,7 @@ public class GraphSearch
     public static BFSResult BFSGetRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
     {
         Dictionary<Vector3Int, Vector3Int?> visitedNodes = new Dictionary<Vector3Int, Vector3Int?>();
-        Dictionary<Vector3Int, int> costSoFar = new Dictionary<Vector3Int, int>(); 
+        Dictionary<Vector3Int, int> costSoFar = new Dictionary<Vector3Int, int>();
         Queue<Vector3Int> nodesToVisitQueue = new Queue<Vector3Int>();
 
         nodesToVisitQueue.Enqueue(startPoint);
@@ -36,7 +36,7 @@ public class GraphSearch
                 {
                     if (!visitedNodes.ContainsKey(neighbourPosition))
                     {
-                        visitedNodes[neighbourPosition] = currentNode; 
+                        visitedNodes[neighbourPosition] = currentNode;
                         costSoFar[neighbourPosition] = newCost;
                         nodesToVisitQueue.Enqueue(neighbourPosition);
                     }

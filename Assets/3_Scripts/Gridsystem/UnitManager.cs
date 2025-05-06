@@ -1,30 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SearchService;
 using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] private HexGrid hexGrid;
     [SerializeField] private MovementSystem movementSystem;
-    [SerializeField] private EnemyUnit enemyUnit;
+    [SerializeField] private List<EnemyUnit> enemyUnits = new List<EnemyUnit>();
 
-    public static UnitManager Instance;
-
+    public static UnitManager Instance { get; private set; }
     public bool PlayersTurn { get; private set; } = true;
 
     [SerializeField] private Unit selectedUnit;
     private Hex previouslySelectedHex;
+    public Unit SelectedUnit => selectedUnit;
+    private bool isFirstTurn = true;
 
     void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
+
     public void HandleUnitSelected(GameObject unit)
     {
-        if (PlayersTurn == false) return;
+        if (!PlayersTurn) return;
 
-        Unit unitReference = unit.GetComponent<Unit>();
+        if (!unit.TryGetComponent<Unit>(out var unitReference)) return;
 
         if (CheckIfTheSameUnitSelected(unitReference)) return;
 
@@ -33,7 +42,7 @@ public class UnitManager : MonoBehaviour
 
     private bool CheckIfTheSameUnitSelected(Unit unitReference)
     {
-        if (this.selectedUnit == unitReference)
+        if (selectedUnit == unitReference)
         {
             ClearOldSelection();
             return true;
@@ -43,44 +52,31 @@ public class UnitManager : MonoBehaviour
 
     public void HandleTerrainSelected(GameObject hexGO)
     {
-        if (selectedUnit == null || PlayersTurn == false)
-        {
-            return;
-        }
+        if (selectedUnit == null || !PlayersTurn) return;
 
-        Hex selectedHex = hexGO.GetComponent<Hex>();
+        if (!hexGO.TryGetComponent<Hex>(out var selectedHex)) return;
 
-        if (HandleHexOutOfRange(selectedHex.HexCoords) || HandleSelectedHexIsUnitHex(selectedHex.HexCoords)) return;
+        if (HandleHexOutOfRange(selectedHex.HexCoords) ||
+            HandleSelectedHexIsUnitHex(selectedHex.HexCoords)) return;
 
         HandleTargetHexSelected(selectedHex);
     }
 
-    private void PrepareUnitForMovement(Unit unitReference)
+    public void PrepareUnitForMovement(Unit unitReference)
     {
-        if (this.selectedUnit != null)
-        {
-            ClearOldSelection();
-        }
+        selectedUnit?.Deselect();
 
-        this.selectedUnit = unitReference;
-        this.selectedUnit.Select();
-
-        if (hexGrid != null)
-        {
-            movementSystem.ShowRange(this.selectedUnit, this.hexGrid);
-        }
-        else
-        {
-            Debug.LogError("HexGrid reference fehlt!");
-        }
+        selectedUnit = unitReference;
+        selectedUnit.Select();
+        movementSystem.ShowRange(selectedUnit, hexGrid);
     }
 
     private void ClearOldSelection()
     {
         previouslySelectedHex = null;
-        this.selectedUnit.Deselect();
-        movementSystem.HideRange(this.hexGrid);
-        this.selectedUnit = null;
+        selectedUnit?.Deselect();
+        movementSystem.HideRange(hexGrid);
+        selectedUnit = null;
     }
 
     private void HandleTargetHexSelected(Hex selectedHex)
@@ -88,62 +84,103 @@ public class UnitManager : MonoBehaviour
         if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
         {
             previouslySelectedHex = selectedHex;
-            movementSystem.ShowPath(selectedHex.HexCoords, this.hexGrid);
+            movementSystem.ShowPath(selectedHex.HexCoords, hexGrid);
         }
         else
         {
-            movementSystem.MoveUnit(selectedUnit, this.hexGrid);
+            movementSystem.MoveUnit(selectedUnit, hexGrid);
             PlayersTurn = false;
-            selectedUnit.MovementFinished += ResetTurn;
+            selectedUnit.MovementFinished += OnMovementFinished;
             ClearOldSelection();
         }
     }
+
+    private void OnMovementFinished(Unit unit)
+    {
+        unit.MovementFinished -= OnMovementFinished;
+        EndPlayerTurn();
+    }
+
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)
     {
         if (hexPosition == hexGrid.GetClosestHex(selectedUnit.transform.position))
         {
-            selectedUnit.Deselect();
             ClearOldSelection();
             return true;
         }
         return false;
     }
+
     private bool HandleHexOutOfRange(Vector3Int hexPosition)
     {
-        if (movementSystem.IsHexInRange(hexPosition) == false)
+        if (!movementSystem.IsHexInRange(hexPosition))
         {
-            Debug.Log("Hex Out of range!");
+            Debug.Log("Hex out of range!");
             return true;
         }
         return false;
     }
-    private void ResetTurn(Unit selectedUnit)
+
+    public void EndPlayerTurn()
     {
-        selectedUnit.MovementFinished -= ResetTurn;
+        PlayersTurn = false;
+        ClearOldSelection();
+        if (CardManager.Instance != null)
+        {
+            CardManager.Instance.DiscardHand();
+        }
+
+        StartCoroutine(EnemyTurnRoutine());
+    }
+
+    private IEnumerator EnemyTurnRoutine()
+    {
+        foreach (var enemy in enemyUnits)
+        {
+            if (enemy != null)
+            {
+                enemy.MoveTowardsPlayer();
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+        StartPlayerTurn();
+    }
+
+    public void StartPlayerTurn()
+    {
         PlayersTurn = true;
-        if (enemyUnit != null)
+
+        if (!isFirstTurn)
         {
-            Debug.Log("Enemy found");
-            enemyUnit.MoveTowardsPlayer();
+            CardManager.Instance.DrawCards(2);
         }
-        else
+        isFirstTurn = false;
+    }
+
+    public void RegisterEnemy(EnemyUnit enemy)
+    {
+        if (!enemyUnits.Contains(enemy))
         {
-            Debug.LogError("No Enemy!");
+            enemyUnits.Add(enemy);
         }
+    }
+
+    public void UnregisterEnemy(EnemyUnit enemy)
+    {
+        enemyUnits.Remove(enemy);
     }
 
     public void ActivateMovement()
     {
-        if (PlayersTurn == false) return;
+        if (!PlayersTurn) return;
 
-        Unit[] units = FindObjectsOfType<Unit>();
+        var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
         if (units.Length == 0)
         {
-            Debug.LogWarning("Keine Unit gefunden!");
+            Debug.LogWarning("No units found!");
             return;
         }
 
-        selectedUnit = units[0];
-        PrepareUnitForMovement(selectedUnit);
+        PrepareUnitForMovement(units[0]);
     }
 }

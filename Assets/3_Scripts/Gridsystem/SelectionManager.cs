@@ -52,6 +52,6 @@ public class SelectionManager : MonoBehaviour
             return true;
         }
         result = null;
-        return false; 
+        return false;
     }
 }

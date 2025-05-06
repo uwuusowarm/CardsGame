@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEngine.UI; 
 
 [RequireComponent(typeof(Button))] 
@@ -48,4 +48,4 @@ public class DamageButtonHelper : MonoBehaviour
         Debug.Log(damageInfo.leftVal, this);
         damageController.ActivateDamageMode(damageToDeal);
     }
-}
+}*/

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [SelectionBase]
-public class EnemyUnit : Unit  
+public class EnemyUnit : Unit
 {
     [Header("Health")]
     public int maxHealth = 3;

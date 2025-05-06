@@ -23,7 +23,7 @@ public class DropZone : MonoBehaviour, IDropHandler
     {
         foreach (EnemyUnit enemy in FindObjectsOfType<EnemyUnit>())
         {
-            enemy.ToggleHighlight();
+            //enemy.ToggleHighlight();
         }
     }
 
@@ -40,11 +40,11 @@ public class DropZone : MonoBehaviour, IDropHandler
                 card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             }
 
-            // Highlight aller Gegner entfernen
+            
             foreach (EnemyUnit enemy in FindObjectsOfType<EnemyUnit>())
             {
-                if (enemy != null)
-                    enemy.ToggleHighlight();
+                if (enemy != null) ;
+                    //enemy.ToggleHighlight();
             }
         }
     }

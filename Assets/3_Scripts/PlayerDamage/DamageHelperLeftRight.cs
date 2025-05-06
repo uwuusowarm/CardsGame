@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEngine.UI;
 
 // Make sure PossibleAction enum is defined
@@ -67,4 +67,4 @@ public class DamagHelperLeftRight : MonoBehaviour
         
         Debug.Log($"No slot on parent '{parentTransform.name}' is set to 'Attack'. Damage mode not activated.");
     }
-}
+}*/

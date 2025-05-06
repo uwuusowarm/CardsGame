@@ -8,6 +8,7 @@ public class Unit : MonoBehaviour
 {
     [SerializeField] private int movementPoints = 20;
     protected Hex currentHex;
+    public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
 
     [SerializeField] private float movementDuration = 1, rotationDuration = 0.3f;
@@ -18,6 +19,20 @@ public class Unit : MonoBehaviour
     private void Start()
     {
         StartCoroutine(InitializeHexPosition());
+    }
+
+    public void Attack(int damage)
+    {
+        
+    }
+
+    public void Heal(int amount)
+    {
+        
+    }
+    public void AddMovementPoints(int points)
+    {
+        movementPoints += points;
     }
 
     protected IEnumerator InitializeHexPosition()
@@ -104,7 +119,7 @@ public class Unit : MonoBehaviour
         while (timeElapsed < movementDuration)
         {
             timeElapsed += Time.deltaTime;
-            float lerpStep = timeElapsed/movementDuration;
+            float lerpStep = timeElapsed / movementDuration;
             transform.position = Vector3.Lerp(startPosition, endPosition, lerpStep);
             yield return null;
         }

@@ -2,6 +2,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.VisualScripting;
 
 public class HexGrid : MonoBehaviour
 {
@@ -25,6 +26,35 @@ public class HexGrid : MonoBehaviour
 
         InitializeGrid();
     }
+
+    public void AddMovementPoints(int points)
+    {
+        if (UnitManager.Instance == null)
+        {
+            Debug.LogError("UnitManager nicht gefunden!");
+            return;
+        }
+        if (UnitManager.Instance.SelectedUnit == null)
+        {
+            var playerUnits = FindObjectsOfType<Unit>();
+            foreach (var unit in playerUnits)
+            {
+                if (!unit.IsEnemy)
+                {
+                    UnitManager.Instance.PrepareUnitForMovement(unit);
+                    break;
+                }
+            }
+        }
+        if (UnitManager.Instance.SelectedUnit != null)
+        {
+            UnitManager.Instance.SelectedUnit.AddMovementPoints(points);
+        }
+        else
+        {
+            Debug.LogWarning("Keine Einheit für Bewegung gefunden!");
+        }
+    }
     private void InitializeGrid()
     {
     }
@@ -47,7 +77,7 @@ public class HexGrid : MonoBehaviour
     }
 
     public Hex GetTileAt(Vector3Int hexCoordinates)
-    { 
+    {
         Hex result = null;
         hexTileDict.TryGetValue(hexCoordinates, out result);
         return result;
@@ -65,7 +95,7 @@ public class HexGrid : MonoBehaviour
 
         foreach (var direction in Direction.GetDirectionList(hexCoordinates.z))
         {
-            if (hexTileDict.ContainsKey(hexCoordinates +  direction))
+            if (hexTileDict.ContainsKey(hexCoordinates + direction))
             {
                 hexTileNeighboursDict[hexCoordinates].Add(hexCoordinates + direction);
             }
@@ -97,5 +127,5 @@ public static class Direction
     };
 
     public static List<Vector3Int> GetDirectionList(int z)
-        => z % 2 == 0? directionsOffsetEven : directionsOffsetOdd;
+        => z % 2 == 0 ? directionsOffsetEven : directionsOffsetOdd;
 }
