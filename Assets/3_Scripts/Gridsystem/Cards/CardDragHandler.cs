@@ -72,6 +72,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 case CardEffect.EffectType.Move:
                     HexGrid.Instance?.AddMovementPoints(effect.value);
+                    UnitManager.Instance?.ActivateMovement();
                     break;
 
                 case CardEffect.EffectType.Attack:
