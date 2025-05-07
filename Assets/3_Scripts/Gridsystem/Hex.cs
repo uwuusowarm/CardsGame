@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 [SelectionBase]
@@ -9,7 +10,7 @@ public class Hex : MonoBehaviour
     [SerializeField] private GlowHighlight highlight;
     private HexCoordinates hexCoordinates;
     [SerializeField] private HexType hexType;
-    private Unit unitOnHex;
+    public Unit UnitOnHex { get; private set; }
 
     public Vector3Int hexCoords => hexCoordinates.GetHexCoords();
 
@@ -26,7 +27,7 @@ public class Hex : MonoBehaviour
 
     public bool IsObstacle()
     {
-        return this.hexType == HexType.Obstacle || unitOnHex != null;
+        return this.hexType == HexType.Obstacle || UnitOnHex != null;
     }
 
     private void Awake()
@@ -54,17 +55,28 @@ public class Hex : MonoBehaviour
     }
     public bool IsOccupied()
     {
-        return unitOnHex != null || this.hexType == HexType.Obstacle;
+        return UnitOnHex != null || this.hexType == HexType.Obstacle;
     }
 
     public void SetUnit(Unit unit)
     {
-        unitOnHex = unit;
+        if (unit != null)
+        {
+            //Debug.Log($"Setting unit {unit.name} on hex {hexCoords}");
+            UnitOnHex = unit;
+        }
     }
 
     public void ClearUnit()
     {
-        unitOnHex = null;
+        UnitOnHex = null;
+    }
+
+    private Unit unitOnHex;
+
+    public Unit GetUnit()
+    {
+        return unitOnHex;
     }
 }
 

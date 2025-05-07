@@ -16,8 +16,20 @@ public class Unit : MonoBehaviour
     private Queue<Vector3> pathPositions = new Queue<Vector3>();
     public event Action<Unit> MovementFinished;
 
+    private void Awake()
+    {
+        glowHighlight = GetComponent<GlowHighlight>();
+        if (glowHighlight == null)
+        {
+            Debug.LogError("GlowHighlight component missing on Unit!", gameObject);
+        }
+    }
     private void Start()
     {
+        if (glowHighlight == null)
+        {
+            glowHighlight = GetComponent<GlowHighlight>();
+        }
         StartCoroutine(InitializeHexPosition());
     }
 
@@ -60,12 +72,6 @@ public class Unit : MonoBehaviour
             Debug.LogError($"Failed to initialize unit at {hexCoords}");
         }
     }
-
-    private void Awake()
-    {
-        glowHighlight = GetComponent<GlowHighlight>();
-    }
-
     internal void Deselect()
     {
         glowHighlight.ToggleGlow(false);

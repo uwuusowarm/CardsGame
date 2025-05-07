@@ -1,108 +1,79 @@
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
-[SelectionBase]
-public class EnemyUnit : Unit
+public class EnemyUnit : MonoBehaviour
 {
-    [Header("Health")]
+    [Header("Health Settings")]
     public int maxHealth = 3;
-    private int currentHealth;
+    public int currentHealth { get; private set; }
 
     [Header("Visuals")]
     public Material normalMaterial;
     public Material highlightMaterial;
-    private Renderer rend;
+    private Renderer enemyRenderer;
     private bool isHighlighted = false;
+    public Hex currentHex { get; private set; }
 
-    private Unit playerUnit;
+    private void Awake()
+    {
+        enemyRenderer = GetComponentInChildren<Renderer>();
+        if (enemyRenderer == null)
+        {
+            Debug.LogError("Renderer not found on EnemyUnit!", this);
+        }
+    }
+
     private void Start()
     {
-        GetComponentInChildren<Renderer>().material.color = Color.red;
-        StartCoroutine(InitializeHexPosition());
-        playerUnit = FindObjectOfType<Unit>();
         currentHealth = maxHealth;
-        rend = GetComponentInChildren<Renderer>();
-        rend.material = normalMaterial;
-    }
-    public void MoveTowardsPlayer()
-    {
-        if (playerUnit == null)
-        {
-            return;
-        }
-
-        if (currentHex == null)
-        {
-            return;
-        }
-
-
-        Vector3Int playerHexCoords = HexGrid.Instance.GetClosestHex(playerUnit.transform.position);
-
-        Vector3Int direction = FindBestDirection(playerHexCoords, currentHex.hexCoords);
-
-        Vector3Int targetHexCoords = currentHex.hexCoords + direction;
-        Hex targetHex = HexGrid.Instance.GetTileAt(targetHexCoords);
-
-        if (targetHex == null)
-        {
-            return;
-        }
-
-        if (targetHex.IsOccupied())
-        {
-            return;
-        }
-        List<Vector3> path = new List<Vector3> { targetHex.transform.position };
-        MoveTroughPath(path);
+        ResetMaterial();
+        StartCoroutine(VerifyHexPosition());
     }
 
-    private Vector3Int FindBestDirection(Vector3Int playerPos, Vector3Int enemyPos)
+    public void ToggleHighlight(bool highlight)
     {
-        List<Vector3Int> possibleDirections = Direction.GetDirectionList(enemyPos.z);
-        Vector3Int bestDirection = Vector3Int.zero;
-        float shortestDistance = float.MaxValue;
+        if (enemyRenderer == null) return;
 
-        foreach (Vector3Int dir in possibleDirections)
-        {
-            Vector3Int neighborPos = enemyPos + dir;
-            float distance = Vector3Int.Distance(neighborPos, playerPos);
-
-            if (distance < shortestDistance)
-            {
-                Hex neighborHex = HexGrid.Instance.GetTileAt(neighborPos);
-                if (neighborHex != null && !neighborHex.IsOccupied())
-                {
-                    shortestDistance = distance;
-                    bestDirection = dir;
-                }
-            }
-        }
-        return bestDirection;
+        isHighlighted = highlight;
+        enemyRenderer.material = highlight ? highlightMaterial : normalMaterial;
     }
-    public void ToggleHighlight()
+
+    private void ResetMaterial()
     {
-        isHighlighted = !isHighlighted;
-        rend.material = isHighlighted ? highlightMaterial : normalMaterial;
+        if (enemyRenderer != null)
+        {
+            enemyRenderer.material = normalMaterial;
+        }
     }
 
     private void OnMouseDown()
     {
-        if (isHighlighted)
+        if (UnitManager.Instance.PlayersTurn && isHighlighted)
         {
-            TakeDamage(1);
-            ToggleHighlight();
+            AttackManager.Instance?.HandleEnemyClick(this);
         }
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int damage)
     {
-        currentHealth -= amount;
-        Debug.Log($"Gegner getroffen! Verbleibende HP: {currentHealth}");
+        currentHealth -= damage;
+        Debug.Log($"Enemy hit! Remaining HP: {currentHealth}");
 
         if (currentHealth <= 0)
         {
             Destroy(gameObject);
         }
+    }
+
+    private IEnumerator VerifyHexPosition()
+    {
+        yield return new WaitForSeconds(1);
+        Vector3Int hexCoords = HexGrid.Instance.GetClosestHex(transform.position);
+        currentHex = HexGrid.Instance.GetTileAt(hexCoords);
+
+        if (currentHex == null)
+            Debug.LogError("Enemy not on grid!");
+        else
+            Debug.Log($"Enemy registered at {hexCoords}");
     }
 }

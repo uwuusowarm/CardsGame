@@ -23,20 +23,14 @@ public class CardCreatorWindow : EditorWindow
     private void OnGUI()
     {
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-
-        // Basis-Informationen
         EditorGUILayout.LabelField("Card Basics", EditorStyles.boldLabel);
         newCard.cardName = EditorGUILayout.TextField("Name", newCard.cardName);
         newCard.manaCost = EditorGUILayout.IntField("Mana Cost", newCard.manaCost);
         newCard.description = EditorGUILayout.TextArea(newCard.description, GUILayout.Height(50));
         newCard.cardArt = (Sprite)EditorGUILayout.ObjectField("Art", newCard.cardArt, typeof(Sprite), false);
-
-        // Effekt-Sektionen
         DrawEffectSection("Left Swipe Effects", newCard.leftEffects);
         DrawEffectSection("Right Swipe Effects", newCard.rightEffects);
         DrawEffectSection("Always Active Effects", newCard.alwaysEffects);
-
-        // Speicher-Button
         if (GUILayout.Button("Save Card", GUILayout.Height(40)))
         {
             SaveCard();
@@ -46,37 +40,36 @@ public class CardCreatorWindow : EditorWindow
     }
 
     private void DrawEffectSection(string header, List<CardEffect> effects)
+{
+    EditorGUILayout.Space();
+    EditorGUILayout.LabelField(header, EditorStyles.boldLabel);
+
+    for (int i = 0; i < effects.Count; i++)
     {
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField(header, EditorStyles.boldLabel);
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
-        for (int i = 0; i < effects.Count; i++)
+        effects[i].effectType = (CardEffect.EffectType)EditorGUILayout.EnumPopup("Type", effects[i].effectType);
+        effects[i].value = EditorGUILayout.IntField("Value", effects[i].value);
+        
+        if (effects[i].effectType == CardEffect.EffectType.Attack)
         {
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-
-            effects[i].effectType = (CardEffect.EffectType)EditorGUILayout.EnumPopup("Type", effects[i].effectType);
-            effects[i].value = EditorGUILayout.IntField("Value", effects[i].value);
-            effects[i].isTemporary = EditorGUILayout.Toggle("Is Temporary", effects[i].isTemporary);
-
-            if (effects[i].isTemporary)
-            {
-                effects[i].duration = EditorGUILayout.IntField("Duration (Turns)", effects[i].duration);
-            }
-
-            if (GUILayout.Button("Remove Effect"))
-            {
-                effects.RemoveAt(i);
-                i--;
-            }
-
-            EditorGUILayout.EndVertical();
+            effects[i].range = EditorGUILayout.IntField("Range", effects[i].range);
         }
 
-        if (GUILayout.Button("Add Effect"))
+        if (GUILayout.Button("Remove Effect"))
         {
-            effects.Add(new CardEffect());
+            effects.RemoveAt(i);
+            i--;
         }
+
+        EditorGUILayout.EndVertical();
     }
+
+    if (GUILayout.Button("Add Effect"))
+    {
+        effects.Add(new CardEffect());
+    }
+}
 
     private void SaveCard()
     {

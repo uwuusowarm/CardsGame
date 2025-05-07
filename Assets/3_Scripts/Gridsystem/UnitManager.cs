@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UnitManager : MonoBehaviour
@@ -71,12 +72,13 @@ public class UnitManager : MonoBehaviour
         movementSystem.ShowRange(selectedUnit, hexGrid);
     }
 
-    private void ClearOldSelection()
+    public void ClearOldSelection()
     {
         previouslySelectedHex = null;
         selectedUnit?.Deselect();
         movementSystem.HideRange(hexGrid);
         selectedUnit = null;
+        AttackManager.Instance?.ClearHighlights();
     }
 
     private void HandleTargetHexSelected(Hex selectedHex)
@@ -139,7 +141,7 @@ public class UnitManager : MonoBehaviour
         {
             if (enemy != null)
             {
-                enemy.MoveTowardsPlayer();
+                //enemy.MoveTowardsPlayer();
                 yield return new WaitForSeconds(0.5f);
             }
         }
@@ -173,14 +175,17 @@ public class UnitManager : MonoBehaviour
     public void ActivateMovement()
     {
         if (!PlayersTurn) return;
+        Unit[] playerUnits = FindObjectsByType<Unit>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                            .Where(unit => unit.GetComponent<EnemyUnit>() == null) 
+                            .ToArray();
 
-        var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
-        if (units.Length == 0)
+        if (playerUnits.Length > 0)
         {
-            Debug.LogWarning("No units found!");
-            return;
+            PrepareUnitForMovement(playerUnits[0]); 
         }
-
-        PrepareUnitForMovement(units[0]);
+        else
+        {
+            Debug.LogWarning("Keine Spieler-Unit (ohne EnemyUnit-Skript) gefunden!");
+        }
     }
 }

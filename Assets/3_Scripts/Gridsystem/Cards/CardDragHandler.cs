@@ -23,8 +23,6 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         rectTransform = GetComponent<RectTransform>();
         cardImage = GetComponent<Image>();
         canvas = GetComponentInParent<Canvas>();
-
-        // Automatische Suche der DropZones
         leftActionZone = GameObject.FindGameObjectWithTag(leftZoneTag)?.GetComponent<RectTransform>();
         rightActionZone = GameObject.FindGameObjectWithTag(rightZoneTag)?.GetComponent<RectTransform>();
 
@@ -41,8 +39,6 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         isDragging = false;
         cardImage.raycastTarget = true;
         transform.localScale = Vector3.one;
-
-        // Sicherer Zugriff mit Null-Checks
         if (leftActionZone != null && rightActionZone != null)
         {
             bool isLeftAction = RectTransformUtility.RectangleContainsScreenPoint(leftActionZone, eventData.position);
@@ -72,9 +68,14 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 case CardEffect.EffectType.Move:
                     HexGrid.Instance?.AddMovementPoints(effect.value);
+                    UnitManager.Instance?.ActivateMovement();
                     break;
 
                 case CardEffect.EffectType.Attack:
+                    if (UnitManager.Instance.SelectedUnit != null)
+                    {
+                        AttackManager.Instance.PrepareAttack(effect.value, effect.range);
+                    }
                     break;
             }
         }
