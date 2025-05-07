@@ -61,12 +61,34 @@ public class HexGrid : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("Initializing grid...");
+        foreach (Hex hex in FindObjectsOfType<Hex>())
+        {
+            hexTileDict[hex.hexCoords] = hex;
+            Debug.Log($"Registered hex at {hex.hexCoords}");
+        }
         foreach (Hex hex in FindObjectsOfType<Hex>())
         {
             hexTileDict[hex.hexCoords] = hex;
             hex.HexCoords = hex.hexCoords;
         }
+        foreach (var hexPair in hexTileDict)
+        {
+            hexTileNeighboursDict[hexPair.Key] = new List<Vector3Int>();
+
+            foreach (var direction in Direction.GetDirectionList(hexPair.Key.z))
+            {
+                Vector3Int neighborCoords = hexPair.Key + direction;
+                if (hexTileDict.ContainsKey(neighborCoords))
+                {
+                    hexTileNeighboursDict[hexPair.Key].Add(neighborCoords);
+                }
+            }
+        }
+
+        Debug.Log($"Grid initialized with {hexTileDict.Count} hexes");
     }
+
     public Vector3Int GetClosestHex(Vector3 worldPosition)
     {
         return new Vector3Int(
@@ -91,18 +113,37 @@ public class HexGrid : MonoBehaviour
         if (hexTileNeighboursDict.ContainsKey(hexCoordinates))
             return hexTileNeighboursDict[hexCoordinates];
 
-        hexTileNeighboursDict.Add(hexCoordinates, new List<Vector3Int>());
+        hexTileNeighboursDict[hexCoordinates] = new List<Vector3Int>();
 
         foreach (var direction in Direction.GetDirectionList(hexCoordinates.z))
         {
-            if (hexTileDict.ContainsKey(hexCoordinates + direction))
+            Vector3Int neighborCoords = hexCoordinates + direction;
+            if (hexTileDict.ContainsKey(neighborCoords))
             {
-                hexTileNeighboursDict[hexCoordinates].Add(hexCoordinates + direction);
+                hexTileNeighboursDict[hexCoordinates].Add(neighborCoords);
             }
         }
+
         return hexTileNeighboursDict[hexCoordinates];
     }
+    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range = 1)
+    {
+        List<Vector3Int> result = new List<Vector3Int>();
+
+        if (range == 1)
+        {
+            return GetNeighborsFor(hexCoordinates); 
+        }
+        else
+        {
+
+        }
+
+        return result;
+    }
 }
+
+
 
 public static class Direction
 {

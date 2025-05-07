@@ -72,12 +72,13 @@ public class UnitManager : MonoBehaviour
         movementSystem.ShowRange(selectedUnit, hexGrid);
     }
 
-    private void ClearOldSelection()
+    public void ClearOldSelection()
     {
         previouslySelectedHex = null;
         selectedUnit?.Deselect();
         movementSystem.HideRange(hexGrid);
         selectedUnit = null;
+        AttackManager.Instance?.ClearHighlights();
     }
 
     private void HandleTargetHexSelected(Hex selectedHex)
@@ -140,7 +141,7 @@ public class UnitManager : MonoBehaviour
         {
             if (enemy != null)
             {
-                enemy.MoveTowardsPlayer();
+                //enemy.MoveTowardsPlayer();
                 yield return new WaitForSeconds(0.5f);
             }
         }

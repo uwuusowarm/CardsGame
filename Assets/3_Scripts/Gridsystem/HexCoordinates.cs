@@ -16,6 +16,9 @@ public class HexCoordinates : MonoBehaviour
     private void Awake()
     {
         offsetCoordinates = ConvertPositionToOffset(transform.position);
+        offsetCoordinates.x = Mathf.RoundToInt(offsetCoordinates.x);
+        offsetCoordinates.y = Mathf.RoundToInt(offsetCoordinates.y);
+        offsetCoordinates.z = Mathf.RoundToInt(offsetCoordinates.z);
     }
 
     private Vector3Int ConvertPositionToOffset(Vector3 position)

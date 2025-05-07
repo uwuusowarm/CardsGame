@@ -1,3 +1,5 @@
+using UnityEngine;
+
 [System.Serializable]
 public class CardEffect
 {
@@ -5,6 +7,8 @@ public class CardEffect
     public int value;
     public bool isTemporary;
     public int duration;
+    [Tooltip("0 = melee, 1+ = range")]
+    public int range;
 
     public enum EffectType
     {
