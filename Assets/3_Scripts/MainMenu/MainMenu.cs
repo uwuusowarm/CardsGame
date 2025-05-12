@@ -68,16 +68,6 @@ public class MainMenu : MonoBehaviour
 
          string input = selectedFPS.text;
 
-        /*
-          if (int.TryParse(input, out int fps))
-          {
-              targetFPS = fps;
-          }
-          else
-          {
-              targetFPS = 60;
-          }
-        */
 
         if (int.TryParse(input, out int fps) && fps >= 30)
         {
@@ -97,3 +87,4 @@ public class MainMenu : MonoBehaviour
         resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex;
     }
 }
+

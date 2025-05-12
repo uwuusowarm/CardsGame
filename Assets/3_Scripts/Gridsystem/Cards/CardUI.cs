@@ -13,25 +13,50 @@ public class CardUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI rightEffectText;
     [SerializeField] private Image cardImage;
 
+    public void Initialize(CardScriptable scriptableObject)
+    {
+        if (scriptableObject == null)
+        {
+            Debug.LogError("CardScriptable is null!");
+            return;
+        }
+
+        nameText.text = scriptableObject.cardName ?? "No Name";
+        costText.text = scriptableObject.manaCost.ToString();
+
+        if (cardImage != null && scriptableObject.cardArt != null)
+        {
+            cardImage.sprite = scriptableObject.cardArt;
+        }
+
+        leftEffectText.text = FormatEffects(scriptableObject.leftEffects);
+        rightEffectText.text = FormatEffects(scriptableObject.rightEffects);
+    }
+
     public void Initialize(CardData data)
     {
         cardData = data;
-        if (data == null)
+        UpdateUI();
+    }
+
+    private void UpdateUI()
+    {
+        if (cardData == null)
         {
             Debug.LogError("CardData is null!");
             return;
         }
 
-        nameText.text = data.cardName ?? "No Name";
-        costText.text = data.manaCost.ToString();
+        nameText.text = cardData.cardName ?? "No Name";
+        costText.text = cardData.manaCost.ToString();
 
-        if (cardImage != null && data.cardArt != null)
+        if (cardImage != null && cardData.cardArt != null)
         {
-            cardImage.sprite = data.cardArt;
+            cardImage.sprite = cardData.cardArt;
         }
 
-        leftEffectText.text = FormatEffects(data.leftEffects);
-        rightEffectText.text = FormatEffects(data.rightEffects);
+        leftEffectText.text = FormatEffects(cardData.leftEffects);
+        rightEffectText.text = FormatEffects(cardData.rightEffects);
     }
 
     private string FormatEffects(List<CardEffect> effects)
@@ -48,6 +73,7 @@ public class CardUI : MonoBehaviour
         }
         return sb.ToString();
     }
+
     public interface ICardDataHolder
     {
         CardData GetCardData();

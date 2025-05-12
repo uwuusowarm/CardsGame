@@ -43,7 +43,7 @@ public class DropZone : MonoBehaviour, IDropHandler
             
             foreach (EnemyUnit enemy in FindObjectsOfType<EnemyUnit>())
             {
-                if (enemy != null) ;
+                if (enemy != null);
                     //enemy.ToggleHighlight();
             }
         }
