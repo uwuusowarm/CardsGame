@@ -9,9 +9,9 @@ public class CardCreatorWindow : EditorWindow
 {
     private CardData newCard;
     private Vector2 scrollPos;
-    private Texture2D cardTexture;
     private GameObject cardPrefabTemplate;
     private Dictionary<string, Sprite> classBackgrounds = new Dictionary<string, Sprite>();
+    private Dictionary<CardRarity, Sprite> rarityBorders = new Dictionary<CardRarity, Sprite>();
 
     [MenuItem("Tools/Card Creator")]
     public static void ShowWindow()
@@ -22,63 +22,62 @@ public class CardCreatorWindow : EditorWindow
     private void OnEnable()
     {
         newCard = CreateInstance<CardData>();
-        LoadClassBackgrounds();
-        LoadCardTemplate();
+        LoadResources();
     }
 
-    private void LoadCardTemplate()
+    private void LoadResources()
     {
         string templatePath = "Assets/3_Scripts/Gridsystem/Cards/Card.prefab";
         cardPrefabTemplate = AssetDatabase.LoadAssetAtPath<GameObject>(templatePath);
 
-        if (cardPrefabTemplate == null)
+        string bgPath = "Assets/2_Art/Cards/Card Layouts";
+        classBackgrounds = new Dictionary<string, Sprite>()
         {
-            Debug.LogError($"Could not load card template at path: {templatePath}");
-        }
-    }
+            { "Wizard", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Wizard_v1_NC.png") },
+            { "Warrior", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Warrior_v1_NC.png") },
+            { "Rogue", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Rogue_v1_NC.png") },
+            { "Monster", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Monster_v1_NC.png") },
+            { "Base", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Base_v1_NC.png") }
+        };
 
-    private void LoadClassBackgrounds()
-    {
-        string bgPath = "Assets/3_Scripts/Gridsystem/Cards/Backgrounds";
-        string[] bgGUIDs = AssetDatabase.FindAssets("t:Sprite", new[] { bgPath });
-
-        foreach (string guid in bgGUIDs)
+        string rarityPath = "Assets/2_Art/Cards/Rarity Layer";
+        rarityBorders = new Dictionary<CardRarity, Sprite>()
         {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            Sprite bg = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-            if (bg != null)
-            {
-                classBackgrounds[bg.name] = bg;
-            }
-        }
+            { CardRarity.Common, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Common_v1_NC.png") },
+            { CardRarity.Rare, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Rare_v1_NC.png") },
+            { CardRarity.Legendary, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Legendary_v1_NC.png") },
+            { CardRarity.Monster, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Monster_v1_NC.png") }
+        };
     }
 
     private void OnGUI()
     {
         if (cardPrefabTemplate == null)
         {
-            EditorGUILayout.HelpBox("Card template not found! Please ensure Card.prefab exists in the correct path.", MessageType.Error);
-            if (GUILayout.Button("Try Reload Template"))
+            EditorGUILayout.HelpBox("Card template not found! Please ensure Card.prefab exists at: Assets/3_Scripts/Gridsystem/Cards/Card.prefab", MessageType.Error);
+            if (GUILayout.Button("Reload Resources"))
             {
-                LoadCardTemplate();
+                LoadResources();
             }
             return;
         }
 
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-
+        
         EditorGUILayout.LabelField("Card Basics", EditorStyles.boldLabel);
         newCard.cardName = EditorGUILayout.TextField("Name", newCard.cardName);
         newCard.manaCost = EditorGUILayout.IntField("Mana Cost", newCard.manaCost);
         newCard.description = EditorGUILayout.TextArea(newCard.description, GUILayout.Height(50));
         newCard.cardArt = (Sprite)EditorGUILayout.ObjectField("Art", newCard.cardArt, typeof(Sprite), false);
-        newCard.cardClass = (CardClass)EditorGUILayout.EnumPopup("Class", newCard.cardClass);
-        newCard.rarity = (CardRarity)EditorGUILayout.EnumPopup("Rarity", newCard.rarity);
 
+        newCard.cardClass = (CardClass)EditorGUILayout.EnumPopup("Class", newCard.cardClass);
+
+        newCard.rarity = (CardRarity)EditorGUILayout.EnumPopup("Rarity", newCard.rarity);
+        
         DrawEffectSection("Left Swipe Effects", newCard.leftEffects);
         DrawEffectSection("Right Swipe Effects", newCard.rightEffects);
         DrawEffectSection("Always Active Effects", newCard.alwaysEffects);
-
+        
         if (GUILayout.Button("Save Card", GUILayout.Height(40)))
         {
             SaveCard();
@@ -98,7 +97,7 @@ public class CardCreatorWindow : EditorWindow
 
             effects[i].effectType = (CardEffect.EffectType)EditorGUILayout.EnumPopup("Type", effects[i].effectType);
             effects[i].value = EditorGUILayout.IntField("Value", effects[i].value);
-
+            
             if (effects[i].effectType == CardEffect.EffectType.Attack)
             {
                 effects[i].range = EditorGUILayout.IntField("Range", effects[i].range);
@@ -128,15 +127,16 @@ public class CardCreatorWindow : EditorWindow
             "Select where to save the card");
 
         if (string.IsNullOrEmpty(path)) return;
+
         string directory = Path.GetDirectoryName(path);
         if (!Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
         }
+
         AssetDatabase.CreateAsset(newCard, path);
         AssetDatabase.SaveAssets();
         CreateCardPrefab(path);
-
         AssetDatabase.Refresh();
         EditorUtility.FocusProjectWindow();
         Selection.activeObject = newCard;
@@ -145,49 +145,40 @@ public class CardCreatorWindow : EditorWindow
     private void CreateCardPrefab(string cardDataPath)
     {
         GameObject cardInstance = (GameObject)PrefabUtility.InstantiatePrefab(cardPrefabTemplate);
-
+        
         try
         {
             CardUI cardUI = cardInstance.GetComponent<CardUI>();
             if (cardUI == null)
             {
                 Debug.LogError("Card template missing CardUI component!");
-                DestroyImmediate(cardInstance);
                 return;
             }
 
             cardUI.Initialize(newCard);
+
             Image background = cardInstance.transform.Find("Background")?.GetComponent<Image>();
             if (background != null && classBackgrounds.TryGetValue(newCard.cardClass.ToString(), out Sprite bgSprite))
             {
                 background.sprite = bgSprite;
             }
+
             Image border = cardInstance.transform.Find("Border")?.GetComponent<Image>();
-            if (border != null)
+            if (border != null && rarityBorders.TryGetValue(newCard.rarity, out Sprite borderSprite))
             {
-                border.color = GetRarityColor(newCard.rarity);
+                border.sprite = borderSprite;
             }
+
             string prefabPath = Path.Combine(
                 Path.GetDirectoryName(cardDataPath),
                 Path.GetFileNameWithoutExtension(cardDataPath) + ".prefab");
-
+                
             prefabPath = AssetDatabase.GenerateUniqueAssetPath(prefabPath);
             PrefabUtility.SaveAsPrefabAsset(cardInstance, prefabPath);
         }
         finally
         {
             DestroyImmediate(cardInstance);
-        }
-    }
-
-    private Color GetRarityColor(CardRarity rarity)
-    {
-        switch (rarity)
-        {
-            case CardRarity.Common: return new Color(0.65f, 0.5f, 0.35f); 
-            case CardRarity.Rare: return new Color(0.75f, 0.75f, 0.75f); 
-            case CardRarity.Legendary: return new Color(1f, 0.84f, 0f);
-            default: return Color.white;
         }
     }
 }
