@@ -61,17 +61,13 @@ public class MainMenu : MonoBehaviour
         LoadSettings(currentResolutionIndex);
         #endregion
     }
-    public void LoadSettings(int currentResolutionIndex)
-    {
-        resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex;
-    }
 
-    //Framerate Limit
     void Update()
     {
-        
+        // Framerate Limit
 
-        string input = selectedFPS.text;
+         string input = selectedFPS.text;
+
 
         if (int.TryParse(input, out int fps) && fps >= 30)
         {
@@ -86,5 +82,9 @@ public class MainMenu : MonoBehaviour
         Application.targetFrameRate = targetFPS;
     }
 
-
+    public void LoadSettings(int currentResolutionIndex)
+    {
+        resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex;
+    }
 }
+
