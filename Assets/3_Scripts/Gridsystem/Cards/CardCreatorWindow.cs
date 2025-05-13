@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 
 public class CardCreatorWindow : EditorWindow
 {
@@ -12,6 +13,7 @@ public class CardCreatorWindow : EditorWindow
     private GameObject cardPrefabTemplate;
     private Dictionary<string, Sprite> classBackgrounds = new Dictionary<string, Sprite>();
     private Dictionary<CardRarity, Sprite> rarityBorders = new Dictionary<CardRarity, Sprite>();
+    private Dictionary<CardEffect.EffectType, Sprite> effectIcons = new Dictionary<CardEffect.EffectType, Sprite>();
 
     [MenuItem("Tools/Card Creator")]
     public static void ShowWindow()
@@ -27,8 +29,8 @@ public class CardCreatorWindow : EditorWindow
 
     private void LoadResources()
     {
-        string templatePath = "Assets/3_Scripts/Gridsystem/Cards/Card.prefab";
-        cardPrefabTemplate = AssetDatabase.LoadAssetAtPath<GameObject>(templatePath);
+
+        cardPrefabTemplate = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/3_Scripts/Gridsystem/Cards/Card.prefab");
 
         string bgPath = "Assets/2_Art/Cards/Card Layouts";
         classBackgrounds = new Dictionary<string, Sprite>()
@@ -48,13 +50,22 @@ public class CardCreatorWindow : EditorWindow
             { CardRarity.Legendary, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Legendary_v1_NC.png") },
             { CardRarity.Monster, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Monster_v1_NC.png") }
         };
+
+        string iconsPath = "Assets/2_Art/Cards/Card Icons";
+        effectIcons = new Dictionary<CardEffect.EffectType, Sprite>()
+        {
+            { CardEffect.EffectType.Attack, AssetDatabase.LoadAssetAtPath<Sprite>($"{iconsPath}/Card_Icon_Core_Attack_v1_NC.png") },
+            { CardEffect.EffectType.Block, AssetDatabase.LoadAssetAtPath<Sprite>($"{iconsPath}/Card_Icon_Core_Defense_v1_NC.png") },
+            { CardEffect.EffectType.Heal, AssetDatabase.LoadAssetAtPath<Sprite>($"{iconsPath}/Card_Icon_Core_Heal_v1_NC.png") },
+            { CardEffect.EffectType.Move, AssetDatabase.LoadAssetAtPath<Sprite>($"{iconsPath}/Card_Icon_Core_Movement_v1_NC.png") }
+        };
     }
 
     private void OnGUI()
     {
         if (cardPrefabTemplate == null)
         {
-            EditorGUILayout.HelpBox("Card template not found! Please ensure Card.prefab exists at: Assets/3_Scripts/Gridsystem/Cards/Card.prefab", MessageType.Error);
+            EditorGUILayout.HelpBox("Card template not found!", MessageType.Error);
             if (GUILayout.Button("Reload Resources"))
             {
                 LoadResources();
@@ -69,9 +80,8 @@ public class CardCreatorWindow : EditorWindow
         newCard.manaCost = EditorGUILayout.IntField("Mana Cost", newCard.manaCost);
         newCard.description = EditorGUILayout.TextArea(newCard.description, GUILayout.Height(50));
         newCard.cardArt = (Sprite)EditorGUILayout.ObjectField("Art", newCard.cardArt, typeof(Sprite), false);
-
+        
         newCard.cardClass = (CardClass)EditorGUILayout.EnumPopup("Class", newCard.cardClass);
-
         newCard.rarity = (CardRarity)EditorGUILayout.EnumPopup("Rarity", newCard.rarity);
         
         DrawEffectSection("Left Swipe Effects", newCard.leftEffects);
@@ -94,14 +104,20 @@ public class CardCreatorWindow : EditorWindow
         for (int i = 0; i < effects.Count; i++)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.BeginHorizontal();
 
+            if (effectIcons.TryGetValue(effects[i].effectType, out Sprite icon))
+            {
+                Rect rect = GUILayoutUtility.GetRect(40, 40);
+                GUI.DrawTexture(rect, icon.texture, ScaleMode.ScaleToFit);
+            }
+
+            EditorGUILayout.BeginVertical();
             effects[i].effectType = (CardEffect.EffectType)EditorGUILayout.EnumPopup("Type", effects[i].effectType);
             effects[i].value = EditorGUILayout.IntField("Value", effects[i].value);
-            
-            if (effects[i].effectType == CardEffect.EffectType.Attack)
-            {
-                effects[i].range = EditorGUILayout.IntField("Range", effects[i].range);
-            }
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndHorizontal();
 
             if (GUILayout.Button("Remove Effect"))
             {
@@ -157,18 +173,16 @@ public class CardCreatorWindow : EditorWindow
 
             cardUI.Initialize(newCard);
 
-            Image background = cardInstance.transform.Find("Background")?.GetComponent<Image>();
-            if (background != null && classBackgrounds.TryGetValue(newCard.cardClass.ToString(), out Sprite bgSprite))
+            if (classBackgrounds.TryGetValue(newCard.cardClass.ToString(), out Sprite bgSprite))
             {
-                background.sprite = bgSprite;
+                cardUI.SetBackground(bgSprite);
             }
-
-            Image border = cardInstance.transform.Find("Border")?.GetComponent<Image>();
-            if (border != null && rarityBorders.TryGetValue(newCard.rarity, out Sprite borderSprite))
+            if (rarityBorders.TryGetValue(newCard.rarity, out Sprite borderSprite))
             {
-                border.sprite = borderSprite;
+                cardUI.SetBorder(borderSprite);
             }
-
+            SetEffectVisuals(cardUI, newCard.leftEffects, true);
+            SetEffectVisuals(cardUI, newCard.rightEffects, false);
             string prefabPath = Path.Combine(
                 Path.GetDirectoryName(cardDataPath),
                 Path.GetFileNameWithoutExtension(cardDataPath) + ".prefab");
@@ -179,6 +193,24 @@ public class CardCreatorWindow : EditorWindow
         finally
         {
             DestroyImmediate(cardInstance);
+        }
+    }
+
+    private void SetEffectVisuals(CardUI cardUI, List<CardEffect> effects, bool isLeft)
+    {
+        if (effects == null || effects.Count == 0) return;
+
+        CardEffect primaryEffect = effects[0];
+        if (effectIcons.TryGetValue(primaryEffect.effectType, out Sprite icon))
+        {
+            if (isLeft)
+            {
+                cardUI.SetLeftEffect(primaryEffect.value, icon);
+            }
+            else
+            {
+                cardUI.SetRightEffect(primaryEffect.value, icon);
+            }
         }
     }
 }
