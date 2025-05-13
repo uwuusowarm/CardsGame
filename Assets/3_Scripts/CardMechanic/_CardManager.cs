@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class _CardManager : MonoBehaviour
 {
-    // Singleton-Instanz
     public static _CardManager Instance { get; private set; }
 
     [Header("Alle verfügbaren Karten (z.B. 20)")]
@@ -24,29 +23,25 @@ public class _CardManager : MonoBehaviour
     [Tooltip("Optional: Panel/Container für abgelegte Karten")]
     [SerializeField] private Transform discardGrid;
 
-    // Laufzeit-Listen
     private List<CardData> deck = new List<CardData>();
     private List<CardData> hand = new List<CardData>();
     private List<CardData> discard = new List<CardData>();
 
     private void Awake()
     {
-        // Singleton-Setup
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
         Instance = this;
-
-        // Button-Listener registrieren
+        
         deckButton.onClick.AddListener(OnDeckClicked);
     }
 
     private void Start()
     {
         InitializeDeck();
-        // Leere UI von Hand und Ablage anzeigen
         UpdateHandUI();
         UpdateDiscardUI();
     }
@@ -70,13 +65,11 @@ public class _CardManager : MonoBehaviour
 
     private void OnDeckClicked()
     {
-        // Alte Hand ins Ablagestapel verschieben
         if (hand.Count > 0)
         {
             discard.AddRange(hand);
             hand.Clear();
         }
-        // Neue Karten ziehen
         DrawCards(drawCount);
     }
 
@@ -87,7 +80,7 @@ public class _CardManager : MonoBehaviour
             if (deck.Count == 0)
             {
                 RefillDeckFromDiscard();
-                if (deck.Count == 0) break; // alle Karten verbraucht
+                if (deck.Count == 0) break; 
             }
 
             var card = deck[0];
@@ -108,18 +101,15 @@ public class _CardManager : MonoBehaviour
 
     private void UpdateHandUI()
     {
-        // Alte UI-Objekte löschen
         foreach (Transform t in handGrid)
             Destroy(t.gameObject);
 
-        // Neue Karten-UI instanziieren
         foreach (var card in hand)
         {
             var go = Instantiate(cardUIPrefab, handGrid);
             var ui = go.GetComponent<CardUI>();
             ui.Initialize(card);
 
-            // Drag-Handler die CardData zuweisen
             var drag = go.GetComponent<CardDragHandler>();
             if (drag != null)
                 drag.Card = card;
@@ -130,35 +120,27 @@ public class _CardManager : MonoBehaviour
     {
         if (discardGrid == null) return;
 
-        // Alte UI-Objekte löschen
         foreach (Transform t in discardGrid)
             Destroy(t.gameObject);
 
-        // Neue Karten-UI instanziieren
         foreach (var card in discard)
         {
             var go = Instantiate(cardUIPrefab, discardGrid);
             var ui = go.GetComponent<CardUI>();
             ui.Initialize(card);
 
-            // Drag-Handler die CardData zuweisen
             var drag = go.GetComponent<CardDragHandler>();
             if (drag != null)
                 drag.Card = card;
         }
     }
 
-    /// <summary>
-    /// Wird von DropZone aufgerufen, um eine Karte in Hand oder Ablagestapel zu verschieben.
-    /// </summary>
     public void MoveToZone(CardData card, DropType zone)
     {
-        // Entferne Karte aus allen Listen
         deck.Remove(card);
         hand.Remove(card);
         discard.Remove(card);
 
-        // Füge in die gewünschte Liste ein
         switch (zone)
         {
             case DropType.Hand:
@@ -169,7 +151,6 @@ public class _CardManager : MonoBehaviour
                 break;
         }
 
-        // UI aktualisieren
         UpdateHandUI();
         UpdateDiscardUI();
     }

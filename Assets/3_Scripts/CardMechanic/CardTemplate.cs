@@ -6,29 +6,22 @@ using UnityEngine.UI;
 public class CardTemplate : MonoBehaviour
 {
     [Header("Class")] public String cardClass;
-
     [Header("Card Name")] public String cardName;
-
     [Header("Left Action")]
-    [Tooltip("Select the action for the left slot from the predefined list.")]
+
     public ActionList actionLeft = ActionList.Attack; 
     
-    [Tooltip("Value associated with the left action.")] [Range(0, 10)]
+   
     public int leftVal = 1;
-    
     [Header("Right Action")]
-    [Tooltip("Select the action for the right slot from the predefined list.")]
+
     public ActionList actionRight = ActionList.Attack; 
     
-    [Tooltip("Value associated with the left action.")] [Range(0, 10)]
-    public int rightVal = 1;
+   public int rightVal = 1;
     
     [Header("Range Value")] [Range(1, 3)] public int rangeVal = 1;
-
     [Header("Effect")] public String effectName;
-
     [Header("Illustration")] public Sprite illustrationBig;
-    
     [Header("Icons")] public Sprite iconLeft; public Sprite iconRight;
     
     private TextMeshProUGUI valLeftText;
