@@ -1,51 +1,32 @@
-/*using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-[RequireComponent(typeof(RectTransform), typeof(UnityEngine.UI.Graphic))]
+[RequireComponent(typeof(RectTransform), typeof(Image))]
 public class DropZone : MonoBehaviour, IDropHandler
 {
+    [Tooltip("Wähle, ob diese Zone für Hand oder Ablagestapel ist")]
     public DropType zoneType = DropType.Hand;
 
     public void OnDrop(PointerEventData eventData)
     {
-        GameObject card = eventData.pointerDrag;
-        if (card == null || zoneType != DropType.Player2Ablage) return;
+        // Quelle des Drags ist das Card-GameObject
+        GameObject go = eventData.pointerDrag;
+        if (go == null) return;
 
-        HighlightAllEnemies();
+        // Wir erwarten, dass das Prefab ein CardUI hat
+        var ui = go.GetComponent<CardUI>();
+        if (ui == null) return;
 
-        card.transform.SetParent(transform);
-        card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        // Hole das CardData-Objekt
+        var data = ui.GetCardData();
 
-        StartCoroutine(MoveToGraveyardAfterDelay(card, 2f));
+        // Notify CardManager
+        _CardManager.Instance.MoveToZone(data, zoneType);
+
+        // Reparent ins DropZone-Transform und zentrieren
+        go.transform.SetParent(transform);
+        var rt = go.GetComponent<RectTransform>();
+        rt.anchoredPosition = Vector2.zero;
     }
-
-    private void HighlightAllEnemies()
-    {
-        foreach (EnemyUnit enemy in FindObjectsOfType<EnemyUnit>())
-        {
-            //enemy.ToggleHighlight();
-        }
-    }
-
-    private System.Collections.IEnumerator MoveToGraveyardAfterDelay(GameObject card, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        if (card != null)
-        {
-            GameObject graveyard = GameObject.FindWithTag("Graveyard");
-            if (graveyard != null)
-            {
-                card.transform.SetParent(graveyard.transform);
-                card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-            }
-
-            
-            foreach (EnemyUnit enemy in FindObjectsOfType<EnemyUnit>())
-            {
-                if (enemy != null);
-                    //enemy.ToggleHighlight();
-            }
-        }
-    }
-}*/
+}
