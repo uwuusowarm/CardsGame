@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class CardMovementController : MonoBehaviour
 {
-    public void OnCardDiscarded(Card card)
+    /*public void OnCardDiscarded(Card card)
     {
         UnitManager.Instance.ActivateMovement();
-    }
+    }*/
 }
