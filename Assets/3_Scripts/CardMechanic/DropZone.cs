@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(RectTransform), typeof(UnityEngine.UI.Graphic))]
@@ -48,4 +48,4 @@ public class DropZone : MonoBehaviour, IDropHandler
             }
         }
     }
-}
+}*/
