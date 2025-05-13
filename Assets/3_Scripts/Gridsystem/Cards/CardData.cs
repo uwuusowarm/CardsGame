@@ -20,16 +20,17 @@ public class CardData : ScriptableObject
 
 public enum CardClass
 {
-    Mage,
-    Knight,
-    Archer,
-    Priest,
-    Rogue
+    Base,
+    Wizard,    
+    Warrior,   
+    Rogue,     
+    Monster
 }
 
 public enum CardRarity
 {
     Common,
     Rare,
-    Legendary
+    Legendary,
+    Monster
 }
