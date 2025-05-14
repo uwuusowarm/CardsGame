@@ -8,12 +8,11 @@ public class _CardManagerEditor : Editor
 {
     private _CardManager manager;
     private FieldInfo deckField, handField, discardField;
-    private bool showDeck, showHand, showDiscard;
+    private bool showDeck = true, showHand = true, showDiscard = true;
 
     private void OnEnable()
     {
         manager = (_CardManager)target;
-
         var t = typeof(_CardManager);
         deckField = t.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
         handField = t.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -23,48 +22,33 @@ public class _CardManagerEditor : Editor
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("▶ Runtime Card Lists", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Runtime Card Lists", EditorStyles.boldLabel);
 
-        var deckList = deckField?.GetValue(manager) as List<CardData>;
+        DrawList(deckField, ref showDeck, "Deck");
+        DrawList(handField, ref showHand, "Hand");
+        DrawList(discardField, ref showDiscard, "Ablagestapel");
 
-        int deckCount = deckList != null ? deckList.Count : 0;
+        if (Application.isPlaying)
+            Repaint();
+    }
 
-        showDeck = EditorGUILayout.Foldout(showDeck, $"Deck ({deckCount})");
-        if (showDeck && deckList != null)
+    private void DrawList(FieldInfo fi, ref bool foldout, string label)
+    {
+        var list = fi.GetValue(manager) as List<CardData>;
+        int count = list != null ? list.Count : 0;
+        foldout = EditorGUILayout.Foldout(foldout, $"{label} ({count})");
+        if (foldout && list != null)
         {
             EditorGUI.indentLevel++;
-            foreach (var c in deckList)
-                EditorGUILayout.LabelField("• " + c.cardName);
-            EditorGUI.indentLevel--;
-        }
-
-        var handList = handField?.GetValue(manager) as List<CardData>;
-
-        int handCount = handList != null ? handList.Count : 0;
-
-        showHand = EditorGUILayout.Foldout(showHand, $"Hand ({handCount})");
-        if (showHand && handList != null)
-        {
-            EditorGUI.indentLevel++;
-            foreach (var c in handList)
-                EditorGUILayout.LabelField("• " + c.cardName);
-            EditorGUI.indentLevel--;
-        }
-
-        var discardList = discardField?.GetValue(manager) as List<CardData>;
-
-        int discardCount = discardList != null ? discardList.Count : 0;
-
-        showDiscard = EditorGUILayout.Foldout(showDiscard, $"Ablagestapel ({discardCount})");
-        if (showDiscard && discardList != null)
-        {
-            EditorGUI.indentLevel++;
-            foreach (var c in discardList)
+            foreach (var c in list)
                 EditorGUILayout.LabelField("• " + c.cardName);
             EditorGUI.indentLevel--;
         }
     }
-}
 
+    public override bool RequiresConstantRepaint()
+    {
+        return Application.isPlaying;
+    }
+}
