@@ -8,9 +8,13 @@ public class DropZone : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         var go = eventData.pointerDrag;
-        if (go == null) return;
+        if (go == null) 
+            return;
+
         var drag = go.GetComponent<CardDragHandler>();
-        if (drag == null) return;
+        if (drag == null) 
+            return;
+
         _CardManager.Instance.MoveToZone(drag.Card, zoneType);
         drag.DropAccepted = true;
     }

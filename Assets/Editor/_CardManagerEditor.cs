@@ -38,11 +38,14 @@ public class _CardManagerEditor : Editor
         var list = fi.GetValue(manager) as List<CardData>;
         int count = list != null ? list.Count : 0;
         foldout = EditorGUILayout.Foldout(foldout, $"{label} ({count})");
+
         if (foldout && list != null)
         {
             EditorGUI.indentLevel++;
+
             foreach (var c in list)
                 EditorGUILayout.LabelField("• " + c.cardName);
+
             EditorGUI.indentLevel--;
         }
     }

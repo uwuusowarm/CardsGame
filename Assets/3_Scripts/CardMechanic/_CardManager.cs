@@ -25,6 +25,7 @@ public class _CardManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        
         Instance = this;
         deckButton.onClick.AddListener(OnDeckClicked);
     }
@@ -61,6 +62,7 @@ public class _CardManager : MonoBehaviour
             hand.Clear();
             UpdateDiscardUI();
         }
+        
         DrawCards(drawCount);
     }
 
@@ -71,12 +73,16 @@ public class _CardManager : MonoBehaviour
             if (deck.Count == 0)
             {
                 RefillDeckFromDiscard();
-                if (deck.Count == 0) break;
+                
+                if (deck.Count == 0)
+                    break;
             }
+
             var card = deck[0];
             deck.RemoveAt(0);
             hand.Add(card);
         }
+
         UpdateHandUI();
     }
 
@@ -93,10 +99,12 @@ public class _CardManager : MonoBehaviour
         deck.Remove(card);
         hand.Remove(card);
         discard.Remove(card);
+
         if (zone == DropType.Hand)
             hand.Add(card);
         else if (zone == DropType.Discard)
             discard.Add(card);
+
         UpdateHandUI();
         UpdateDiscardUI();
     }
@@ -110,13 +118,17 @@ public class _CardManager : MonoBehaviour
             var ui = go.GetComponent<CardUI>();
             ui.Initialize(card);
             var drag = go.GetComponent<CardDragHandler>();
-            if (drag != null) drag.Card = card;
+
+            if (drag != null) 
+                drag.Card = card;
         }
     }
 
     private void UpdateDiscardUI()
     {
-        if (discardGrid == null) return;
+        if (discardGrid == null)
+            return;
+
         foreach (Transform t in discardGrid) Destroy(t.gameObject);
         foreach (var card in discard)
         {
@@ -124,7 +136,9 @@ public class _CardManager : MonoBehaviour
             var ui = go.GetComponent<CardUI>();
             ui.Initialize(card);
             var drag = go.GetComponent<CardDragHandler>();
-            if (drag != null) Destroy(drag);
+
+            if (drag != null) 
+                Destroy(drag);
         }
     }
 }
