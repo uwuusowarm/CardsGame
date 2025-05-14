@@ -161,7 +161,7 @@ public class CardCreatorWindow : EditorWindow
     private void CreateCardPrefab(string cardDataPath)
     {
         GameObject cardInstance = (GameObject)PrefabUtility.InstantiatePrefab(cardPrefabTemplate);
-        
+
         try
         {
             CardUI cardUI = cardInstance.GetComponent<CardUI>();
@@ -170,23 +170,37 @@ public class CardCreatorWindow : EditorWindow
                 Debug.LogError("Card template missing CardUI component!");
                 return;
             }
-
             cardUI.Initialize(newCard);
-
             if (classBackgrounds.TryGetValue(newCard.cardClass.ToString(), out Sprite bgSprite))
             {
                 cardUI.SetBackground(bgSprite);
             }
+
             if (rarityBorders.TryGetValue(newCard.rarity, out Sprite borderSprite))
             {
                 cardUI.SetBorder(borderSprite);
             }
-            SetEffectVisuals(cardUI, newCard.leftEffects, true);
-            SetEffectVisuals(cardUI, newCard.rightEffects, false);
+            if (newCard.leftEffects != null && newCard.leftEffects.Count > 0)
+            {
+                var leftEffect = newCard.leftEffects[0];
+                if (effectIcons.TryGetValue(leftEffect.effectType, out Sprite leftIcon))
+                {
+                    cardUI.SetLeftEffect(leftEffect.value, leftIcon);
+                }
+            }
+
+            if (newCard.rightEffects != null && newCard.rightEffects.Count > 0)
+            {
+                var rightEffect = newCard.rightEffects[0];
+                if (effectIcons.TryGetValue(rightEffect.effectType, out Sprite rightIcon))
+                {
+                    cardUI.SetRightEffect(rightEffect.value, rightIcon);
+                }
+            }
             string prefabPath = Path.Combine(
                 Path.GetDirectoryName(cardDataPath),
                 Path.GetFileNameWithoutExtension(cardDataPath) + ".prefab");
-                
+
             prefabPath = AssetDatabase.GenerateUniqueAssetPath(prefabPath);
             PrefabUtility.SaveAsPrefabAsset(cardInstance, prefabPath);
         }

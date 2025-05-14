@@ -68,7 +68,7 @@ public class CardUI : MonoBehaviour
         if (leftEffectIcon != null)
         {
             leftEffectIcon.sprite = icon;
-            leftEffectIcon.gameObject.SetActive(true);
+            leftEffectIcon.gameObject.SetActive(icon != null);
         }
     }
 
@@ -82,7 +82,7 @@ public class CardUI : MonoBehaviour
         if (rightEffectIcon != null)
         {
             rightEffectIcon.sprite = icon;
-            rightEffectIcon.gameObject.SetActive(true);
+            rightEffectIcon.gameObject.SetActive(icon != null);
         }
     }
 
