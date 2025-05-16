@@ -6,6 +6,8 @@ using UnityEngine;
 [SelectionBase]
 public class Unit : MonoBehaviour
 {
+    [SerializeField] public int maxHealth = 10;
+    [SerializeField] public int currentHealth;
     [SerializeField] private int movementPoints = 20;
     protected Hex currentHex;
     public bool IsEnemy = false;
