@@ -1,50 +1,56 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CardDragHandler : MonoBehaviour,
+    IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public CardData Card;
-    public bool DropAccepted { get; set; }
 
-    private RectTransform rectTransform;
-    private CanvasGroup canvasGroup;
-    private Canvas canvas;
-    private Vector2 originalPosition;
-    private Transform originalParent;
+    RectTransform rectTransform;
+    CanvasGroup canvasGroup;
+    Canvas canvas;
+    Vector2 originalPosition;
+    Transform originalParent;
+    RectTransform handRect;
 
-    private void Awake()
+    void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
+        handRect = _CardManager.Instance.HandGridRect;
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public void OnBeginDrag(PointerEventData e)
     {
         originalParent = transform.parent;
         originalPosition = rectTransform.anchoredPosition;
         transform.SetParent(canvas.transform, true);
         canvasGroup.blocksRaycasts = false;
-        DropAccepted = false;
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public void OnDrag(PointerEventData e)
     {
-        rectTransform.position = eventData.position;
+        rectTransform.position = e.position;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void OnEndDrag(PointerEventData e)
     {
         canvasGroup.blocksRaycasts = true;
 
-        if (DropAccepted)
-        {
-            Destroy(gameObject);
-        }
+        bool insideHand = RectTransformUtility.RectangleContainsScreenPoint(
+            handRect,
+            e.position,
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : canvas.worldCamera
+        );
+
+        if (insideHand)
+            _CardManager.Instance.MoveToZone(Card, DropType.Hand);
         else
-        {
-            transform.SetParent(originalParent, true);
-            rectTransform.anchoredPosition = originalPosition;
-        }
+            _CardManager.Instance.MoveToZone(Card, DropType.Discard);
+
+        Destroy(gameObject);
     }
 }

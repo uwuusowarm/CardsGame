@@ -13,10 +13,10 @@ public class _CardManagerEditor : Editor
     private void OnEnable()
     {
         manager = (_CardManager)target;
-        var t = typeof(_CardManager);
-        deckField = t.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
-        handField = t.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
-        discardField = t.GetField("discard", BindingFlags.NonPublic | BindingFlags.Instance);
+        var fmlCissostupid = typeof(_CardManager);
+        deckField = fmlCissostupid.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
+        handField = fmlCissostupid.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
+        discardField = fmlCissostupid.GetField("discard", BindingFlags.NonPublic | BindingFlags.Instance);
     }
 
     public override void OnInspectorGUI()
