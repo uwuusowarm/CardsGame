@@ -18,7 +18,7 @@ public class CardDragHandler : MonoBehaviour,
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
-        handRect = _CardManager.Instance.HandGridRect;
+        handRect = CardManager.Instance.HandGridRect;
     }
 
     public void OnBeginDrag(PointerEventData e)
@@ -47,9 +47,9 @@ public class CardDragHandler : MonoBehaviour,
         );
 
         if (insideHand)
-            _CardManager.Instance.MoveToZone(Card, DropType.Hand);
+            CardManager.Instance.MoveToZone(Card, DropType.Hand);
         else
-            _CardManager.Instance.MoveToZone(Card, DropType.Discard);
+            CardManager.Instance.MoveToZone(Card, DropType.Discard);
 
         Destroy(gameObject);
     }

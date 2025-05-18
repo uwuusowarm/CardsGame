@@ -2,9 +2,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class _CardManager : MonoBehaviour
+public class CardManager : MonoBehaviour
 {
-    public static _CardManager Instance { get; private set; }
+    public static CardManager Instance { get; private set; }
 
     [SerializeField] private List<CardData> cardDatabase;
     [SerializeField, Min(1)] private int drawCount = 4;
@@ -37,6 +37,9 @@ public class _CardManager : MonoBehaviour
         UpdateDiscardUI();
     }
 
+    
+
+
     private void Shuffle(List<CardData> list)
     {
         for (int i = 0; i < list.Count; i++)
@@ -56,10 +59,10 @@ public class _CardManager : MonoBehaviour
             hand.Clear();
             UpdateDiscardUI();
         }
-        DrawCards(drawCount);
+        DrawCard(drawCount);
     }
 
-    private void DrawCards(int count)
+    public void DrawCard(int count)
     {
         for (int i = 0; i < count; i++)
         {
@@ -78,6 +81,10 @@ public class _CardManager : MonoBehaviour
         UpdateHandUI();
     }
 
+    public void DrawInitialCards()
+    {
+        DrawCard(2);
+    }
     public void MoveToZone(CardData card, DropType zone)
     {
         if (hand.Contains(card)) hand.Remove(card);
@@ -104,7 +111,7 @@ public class _CardManager : MonoBehaviour
         }
     }
 
-    private void UpdateDiscardUI()
+    public void UpdateDiscardUI()
     {
         if (discardGrid == null) return;
         foreach (Transform t in discardGrid) Destroy(t.gameObject);
