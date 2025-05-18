@@ -27,7 +27,7 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    private void InitializeDeck()
+    public void InitializeDeck()
     {
         deck = new List<CardData>(initialDeck);
         ShuffleDeck();

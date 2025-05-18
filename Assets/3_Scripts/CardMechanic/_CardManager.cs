@@ -7,7 +7,7 @@ public class _CardManager : MonoBehaviour
     public static _CardManager Instance { get; private set; }
 
     [SerializeField] private List<CardData> cardDatabase;
-    [SerializeField, Min(1)] private int drawCount = 4;
+    [SerializeField, Min(1)] public int drawCount = 4;
 
     [SerializeField] private Transform handGrid;
     [SerializeField] private Transform discardGrid;
@@ -37,7 +37,7 @@ public class _CardManager : MonoBehaviour
         UpdateDiscardUI();
     }
 
-    private void InitializeDeck()
+    public void InitializeDeck()
     {
         deck = new List<CardData>(cardDatabase);
         Shuffle(deck);
