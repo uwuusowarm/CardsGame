@@ -56,7 +56,7 @@ public class AttackManager : MonoBehaviour
                 {
                     distances[neighbor] = currentDist + 1;
                     queue.Enqueue(neighbor);
-                    if (currentDist + 1 <= currentAttackRange)
+                    if (currentDist <= currentAttackRange)
                     {
                         hexesInRange.Add(neighbor);
                     }
@@ -121,7 +121,6 @@ public class AttackManager : MonoBehaviour
                 }
             }
         }
-
         return result;
     }
 

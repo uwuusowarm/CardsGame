@@ -129,7 +129,7 @@ public class UnitManager : MonoBehaviour
         ClearOldSelection();
         if (CardManager.Instance != null)
         {
-            CardManager.Instance.DiscardHand();
+            CardManager.Instance.UpdateDiscardUI();
         }
 
         StartCoroutine(EnemyTurnRoutine());
@@ -154,7 +154,7 @@ public class UnitManager : MonoBehaviour
 
         if (!isFirstTurn)
         {
-            CardManager.Instance.DrawCards(2);
+            CardManager.Instance.DrawCard(2);
         }
         isFirstTurn = false;
     }
