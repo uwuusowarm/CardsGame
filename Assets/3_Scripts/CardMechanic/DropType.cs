@@ -1,7 +1,63 @@
 public enum DropType
 {
-    Player1Ablage, 
-    Player2Ablage,
-    Graveyard,
-    Hand
+    Hand,
+    Discard
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//what are u looking for, duh!

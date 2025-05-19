@@ -3831,7 +3831,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1929117844}
-  - component: {fileID: 1929117843}
+  - component: {fileID: 1929117845}
   m_Layer: 0
   m_Name: CardManager
   m_TagString: Untagged
@@ -3839,23 +3839,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1929117843
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1929117842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 944ee3c0afd801b469de149cb54b6ef1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  initialDeck:
-  - {fileID: 11400000, guid: 4ca3ebc68ce4a4a41a8137cb579e51b4, type: 2}
-  cardPrefab: {fileID: 5023809833648921849, guid: 721ca12277cd76745b148fb32da44af6,
-    type: 3}
-  handContainer: {fileID: 571336533}
 --- !u!4 &1929117844
 Transform:
   m_ObjectHideFlags: 0
@@ -3871,6 +3854,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1929117845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1929117842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffdb6549ff49c99449ce440c20896db0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardDatabase: []
+  drawCount: 4
+  handGrid: {fileID: 0}
+  discardGrid: {fileID: 0}
+  cardUIPrefab: {fileID: 0}
+  deckButton: {fileID: 0}
 --- !u!1001 &1951683771
 PrefabInstance:
   m_ObjectHideFlags: 0

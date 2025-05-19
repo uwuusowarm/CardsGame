@@ -7,6 +7,8 @@ public class CardData : ScriptableObject
     public string cardName;
     public int manaCost;
     public Sprite cardArt;
+    public CardClass cardClass;
+    public CardRarity rarity;
 
     [Header("Effects")]
     public List<CardEffect> leftEffects = new List<CardEffect>();
@@ -14,4 +16,21 @@ public class CardData : ScriptableObject
     public List<CardEffect> alwaysEffects = new List<CardEffect>();
 
     [TextArea] public string description;
+}
+
+public enum CardClass
+{
+    Base,
+    Wizard,    
+    Warrior,   
+    Rogue,     
+    Monster
+}
+
+public enum CardRarity
+{
+    Common,
+    Rare,
+    Legendary,
+    Monster
 }

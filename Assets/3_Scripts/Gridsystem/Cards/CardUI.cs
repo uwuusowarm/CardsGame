@@ -1,56 +1,89 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class CardUI : MonoBehaviour
 {
-    private CardData cardData;
-    [Header("UI References")]
+    [Header("Basic Info")]
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI costText;
-    [SerializeField] private TextMeshProUGUI leftEffectText;
-    [SerializeField] private TextMeshProUGUI rightEffectText;
+    [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private Image cardImage;
+
+    [Header("Visual Elements")]
+    [SerializeField] private Image backgroundImage;
+    [SerializeField] private Image borderImage;
+
+    [Header("Left Effect")]
+    [SerializeField] private TextMeshProUGUI leftEffectValue;
+    [SerializeField] private Image leftEffectIcon;
+
+    [Header("Right Effect")]
+    [SerializeField] private TextMeshProUGUI rightEffectValue;
+    [SerializeField] private Image rightEffectIcon;
+
+    private CardData cardData;
 
     public void Initialize(CardData data)
     {
         cardData = data;
+
         if (data == null)
         {
             Debug.LogError("CardData is null!");
             return;
         }
-
         nameText.text = data.cardName ?? "No Name";
         costText.text = data.manaCost.ToString();
-
+        descriptionText.text = data.description ?? "";
         if (cardImage != null && data.cardArt != null)
         {
             cardImage.sprite = data.cardArt;
         }
-
-        leftEffectText.text = FormatEffects(data.leftEffects);
-        rightEffectText.text = FormatEffects(data.rightEffects);
     }
 
-    private string FormatEffects(List<CardEffect> effects)
+    public void SetBackground(Sprite background)
     {
-        if (effects == null || effects.Count == 0) return "No Effects";
-
-        System.Text.StringBuilder sb = new System.Text.StringBuilder();
-        foreach (var effect in effects)
+        if (backgroundImage != null)
         {
-            if (effect != null)
-            {
-                sb.AppendLine($"{effect.effectType}: {effect.value}");
-            }
+            backgroundImage.sprite = background;
         }
-        return sb.ToString();
     }
-    public interface ICardDataHolder
+
+    public void SetBorder(Sprite border)
     {
-        CardData GetCardData();
+        if (borderImage != null)
+        {
+            borderImage.sprite = border;
+        }
+    }
+
+    public void SetLeftEffect(int value, Sprite icon)
+    {
+        if (leftEffectValue != null)
+        {
+            leftEffectValue.text = value.ToString();
+        }
+
+        if (leftEffectIcon != null)
+        {
+            leftEffectIcon.sprite = icon;
+            leftEffectIcon.gameObject.SetActive(icon != null);
+        }
+    }
+
+    public void SetRightEffect(int value, Sprite icon)
+    {
+        if (rightEffectValue != null)
+        {
+            rightEffectValue.text = value.ToString();
+        }
+
+        if (rightEffectIcon != null)
+        {
+            rightEffectIcon.sprite = icon;
+            rightEffectIcon.gameObject.SetActive(icon != null);
+        }
     }
 
     public CardData GetCardData()
