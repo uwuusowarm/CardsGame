@@ -3,27 +3,27 @@ using UnityEngine;
 using System.Reflection;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(_CardManager))]
+[CustomEditor(typeof(CardManager))]
 public class _CardManagerEditor : Editor
 {
-    private _CardManager manager;
+    private CardManager manager;
     private FieldInfo deckField, handField, discardField;
     private bool showDeck = true, showHand = true, showDiscard = true;
 
     private void OnEnable()
     {
-        manager = (_CardManager)target;
-        var t = typeof(_CardManager);
-        deckField = t.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
-        handField = t.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
-        discardField = t.GetField("discard", BindingFlags.NonPublic | BindingFlags.Instance);
+        manager = (CardManager)target;
+        var fmlCissostupid = typeof(CardManager);
+        deckField = fmlCissostupid.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
+        handField = fmlCissostupid.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
+        discardField = fmlCissostupid.GetField("discard", BindingFlags.NonPublic | BindingFlags.Instance);
     }
 
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Runtime Card Lists", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Card List", EditorStyles.boldLabel);
 
         DrawList(deckField, ref showDeck, "Deck");
         DrawList(handField, ref showHand, "Hand");

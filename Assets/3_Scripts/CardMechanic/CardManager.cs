@@ -2,12 +2,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class _CardManager : MonoBehaviour
+public class CardManager : MonoBehaviour
 {
-    public static _CardManager Instance { get; private set; }
+    public static CardManager Instance { get; private set; }
 
     [SerializeField] private List<CardData> cardDatabase;
-    [SerializeField, Min(1)] public int drawCount = 4;
+    [SerializeField, Min(1)] private int drawCount = 4;
 
     [SerializeField] private Transform handGrid;
     [SerializeField] private Transform discardGrid;
@@ -25,23 +25,20 @@ public class _CardManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        
         Instance = this;
         deckButton.onClick.AddListener(OnDeckClicked);
     }
 
     private void Start()
     {
-        InitializeDeck();
+        deck = new List<CardData>(cardDatabase);
+        Shuffle(deck);
         UpdateHandUI();
         UpdateDiscardUI();
     }
 
-    public void InitializeDeck()
-    {
-        deck = new List<CardData>(cardDatabase);
-        Shuffle(deck);
-    }
+    
+
 
     private void Shuffle(List<CardData> list)
     {
@@ -62,48 +59,40 @@ public class _CardManager : MonoBehaviour
             hand.Clear();
             UpdateDiscardUI();
         }
-        
-        DrawCards(drawCount);
+        DrawCard(drawCount);
     }
 
-    private void DrawCards(int count)
+    public void DrawCard(int count)
     {
         for (int i = 0; i < count; i++)
         {
             if (deck.Count == 0)
             {
-                RefillDeckFromDiscard();
-                
-                if (deck.Count == 0)
-                    break;
+                deck.AddRange(discard);
+                discard.Clear();
+                Shuffle(deck);
+                UpdateDiscardUI();
+                if (deck.Count == 0) break;
             }
-
             var card = deck[0];
             deck.RemoveAt(0);
             hand.Add(card);
         }
-
         UpdateHandUI();
     }
 
-    private void RefillDeckFromDiscard()
+    public void DrawInitialCards()
     {
-        deck.AddRange(discard);
-        discard.Clear();
-        Shuffle(deck);
-        UpdateDiscardUI();
+        DrawCard(2);
     }
-
     public void MoveToZone(CardData card, DropType zone)
     {
-        deck.Remove(card);
-        hand.Remove(card);
-        discard.Remove(card);
+        if (hand.Contains(card)) hand.Remove(card);
 
-        if (zone == DropType.Hand)
-            hand.Add(card);
-        else if (zone == DropType.Discard)
+        if (zone == DropType.Discard)
             discard.Add(card);
+        else
+            hand.Add(card);
 
         UpdateHandUI();
         UpdateDiscardUI();
@@ -118,17 +107,13 @@ public class _CardManager : MonoBehaviour
             var ui = go.GetComponent<CardUI>();
             ui.Initialize(card);
             var drag = go.GetComponent<CardDragHandler>();
-
-            if (drag != null) 
-                drag.Card = card;
+            if (drag != null) drag.Card = card;
         }
     }
 
-    private void UpdateDiscardUI()
+    public void UpdateDiscardUI()
     {
-        if (discardGrid == null)
-            return;
-
+        if (discardGrid == null) return;
         foreach (Transform t in discardGrid) Destroy(t.gameObject);
         foreach (var card in discard)
         {
@@ -136,9 +121,10 @@ public class _CardManager : MonoBehaviour
             var ui = go.GetComponent<CardUI>();
             ui.Initialize(card);
             var drag = go.GetComponent<CardDragHandler>();
-
-            if (drag != null) 
-                Destroy(drag);
+            if (drag != null) Destroy(drag);
         }
     }
+
+    public RectTransform HandGridRect => handGrid as RectTransform;
+    public RectTransform DiscardGridRect => discardGrid as RectTransform;
 }
