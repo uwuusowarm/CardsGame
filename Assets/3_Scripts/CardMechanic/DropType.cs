@@ -1,7 +1,9 @@
 public enum DropType
 {
     Hand,
-    Discard
+    Discard,
+    Left,
+    Right
 }
 
 

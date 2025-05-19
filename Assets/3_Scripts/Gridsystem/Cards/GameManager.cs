@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        else if (Instance != this) Destroy(gameObject);
     }
 
     private void Start()
@@ -45,7 +44,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitForManagersAndStartGame()
     {
-        yield return new WaitUntil(() => _CardManager.Instance != null &&
+        yield return new WaitUntil(() => CardManager.Instance != null &&
                                          UnitManager.Instance != null &&
                                          HexGrid.Instance != null &&
                                          AttackManager.Instance != null &&
@@ -67,27 +66,30 @@ public class GameManager : MonoBehaviour
         IsPlayerTurn = true;
         isWaitingForPlayerActionResolution = false;
 
-//        if (UnitManager.Instance != null) UnitManager.Instance.NotifyPlayerTurnStart(); //noch besprechen
+        //if (UnitManager.Instance != null) UnitManager.Instance.NotifyPlayerTurnStart(); //noch besprechen
         //else Debug.LogError("UnitManager.Instance is null.");
-
-        DrawPlayerCards();
-
+        
         if (isFirstTurn)
         {
             Debug.Log("First turn of the game.");
             isFirstTurn = false;
+            CardManager.Instance.DrawInitialCards();
+        }
+        else
+        {
+            DrawPlayerCards();
         }
     }
 
     private void DrawPlayerCards()
     {
-        if (_CardManager.Instance == null)
+        if (CardManager.Instance == null)
         {
-            Debug.LogError("_CardManager.Instance is null for card draw.");
+            Debug.LogError("CardManager.Instance is null for card draw.");
             return;
         }
-        Debug.Log("Calling _CardManager.OnDeckClicked() to discard hand and draw new cards.");
-        _CardManager.Instance.OnDeckClicked();
+        Debug.Log("Calling CardManager.OnDeckClicked() to discard hand and draw new cards.");
+        CardManager.Instance.OnDeckClicked();
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
@@ -120,9 +122,9 @@ public class GameManager : MonoBehaviour
 
         ApplyCachedEffects();
 
-        if (_CardManager.Instance != null)
+        if (CardManager.Instance != null)
         {
-            _CardManager.Instance.MoveToZone(cardData, DropType.Discard);
+            CardManager.Instance.MoveToZone(cardData, DropType.Discard);
         }
         else
         {
