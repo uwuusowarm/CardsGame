@@ -149,7 +149,16 @@ public class CardCreatorWindow : EditorWindow
         {
             Directory.CreateDirectory(directory);
         }
+        if (newCard.leftEffects.Count > 0 && effectIcons.TryGetValue(newCard.leftEffects[0].effectType, out Sprite leftIcon))
+        {
+            newCard.leftEffectIcon = leftIcon;
+        }
 
+        if (newCard.rightEffects.Count > 0 && effectIcons.TryGetValue(newCard.rightEffects[0].effectType, out Sprite rightIcon))
+        {
+            newCard.rightEffectIcon = rightIcon;
+        }
+        
         AssetDatabase.CreateAsset(newCard, path);
         AssetDatabase.SaveAssets();
         CreateCardPrefab(path);
