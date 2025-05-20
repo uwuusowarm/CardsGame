@@ -10,24 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a96a61ce38373274c97e49ef39b7eb27, type: 3}
-  m_Name: Card_55
+  m_Name: Card_Attack
   m_EditorClassIdentifier: 
-  cardName: 55
+  cardName: Attack
   manaCost: 0
-  cardArt: {fileID: 0}
+  cardArt: {fileID: 21300000, guid: 1f395fed01465f04490c65c2afb08259, type: 3}
   cardClass: 0
   rarity: 0
   leftEffects:
   - effectType: 0
-    value: 5
+    value: 3
     isTemporary: 0
     duration: 0
     range: 0
   rightEffects:
-  - effectType: 2
-    value: 5
+  - effectType: 1
+    value: 1
     isTemporary: 0
     duration: 0
     range: 0
   alwaysEffects: []
-  description: 55
+  leftEffectIcon: {fileID: 21300000, guid: 8587820d2bca2ef429dec60d514637f5, type: 3}
+  rightEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
+  description: 
