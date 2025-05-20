@@ -6,9 +6,11 @@ using UnityEngine;
 [SelectionBase]
 public class Unit : MonoBehaviour
 {
-    [SerializeField] public int maxHealth = 10;
+    [SerializeField] public int maxHealth = 5;
     [SerializeField] public int currentHealth;
-    [SerializeField] private int movementPoints = 20;
+    [SerializeField] public int movementPoints = 0;
+    [SerializeField] public int actionPoints = 4;
+    public int shieldPoints = 0;
     protected Hex currentHex;
     public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
@@ -35,15 +37,49 @@ public class Unit : MonoBehaviour
         StartCoroutine(InitializeHexPosition());
     }
 
-    public void Attack(int damage)
+    public void AddBlock(int amount)
     {
-        
+        shieldPoints += amount;
+        Debug.Log("Player blocked for " + amount + " points and now has " + shieldPoints + "Shieldpoints!");
     }
 
     public void Heal(int amount)
     {
-        
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+        Debug.Log("Player healed for " + amount + " points and now has " + currentHealth + "Lifepoints!");
     }
+    
+    public void PlayerTakeDamage(int damage)
+    {
+        if (shieldPoints > 0)
+        {
+            int temp = shieldPoints;
+            shieldPoints -= damage;
+            damage -= temp;
+            if (shieldPoints < 0)
+            {
+                shieldPoints = 0;
+                Debug.Log("Shield hit and broken Player takes " + damage + " damage!");
+            }
+            if (damage <= 0)
+            {
+                Debug.Log("Shield hit! And none damage taken by Player!");
+                return;
+            }
+        }
+
+        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Autsch Player dead!");
+            Destroy(gameObject);
+        }
+        else
+        {
+            Debug.Log("Player has " + currentHealth + " left!");
+        }
+    }
+    
     public void AddMovementPoints(int points)
     {
         movementPoints += points;

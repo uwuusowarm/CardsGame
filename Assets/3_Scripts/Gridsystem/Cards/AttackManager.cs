@@ -48,7 +48,7 @@ public class AttackManager : MonoBehaviour
             Vector3Int current = queue.Dequeue();
             int currentDist = distances[current];
 
-            if (currentDist > currentAttackRange) continue;
+           // if (currentDist > currentAttackRange) continue;
 
             foreach (Vector3Int neighbor in HexGrid.Instance.GetNeighborsFor(current))
             {
@@ -131,7 +131,7 @@ public class AttackManager : MonoBehaviour
         {
             enemy.TakeDamage(currentAttackDamage);
             ClearHighlights();
-            UnitManager.Instance.EndPlayerTurn();
+            GameManager.Instance.PlayerActionResolved(true);
         }
     }
 

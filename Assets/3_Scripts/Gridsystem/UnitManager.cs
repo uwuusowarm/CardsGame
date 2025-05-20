@@ -100,7 +100,6 @@ public class UnitManager : MonoBehaviour
     private void OnMovementFinished(Unit unit)
     {
         unit.MovementFinished -= OnMovementFinished;
-        EndPlayerTurn();
     }
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)
@@ -123,7 +122,12 @@ public class UnitManager : MonoBehaviour
         return false;
     }
 
-    public void EndPlayerTurn()
+    public void ReduceActionPoints(Unit unit, int amount)
+    {
+        unit.actionPoints -= amount;
+    }
+
+    public void StartEnemyTurn()
     {
         PlayersTurn = false;
         ClearOldSelection();
@@ -141,11 +145,10 @@ public class UnitManager : MonoBehaviour
         {
             if (enemy != null)
             {
-                //enemy.MoveTowardsPlayer();
+                enemy.AttackPlayer();
                 yield return new WaitForSeconds(0.5f);
             }
         }
-        StartPlayerTurn();
     }
 
     public void StartPlayerTurn()

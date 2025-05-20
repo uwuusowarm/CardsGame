@@ -58,11 +58,13 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         if (inLeft)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Left);
+            GameManager.Instance.ProcessPlayedCard(Card, true);
             Destroy(gameObject);
         }
         else if (inRight)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Right);
+            GameManager.Instance.ProcessPlayedCard(Card, false);
             Destroy(gameObject);
         }
         else
