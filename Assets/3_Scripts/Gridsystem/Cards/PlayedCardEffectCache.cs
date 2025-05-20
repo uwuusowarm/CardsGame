@@ -14,9 +14,6 @@ public class PlayedCardEffectCache : MonoBehaviour
     public int PendingMovement { get; private set; }
     public int PendingHealing { get; private set; }
     public int PendingBlock { get; private set; }
-    public int PendingBurn { get; private set; }
-    public int PendingDuration { get; private set; }
-    
     public bool HasPendingEffects { get; private set; }
     private void Awake()
     {
@@ -68,10 +65,6 @@ public class PlayedCardEffectCache : MonoBehaviour
                 case CardEffect.EffectType.Block:
                     PendingBlock = effect.value;
                     break;
-                case CardEffect.EffectType.Burn:
-                    PendingBurn = effect.value;
-                    PendingDuration = effect.duration;
-                    break;
             }
         }
         
@@ -80,8 +73,7 @@ public class PlayedCardEffectCache : MonoBehaviour
                   $"Range {PendingRange}, " +  
                   $"Movement {PendingMovement}, " +
                   $"Healing {PendingHealing}, " + 
-                  $"Block {PendingBlock}, " +
-                  $"Burn {PendingBurn} with duration of {PendingDuration}");
+                  $"Block {PendingBlock}");
     }
 
     private void ResetEffectValues()
@@ -91,8 +83,6 @@ public class PlayedCardEffectCache : MonoBehaviour
         PendingMovement = 0;
         PendingHealing = 0;
         PendingBlock = 0;
-        PendingBurn = 0;
-        PendingDuration = 0;
         HasPendingEffects = false;
     }
 
@@ -121,10 +111,6 @@ public class PlayedCardEffectCache : MonoBehaviour
         if (PendingBlock > 0)
         {
             Debug.Log($"Saved Cached {PendingBlock}");
-        }
-        if (PendingBurn > 0)
-        {
-            Debug.Log($"Saved Burn {PendingBurn} with duration of {PendingDuration}");
         }
     }
 }

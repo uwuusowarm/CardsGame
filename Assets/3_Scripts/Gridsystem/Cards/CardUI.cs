@@ -36,6 +36,21 @@ public class CardUI : MonoBehaviour
         nameText.text = data.cardName ?? "No Name";
         costText.text = data.manaCost.ToString();
         descriptionText.text = data.description ?? "";
+        
+        if (data.leftEffects != null && data.leftEffects.Count > 0)
+        {
+            leftEffectValue.text = data.leftEffects[0].value.ToString();
+            leftEffectIcon.sprite = data.leftEffectIcon;
+            leftEffectIcon.gameObject.SetActive(data.leftEffectIcon != null);
+        }
+
+        if (data.rightEffects != null && data.rightEffects.Count > 0)
+        {
+            rightEffectValue.text = data.rightEffects[0].value.ToString();
+            rightEffectIcon.sprite = data.rightEffectIcon;
+            rightEffectIcon.gameObject.SetActive(data.rightEffectIcon != null);
+        }
+        
         if (cardImage != null && data.cardArt != null)
         {
             cardImage.sprite = data.cardArt;
