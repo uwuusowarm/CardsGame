@@ -1,49 +1,86 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CardDragHandler : MonoBehaviour,
+    IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public CardData Card;
-    public bool DropAccepted { get; set; }
 
-    private RectTransform rectTransform;
-    private CanvasGroup canvasGroup;
-    private Canvas canvas;
-    private Vector2 originalPosition;
-    private Transform originalParent;
+    RectTransform rectTransform;
+    CanvasGroup canvasGroup;
+    Canvas canvas;
+    Vector2 originalPosition;
+    Transform originalParent;
+    RectTransform handRect;
+    RectTransform leftRect;
+    RectTransform rightRect;
 
-    private void Awake()
+    void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
+        handRect = CardManager.Instance.HandGridRect;
+        leftRect = CardManager.Instance.LeftGridRect;
+        rightRect = CardManager.Instance.RightGridRect;
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public void OnBeginDrag(PointerEventData e)
     {
         originalParent = transform.parent;
         originalPosition = rectTransform.anchoredPosition;
         transform.SetParent(canvas.transform, true);
         canvasGroup.blocksRaycasts = false;
-        DropAccepted = false;
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public void OnDrag(PointerEventData e)
     {
-        rectTransform.position = eventData.position;
+        rectTransform.position = e.position;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void OnEndDrag(PointerEventData e)
     {
         canvasGroup.blocksRaycasts = true;
-        if (DropAccepted)
+
+        bool insideHand = RectTransformUtility.RectangleContainsScreenPoint(
+            handRect,
+            e.position,
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : canvas.worldCamera
+        );
+        
+        bool insideLeft = RectTransformUtility.RectangleContainsScreenPoint(
+            leftRect,
+            e.position,
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : canvas.worldCamera
+        );
+        
+        bool insideRight = RectTransformUtility.RectangleContainsScreenPoint(
+            rightRect,
+            e.position,
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : canvas.worldCamera
+        );
+
+        if (insideLeft)
         {
-            Destroy(gameObject);
+            CardManager.Instance.MoveToZone(Card, DropType.Left);
+            GameManager.Instance.ProcessPlayedCard(Card, true);
+        }
+        else if (insideRight)
+        {
+            CardManager.Instance.MoveToZone(Card, DropType.Right);
+            GameManager.Instance.ProcessPlayedCard(Card, false);
         }
         else
         {
-            transform.SetParent(originalParent, true);
-            rectTransform.anchoredPosition = originalPosition;
+            CardManager.Instance.MoveToZone(Card, DropType.Hand);
         }
+
+        Destroy(gameObject);
     }
 }

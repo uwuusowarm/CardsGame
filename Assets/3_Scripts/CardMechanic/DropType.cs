@@ -1,5 +1,65 @@
 public enum DropType
 {
     Hand,
-    Discard
+    Discard,
+    Left,
+    Right
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//what are u looking for, duh!
