@@ -443,7 +443,6 @@ GameObject:
   - component: {fileID: 197420744}
   - component: {fileID: 197420743}
   - component: {fileID: 197420742}
-  - component: {fileID: 197420741}
   m_Layer: 5
   m_Name: DrawButton
   m_TagString: Untagged
@@ -468,21 +467,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1002, y: -992}
+  m_AnchoredPosition: {x: 993, y: -553}
   m_SizeDelta: {x: 100, y: 36.5053}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &197420741
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 197420739}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c98e1986342e6f48a0e4d0a0de81dc2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &197420742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -526,7 +513,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 197420743}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1929117845}
+        m_TargetAssemblyTypeName: CardManager, Assembly-CSharp
+        m_MethodName: OnDeckClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &197420743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -753,7 +752,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 78, y: 158}
+  m_AnchoredPosition: {x: 211, y: 138}
   m_SizeDelta: {x: 386.4498, y: 262.015}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &307472466
@@ -1553,7 +1552,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 777, y: 510}
+  m_AnchoredPosition: {x: 735, y: 410}
   m_SizeDelta: {x: 795.88794, y: 243.09698}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &567792564
@@ -3434,7 +3433,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 769, y: -205}
+  m_AnchoredPosition: {x: 740, y: -110}
   m_SizeDelta: {x: 449.80566, y: 178.23267}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1587017188
@@ -3534,7 +3533,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1447, y: 158}
+  m_AnchoredPosition: {x: 1229, y: 127}
   m_SizeDelta: {x: 386.4498, y: 262.015}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1589430033
@@ -4390,6 +4389,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bbafff5c23ce0b64b859fbf604c65d4d, type: 2}
   - {fileID: 11400000, guid: e3b6a4dfe6c79e24481c04da1dd2938b, type: 2}
   - {fileID: 11400000, guid: 64f5f113a5d9f0a41ab85ecf59ba420e, type: 2}
+  - {fileID: 11400000, guid: 64f5f113a5d9f0a41ab85ecf59ba420e, type: 2}
+  - {fileID: 11400000, guid: 9ca8437037d47f54fb8b95e708126d7e, type: 2}
+  - {fileID: 11400000, guid: e1d71be71ab07124ea1417f10add63a0, type: 2}
+  - {fileID: 11400000, guid: 315c630e564b5684db8598477c652b4a, type: 2}
+  - {fileID: 11400000, guid: e1d71be71ab07124ea1417f10add63a0, type: 2}
+  - {fileID: 11400000, guid: 315c630e564b5684db8598477c652b4a, type: 2}
   drawCount: 4
   handGrid: {fileID: 1587017187}
   discardGrid: {fileID: 567792563}
@@ -4721,6 +4726,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 572ab7db695768440918c18de4b642b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 10
+  currentHealth: 0
   movementPoints: 20
   IsEnemy: 1
   movementDuration: 1

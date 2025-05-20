@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CardDragHandler : MonoBehaviour,
-    IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public CardData Card;
 
@@ -20,9 +19,10 @@ public class CardDragHandler : MonoBehaviour,
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
-        handRect = CardManager.Instance.HandGridRect;
-        leftRect = CardManager.Instance.LeftGridRect;
-        rightRect = CardManager.Instance.RightGridRect;
+        var mgr = CardManager.Instance;
+        handRect = mgr.HandGridRect;
+        leftRect = mgr.LeftGridRect;
+        rightRect = mgr.RightGridRect;
     }
 
     public void OnBeginDrag(PointerEventData e)
@@ -42,45 +42,34 @@ public class CardDragHandler : MonoBehaviour,
     {
         canvasGroup.blocksRaycasts = true;
 
-        bool insideHand = RectTransformUtility.RectangleContainsScreenPoint(
-            handRect,
-            e.position,
+        bool inLeft = RectTransformUtility.RectangleContainsScreenPoint(
+            leftRect, e.position,
             canvas.renderMode == RenderMode.ScreenSpaceOverlay
                 ? null
                 : canvas.worldCamera
         );
-        
-        bool insideLeft = RectTransformUtility.RectangleContainsScreenPoint(
-            leftRect,
-            e.position,
-            canvas.renderMode == RenderMode.ScreenSpaceOverlay
-                ? null
-                : canvas.worldCamera
-        );
-        
-        bool insideRight = RectTransformUtility.RectangleContainsScreenPoint(
-            rightRect,
-            e.position,
+        bool inRight = RectTransformUtility.RectangleContainsScreenPoint(
+            rightRect, e.position,
             canvas.renderMode == RenderMode.ScreenSpaceOverlay
                 ? null
                 : canvas.worldCamera
         );
 
-        if (insideLeft)
+        if (inLeft)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Left);
-            GameManager.Instance.ProcessPlayedCard(Card, true);
+            Destroy(gameObject);
         }
-        else if (insideRight)
+        else if (inRight)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Right);
-            GameManager.Instance.ProcessPlayedCard(Card, false);
+            Destroy(gameObject);
         }
         else
         {
             CardManager.Instance.MoveToZone(Card, DropType.Hand);
+            Destroy(gameObject);
         }
-
-        Destroy(gameObject);
     }
+
 }
