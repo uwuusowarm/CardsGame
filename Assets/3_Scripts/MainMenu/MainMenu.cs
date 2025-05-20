@@ -20,14 +20,11 @@ public class MainMenu : MonoBehaviour
     public Text selectedFPS;
     private static MainMenu singleton;
 
-    //Start
     public void StartButton()
     {
         SceneManager.LoadSceneAsync(1);
     }
 
-
-    //Quit
     public void QuitGame()
     {
         Application.Quit();
@@ -37,7 +34,6 @@ public class MainMenu : MonoBehaviour
 #endif
     }
 
-    //Resolution Dropdown
     private void Start()
     {
         #region Resolution Dropdown
@@ -64,8 +60,6 @@ public class MainMenu : MonoBehaviour
 
     void Update()
     {
-        // Framerate Limit
-
          string input = selectedFPS.text;
 
 
