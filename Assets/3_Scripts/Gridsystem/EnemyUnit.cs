@@ -76,6 +76,7 @@ public class EnemyUnit : MonoBehaviour
             Debug.LogError("Enemy not on grid!");
         else
             Debug.Log($"Enemy registered at {hexCoords}");
+            currentHex.SetEnemyUnit(this);
     }
 
     public void AttackPlayer()

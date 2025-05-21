@@ -56,26 +56,34 @@ public class AttackManager : MonoBehaviour
                 {
                     distances[neighbor] = currentDist + 1;
                     queue.Enqueue(neighbor);
-                    if (currentDist <= currentAttackRange)
-                    {
-                        hexesInRange.Add(neighbor);
-                    }
+
+                    hexesInRange.Add(neighbor);
+                    Debug.Log($"Added hex {neighbor} to range");
                 }
             }
         }
         bool enemiesFound = false;
         foreach (Vector3Int hexCoord in hexesInRange)
         {
+            Debug.Log($"Checking hex {hexCoord}");
+
             Hex hex = HexGrid.Instance.GetTileAt(hexCoord);
-            if (hex != null && hex.UnitOnHex != null)
+            
+            Debug.Log($"Checking hex {hexCoord}. GetTileAt returned: {(hex != null ? hex.name : "NULL HEX OBJECT")}"); 
+            if (hex != null && hex.EnemyUnitOnHex != null)
             {
-                EnemyUnit enemy = hex.UnitOnHex.GetComponent<EnemyUnit>();
+                Debug.Log($"Checking existing hex {hexCoord}");
+                EnemyUnit enemy = hex.EnemyUnitOnHex.GetComponent<EnemyUnit>();
                 if (enemy != null)
                 {
                     enemiesFound = true;
                     enemy.ToggleHighlight(true);
                     highlightedEnemies.Add(enemy);
                     Debug.Log($"Enemy found at {hexCoord} (Distance: {distances[hexCoord]})");
+                }
+                else
+                {
+                    Debug.Log($"No enemy found at {hexCoord}");
                 }
             }
         }
