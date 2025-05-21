@@ -18,9 +18,30 @@ public class AttackManager : MonoBehaviour
 
     public void PrepareAttack(int damage, int range)
     {
+        if (UnitManager.Instance == null)
+        {
+            Debug.LogError("AttackManager: PrepareAttack - UnitManager.Instance is NULL. Cannot proceed.");
+            ReturnCardToHand();
+            ClearHighlights(); // Wichtig, um UI-Reste zu vermeiden
+            return;
+        }
+
+        // Dies ist der kritische Check
+        if (UnitManager.Instance.SelectedUnit == null)
+        {
+            Debug.LogError(
+                "AttackManager: PrepareAttack - UnitManager.Instance.SelectedUnit (Player Unit) is NULL. Cannot proceed.");
+            Debug.LogWarning(
+                "Possible causes: Player unit destroyed? SelectedUnit in UnitManager incorrectly set to null after previous action?");
+            // Loggen Sie, wer diese Methode aufruft, um den Kontext zu verstehen
+            Debug.Log(
+                $"PrepareAttack called by card for damage: {damage}, range: {range}. StackTrace: {StackTraceUtility.ExtractStackTrace()}");
+        }
+
         currentAttackDamage = damage;
         currentAttackRange = range;
         HighlightEnemiesInRange();
+        
     }
 
     private void HighlightEnemiesInRange()

@@ -12,6 +12,9 @@ public class ShieldSystem : MonoBehaviour
 
     private int currentShields;
     private bool[] shieldsUnlocked;
+    
+    public static ShieldSystem Instance { get; private set; }
+
 
     private void Start()
     {
@@ -19,6 +22,17 @@ public class ShieldSystem : MonoBehaviour
         InitializeShields(0); 
     }
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
     public void InitializeShields(int startingShields)
     {
         currentShields = startingShields;
@@ -54,6 +68,7 @@ public class ShieldSystem : MonoBehaviour
         currentShields = Mathf.Max(currentShields - amount, 0);
         UpdateShieldDisplay();
     }
+
 
     private void UpdateShieldDisplay()
     {

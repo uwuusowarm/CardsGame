@@ -111,6 +111,11 @@ public class GameManager : MonoBehaviour
         }
         PlayedCardEffectCache.Instance.CacheCardEffect(cardData, isLeftEffectChosen);
 
+        if (playerUnit != null && UnitManager.Instance != null)
+        {
+            UnitManager.Instance.HandleUnitSelected(playerUnit.gameObject);
+        }
+       
         if (cardData.alwaysEffects != null)
         {
             foreach (var effect in cardData.alwaysEffects)

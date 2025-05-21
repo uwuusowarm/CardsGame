@@ -76,14 +76,14 @@ public class UnitManager : MonoBehaviour
 
         selectedUnit = unitReference;
         selectedUnit.Select();
-        movementSystem.ShowRange(selectedUnit, hexGrid);
+        movementSystem.Initialize(selectedUnit, hexGrid);
     }
 
     public void ClearOldSelection()
     {
         previouslySelectedHex = null;
         selectedUnit?.Deselect();
-        movementSystem.HideRange(hexGrid);
+        movementSystem.HideRange();
         selectedUnit = null;
         AttackManager.Instance?.ClearHighlights();
     }
@@ -93,12 +93,11 @@ public class UnitManager : MonoBehaviour
         if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
         {
             previouslySelectedHex = selectedHex;
-            movementSystem.ShowPath(selectedHex.HexCoords, hexGrid);
+            movementSystem.AddToPath(selectedHex.HexCoords);
         }
         else
         {
-            movementSystem.MoveUnit(selectedUnit, hexGrid);
-            PlayersTurn = false;
+            movementSystem.MoveUnit();
             selectedUnit.MovementFinished += OnMovementFinished;
             ClearOldSelection();
         }
