@@ -14,6 +14,9 @@ public class HealthSystem : MonoBehaviour
 
     private int currentHealth;
     private bool[] extraHealthUnlocked; 
+    
+    public static HealthSystem Instance { get; private set; }
+
 
     private void Start()
     {
@@ -21,6 +24,17 @@ public class HealthSystem : MonoBehaviour
         InitializeHealth(maxBaseHealth);
     }
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
     public void InitializeHealth(int startingHealth)
     {
         currentHealth = startingHealth;
@@ -48,6 +62,7 @@ public class HealthSystem : MonoBehaviour
         currentHealth = Mathf.Max(currentHealth - amount, 0);
         UpdateHealthDisplay();
     }
+
 
     private void UpdateHealthDisplay()
     {

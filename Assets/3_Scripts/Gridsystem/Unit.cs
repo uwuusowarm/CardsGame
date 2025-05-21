@@ -14,6 +14,8 @@ public class Unit : MonoBehaviour
     protected Hex currentHex;
     public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
+    
+    public static Unit Instance { get; private set; }
 
     [SerializeField] private float movementDuration = 1, rotationDuration = 0.3f;
     private GlowHighlight glowHighlight;
@@ -39,50 +41,41 @@ public class Unit : MonoBehaviour
 
     public void AddBlock(int amount)
     {
-        shieldPoints += amount;
-        Debug.Log("Player blocked for " + amount + " points and now has " + shieldPoints + "Shieldpoints!");
+        ShieldSystem.Instance.AddShields(amount);
     }
 
     public void Heal(int amount)
     {
-        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-        Debug.Log("Player healed for " + amount + " points and now has " + currentHealth + "Lifepoints!");
+        HealthSystem.Instance.AddHealth(amount);
     }
     
     public void PlayerTakeDamage(int damage)
     {
-        if (shieldPoints > 0)
+        int remainingDamage = damage;
+
+        if (ShieldSystem.Instance.GetCurrentShields() > 0)
         {
-            int temp = shieldPoints;
-            shieldPoints -= damage;
-            damage -= temp;
-            if (shieldPoints < 0)
-            {
-                shieldPoints = 0;
-                Debug.Log("Shield hit and broken Player takes " + damage + " damage!");
-            }
-            if (damage <= 0)
-            {
-                Debug.Log("Shield hit! And none damage taken by Player!");
-                return;
-            }
+            int shieldDamage = Mathf.Min(remainingDamage, ShieldSystem.Instance.GetCurrentShields());
+            ShieldSystem.Instance.LoseShields(shieldDamage);
+            remainingDamage -= shieldDamage;
+
+            Debug.Log($"Shields took {shieldDamage} damage. Remaining shields: {ShieldSystem.Instance.GetCurrentShields()}");
         }
 
-        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
-        if (currentHealth <= 0)
+        if (remainingDamage > 0)
         {
-            Debug.Log("Autsch Player dead!");
-            Destroy(gameObject);
-        }
-        else
-        {
-            Debug.Log("Player has " + currentHealth + " left!");
-        }
-    }
+            HealthSystem.Instance.LoseHealth(remainingDamage);
+            Debug.Log($"Health took {remainingDamage} damage. Remaining health: {HealthSystem.Instance.GetCurrentHealth()}");
+        }    }
     
     public void AddMovementPoints(int points)
     {
-        movementPoints += points;
+        movementPoints += (points*10);
+    }
+    
+    public void ResetMovementPoints()
+    {
+        movementPoints = 0;
     }
 
     protected IEnumerator InitializeHexPosition()
@@ -121,6 +114,11 @@ public class Unit : MonoBehaviour
 
     internal void MoveTroughPath(List<Vector3> currentPath)
     {
+        if (currentPath.Count > movementPoints)
+        {
+            Debug.LogWarning("Not enough movement points!");
+            return;
+        }
         pathPositions = new Queue<Vector3>(currentPath);
         Vector3 firstTarget = pathPositions.Dequeue();
         StartCoroutine(RotationCoroutine(firstTarget, rotationDuration, true));
@@ -188,6 +186,8 @@ public class Unit : MonoBehaviour
         else
         {
             Debug.Log("Movement finished!");
+            movementPoints = 0;
+                
             MovementFinished?.Invoke(this);
         }
     }

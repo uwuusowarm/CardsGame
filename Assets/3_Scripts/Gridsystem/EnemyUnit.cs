@@ -62,7 +62,7 @@ public class EnemyUnit : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            Destroy(gameObject);
+           Destroy(gameObject);
         }
     }
 
