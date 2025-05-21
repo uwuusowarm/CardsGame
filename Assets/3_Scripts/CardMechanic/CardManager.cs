@@ -9,44 +9,48 @@ public class CardManager : MonoBehaviour
 {
     public static CardManager Instance { get; private set; }
 
+    [Header("Einstellungen")]
     [SerializeField, Min(1)] private int drawCount = 4;
     [SerializeField] private List<CardData> cardDatabase;
+
+    [Header("UI-Referenzen")]
     [SerializeField] private Transform handGrid;
-    [SerializeField] private Transform discardGrid;
     [SerializeField] private Transform leftGrid;
     [SerializeField] private Transform rightGrid;
-    [SerializeField] private GameObject cardUIPrefab;
-    [SerializeField] private Button deckButton;
+    [SerializeField] private Transform discardGrid;
+    [SerializeField] private GameObject cardPrefab;
+    [SerializeField] private float playCooldown = 0.5f;
+    [SerializeField] private float autoDiscardDelay = 3f;
 
     private List<CardData> deck = new List<CardData>();
     private List<CardData> hand = new List<CardData>();
-    private List<CardData> discardPile = new List<CardData>();
     private List<CardData> leftZone = new List<CardData>();
     private List<CardData> rightZone = new List<CardData>();
+    private List<CardData> discardPile = new List<CardData>();
+
     public RectTransform HandGridRect => handGrid as RectTransform;
     public RectTransform LeftGridRect => leftGrid as RectTransform;
     public RectTransform RightGridRect => rightGrid as RectTransform;
     public RectTransform DiscardGridRect => discardGrid as RectTransform;
 
-    public void DrawInitialCards() => DrawCards(drawCount);
-    public void DrawCard() => DrawCards(drawCount);
-    public void DrawCard(int c) => DrawCards(c);
+    private bool isPlaying = false;
+    private bool hasDrawnStartHand = false;
+    public void DrawCard() => DrawCards(1);
+    public void DrawCard(int count) => DrawCards(count);
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
+        if (Instance != null && Instance != this) 
             Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        deckButton.onClick.AddListener(OnDeckClicked);
+        else Instance = this;
     }
 
     private void Start()
     {
-        deck = new List<CardData>(cardDatabase);
+        deck.Clear();
+        deck.AddRange(cardDatabase);
         Shuffle(deck);
+        DrawInitialCards();
         UpdateAllUI();
     }
 
@@ -61,45 +65,64 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    public void OnDeckClicked()
+    public void DrawInitialCards()
     {
-        if (deck.Count < drawCount && discardPile.Count > 0)
+        if (hasDrawnStartHand) 
+            return;
+        hasDrawnStartHand = true;
+        DrawCards(drawCount);
+    }
+
+    private void DrawCards(int count)
+    {
+        if (hand.Count > 0) 
+            return;
+
+        if (deck.Count == 0 && discardPile.Count > 0)
         {
             deck.AddRange(discardPile);
             discardPile.Clear();
             Shuffle(deck);
         }
 
-        DrawCards(drawCount);
-        UpdateAllUI();
-    }
+        int toDraw = Mathf.Min(count, deck.Count);
 
-    private void DrawCards(int count)
-    {
-        for (int i = 0; i < count && deck.Count > 0; i++)
+        for (int i = 0; i < toDraw; i++)
         {
             hand.Add(deck[0]);
             deck.RemoveAt(0);
         }
+        UpdateAllUI();
     }
 
-    public void MoveToZone(CardData card, DropType zone)
+    public void OnDeckClicked()
     {
-        hand.Remove(card);
+        DrawCards(drawCount);
+    }
 
-        switch (zone)
+    public void MoveToZone(CardData card, DropType type)
+    {
+        if ((type == DropType.Left && leftZone.Contains(card)) ||
+            (type == DropType.Right && rightZone.Contains(card)))
+        {
+            Debug.Log($"[CardManager] Karte '{card.cardName}' wurde bereits in Zone '{type}' gelegt.");
+            UpdateAllUI();
+            return;
+        }
+
+        if (isPlaying) return;
+        isPlaying = true;
+
+        int idx = hand.IndexOf(card);
+        if (idx >= 0) hand.RemoveAt(idx);
+
+        switch (type)
         {
             case DropType.Left:
                 leftZone.Add(card);
-                StartCoroutine(ZoneCooldown(card, DropType.Left));
-                GameManager.Instance.ProcessPlayedCard(card, true);
-
                 break;
             case DropType.Right:
                 rightZone.Add(card);
-                StartCoroutine(ZoneCooldown(card, DropType.Right));
-                GameManager.Instance.ProcessPlayedCard(card, false);
-
                 break;
             case DropType.Discard:
                 discardPile.Add(card);
@@ -110,72 +133,56 @@ public class CardManager : MonoBehaviour
         }
 
         UpdateAllUI();
+        StartCoroutine(PlayCooldown());
+
+        if (type == DropType.Left || type == DropType.Right)
+            StartCoroutine(AutoDiscard(card, type));
     }
 
-    private IEnumerator ZoneCooldown(CardData card, DropType zone)
+    private IEnumerator PlayCooldown()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(playCooldown);
+        isPlaying = false;
+    }
 
-        if (zone == DropType.Left) 
-            leftZone.Remove(card);
-
-        else rightZone.Remove(card);
-
+    private IEnumerator AutoDiscard(CardData card, DropType fromZone)
+    {
+        yield return new WaitForSeconds(autoDiscardDelay);
+        switch (fromZone)
+        {
+            case DropType.Left:
+                leftZone.Remove(card);
+                break;
+            case DropType.Right:
+                rightZone.Remove(card);
+                break;
+        }
         discardPile.Add(card);
         UpdateAllUI();
     }
 
-    private void UpdateAllUI()
+    public void UpdateAllUI()
     {
-        UpdateHandUI();
-        UpdateZoneUI(leftGrid, leftZone, false, hide: false);
-        UpdateZoneUI(rightGrid, rightZone, false, hide: false);
-        UpdateZoneUI(discardGrid, discardPile, false, hide: false);
+        RebuildContainer(handGrid, hand, true);
+        RebuildContainer(leftGrid, leftZone, false);
+        RebuildContainer(rightGrid, rightZone, false);
+        RebuildContainer(discardGrid, discardPile, false);
     }
 
-    private void UpdateHandUI()
+    private void RebuildContainer(Transform parent, List<CardData> list, bool draggable)
     {
-        foreach (Transform t in handGrid) 
-            Destroy(t.gameObject);
-        foreach (var c in hand)
+        for (int i = parent.childCount - 1; i >= 0; i--)
+            DestroyImmediate(parent.GetChild(i).gameObject);
+
+        foreach (var c in list)
         {
-            var go = Instantiate(cardUIPrefab, handGrid);
-
+            var go = Instantiate(cardPrefab, parent);
             go.GetComponent<CardUI>().Initialize(c);
-
-            if (go.TryGetComponent<CardDragHandler>(out var d))
-                d.Card = c;
-        }
-    }
-
-    private void UpdateZoneUI(Transform grid, List<CardData> cards, bool draggable, bool hide)
-    {
-        foreach (Transform t in grid) 
-            Destroy(t.gameObject);
-        foreach (var c in cards)
-        {
-            var go = Instantiate(cardUIPrefab, grid);
-
-            go.GetComponent<CardUI>().Initialize(c);
-
             if (draggable && go.TryGetComponent<CardDragHandler>(out var d))
                 d.Card = c;
-
-            else if (go.TryGetComponent<CardDragHandler>(out var d2))
+            else if (!draggable && go.TryGetComponent<CardDragHandler>(out var d2))
                 Destroy(d2);
-
-            if (hide)
-            {
-                var cg = go.GetComponent<CanvasGroup>() ?? go.AddComponent<CanvasGroup>();
-                cg.alpha = 0f;
-                cg.blocksRaycasts = false;
-            }
-
             go.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
         }
-    }
-    public void UpdateDiscardUI()
-    {
-        UpdateZoneUI(discardGrid, discardPile, false, hide: false);
     }
 }

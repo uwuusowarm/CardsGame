@@ -43,7 +43,7 @@ public class UnitManager : MonoBehaviour
             Debug.LogWarning($"Unit {unit.name} does not have a Unit component!");
             return;
         }
-    
+
         Debug.Log($"Unit {unitReference.name} selected.");
         PrepareUnitForMovement(unitReference);
     }
@@ -139,7 +139,8 @@ public class UnitManager : MonoBehaviour
         ClearOldSelection();
         if (CardManager.Instance != null)
         {
-            CardManager.Instance.UpdateDiscardUI();
+            // Statt UpdateDiscardUI nun UpdateAllUI aufrufen
+            CardManager.Instance.UpdateAllUI();
         }
 
         StartCoroutine(EnemyTurnRoutine());
@@ -185,12 +186,12 @@ public class UnitManager : MonoBehaviour
     {
         if (!PlayersTurn) return;
         Unit[] playerUnits = FindObjectsByType<Unit>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-                            .Where(unit => unit.GetComponent<EnemyUnit>() == null) 
+                            .Where(unit => unit.GetComponent<EnemyUnit>() == null)
                             .ToArray();
 
         if (playerUnits.Length > 0)
         {
-            PrepareUnitForMovement(playerUnits[0]); 
+            PrepareUnitForMovement(playerUnits[0]);
         }
         else
         {
