@@ -163,6 +163,7 @@ public class GameManager : MonoBehaviour
         {
             targetForSelfEffects.AddMovementPoints(PlayedCardEffectCache.Instance.PendingMovement);
             Debug.Log($"Player gained {PlayedCardEffectCache.Instance.PendingMovement} Movement Points.");
+            UnitManager.Instance.HandleUnitSelected(targetForSelfEffects.gameObject);
         }
 
         if (PlayedCardEffectCache.Instance.PendingDamage > 0)
@@ -252,21 +253,14 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator EnemyTurnRoutine()
     {
-        Debug.Log("Starting Enemy Turn Routine.");
-        if (UnitManager.Instance != null)
-        {
-            UnitManager.Instance.StartEnemyTurn();
-        }
-        else if (UnitManager.Instance == null)
-        {
-            Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
+            Debug.Log("Starting Enemy Turn Routine.");
+            if (UnitManager.Instance == null)
+            {
+                Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
+                StartPlayerTurn();
+                yield break;
+            }
+            Debug.Log("Enemy Turn Finished.");
             StartPlayerTurn();
-            
-            yield break;
-        }
-        
-        
-        Debug.Log("Enemy Turn Finished.");
-        StartPlayerTurn();
     }
 }

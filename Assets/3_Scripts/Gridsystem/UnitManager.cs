@@ -32,12 +32,19 @@ public class UnitManager : MonoBehaviour
 
     public void HandleUnitSelected(GameObject unit)
     {
-        if (!PlayersTurn) return;
+        if (!PlayersTurn)
+        {
+            Debug.Log("Not player's turn. Cannot select unit.");
+            return;
+        }
 
-        if (!unit.TryGetComponent<Unit>(out var unitReference)) return;
-
-        if (CheckIfTheSameUnitSelected(unitReference)) return;
-
+        if (!unit.TryGetComponent<Unit>(out var unitReference))
+        {
+            Debug.LogWarning($"Unit {unit.name} does not have a Unit component!");
+            return;
+        }
+    
+        Debug.Log($"Unit {unitReference.name} selected.");
         PrepareUnitForMovement(unitReference);
     }
 
