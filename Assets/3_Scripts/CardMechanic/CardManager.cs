@@ -101,8 +101,6 @@ public class CardManager : MonoBehaviour
                 rightZone.Clear();
                 leftZone.Clear();
                 leftZone.Add(card);
-                GameManager.Instance.ProcessPlayedCard(card, true);
-
                 break;
 
             case DropType.Right:
@@ -111,7 +109,6 @@ public class CardManager : MonoBehaviour
                 leftZone.Clear();
                 rightZone.Clear();
                 rightZone.Add(card);
-                GameManager.Instance.ProcessPlayedCard(card, false);
                 break;
 
             case DropType.Discard:
