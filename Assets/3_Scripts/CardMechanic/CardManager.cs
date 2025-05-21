@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,16 +18,19 @@ public class CardManager : MonoBehaviour
     [SerializeField] private GameObject cardUIPrefab;
     [SerializeField] private Button deckButton;
 
-    private List<CardData> deck = new();
-    private List<CardData> hand = new();
-    private List<CardData> discardPile = new();
-    private List<CardData> leftZone = new();
-    private List<CardData> rightZone = new();
-
+    private List<CardData> deck = new List<CardData>();
+    private List<CardData> hand = new List<CardData>();
+    private List<CardData> discardPile = new List<CardData>();
+    private List<CardData> leftZone = new List<CardData>();
+    private List<CardData> rightZone = new List<CardData>();
     public RectTransform HandGridRect => handGrid as RectTransform;
     public RectTransform LeftGridRect => leftGrid as RectTransform;
     public RectTransform RightGridRect => rightGrid as RectTransform;
     public RectTransform DiscardGridRect => discardGrid as RectTransform;
+
+    public void DrawInitialCards() => DrawCards(drawCount);
+    public void DrawCard() => DrawCards(drawCount);
+    public void DrawCard(int c) => DrawCards(c);
 
     private void Awake()
     {
@@ -35,7 +39,6 @@ public class CardManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
         deckButton.onClick.AddListener(OnDeckClicked);
     }
@@ -47,19 +50,19 @@ public class CardManager : MonoBehaviour
         UpdateAllUI();
     }
 
-    public void DrawInitialCards() => DrawCards(drawCount);
-    public void DrawCard() => DrawCards(drawCount);
-    public void DrawCard(int urmom) => DrawCards(urmom);
+    private void Shuffle(List<CardData> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            int r = Random.Range(i, list.Count);
+            var tmp = list[i];
+            list[i] = list[r];
+            list[r] = tmp;
+        }
+    }
+
     public void OnDeckClicked()
     {
-        discardPile.AddRange(hand);
-        discardPile.AddRange(leftZone);
-        discardPile.AddRange(rightZone);
-
-        hand.Clear();
-        leftZone.Clear();
-        rightZone.Clear();
-
         if (deck.Count < drawCount && discardPile.Count > 0)
         {
             deck.AddRange(discardPile);
@@ -80,15 +83,6 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    private void Shuffle(List<CardData> list)
-    {
-        for (int i = 0; i < list.Count; i++)
-        {
-            int randomIndex = Random.Range(i, list.Count);
-            (list[i], list[randomIndex]) = (list[randomIndex], list[i]);
-        }
-    }
-
     public void MoveToZone(CardData card, DropType zone)
     {
         hand.Remove(card);
@@ -96,79 +90,92 @@ public class CardManager : MonoBehaviour
         switch (zone)
         {
             case DropType.Left:
-                discardPile.AddRange(rightZone);
-                discardPile.AddRange(leftZone);
-                rightZone.Clear();
-                leftZone.Clear();
                 leftZone.Add(card);
+                StartCoroutine(ZoneCooldown(card, DropType.Left));
                 GameManager.Instance.ProcessPlayedCard(card, true);
 
                 break;
-
             case DropType.Right:
-                discardPile.AddRange(leftZone);
-                discardPile.AddRange(rightZone);
-                leftZone.Clear();
-                rightZone.Clear();
                 rightZone.Add(card);
+                StartCoroutine(ZoneCooldown(card, DropType.Right));
                 GameManager.Instance.ProcessPlayedCard(card, false);
-                break;
 
+                break;
             case DropType.Discard:
                 discardPile.Add(card);
                 break;
-
             default:
                 hand.Add(card);
                 break;
         }
 
         UpdateAllUI();
-        
     }
 
-    public void UpdateDiscardUI()
+    private IEnumerator ZoneCooldown(CardData card, DropType zone)
     {
-        UpdateZoneUI(discardGrid, discardPile, false, disableRaycast: true);
+        yield return new WaitForSeconds(3f);
+
+        if (zone == DropType.Left) 
+            leftZone.Remove(card);
+
+        else rightZone.Remove(card);
+
+        discardPile.Add(card);
+        UpdateAllUI();
     }
 
     private void UpdateAllUI()
     {
-        UpdateZoneUI(handGrid, hand, true);
-        UpdateZoneUI(leftGrid, leftZone, false);
-        UpdateZoneUI(rightGrid, rightZone, false);
-        UpdateZoneUI(discardGrid, discardPile, false, disableRaycast: true);
-      
+        UpdateHandUI();
+        UpdateZoneUI(leftGrid, leftZone, false, hide: false);
+        UpdateZoneUI(rightGrid, rightZone, false, hide: false);
+        UpdateZoneUI(discardGrid, discardPile, false, hide: false);
     }
 
-    private void UpdateZoneUI(Transform grid, List<CardData> cards, bool draggable, bool disableRaycast = false)
+    private void UpdateHandUI()
     {
-        foreach (Transform child in grid)
-            Destroy(child.gameObject);
-
-        foreach (var card in cards)
+        foreach (Transform t in handGrid) 
+            Destroy(t.gameObject);
+        foreach (var c in hand)
         {
-            var cardUI = Instantiate(cardUIPrefab, grid);
-            cardUI.GetComponent<CardUI>().Initialize(card);
+            var go = Instantiate(cardUIPrefab, handGrid);
 
-            if (draggable)
-            {
-                if (cardUI.TryGetComponent<CardDragHandler>(out var handler))
-                    handler.Card = card;
-            }
-            else
-            {
-                if (cardUI.TryGetComponent<CardDragHandler>(out var handler))
-                    Destroy(handler);
+            go.GetComponent<CardUI>().Initialize(c);
 
-                cardUI.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-            }
-
-            if (disableRaycast)
-            {
-                var canvasGroup = cardUI.GetComponent<CanvasGroup>() ?? cardUI.AddComponent<CanvasGroup>();
-                canvasGroup.blocksRaycasts = false;
-            }
+            if (go.TryGetComponent<CardDragHandler>(out var d))
+                d.Card = c;
         }
+    }
+
+    private void UpdateZoneUI(Transform grid, List<CardData> cards, bool draggable, bool hide)
+    {
+        foreach (Transform t in grid) 
+            Destroy(t.gameObject);
+        foreach (var c in cards)
+        {
+            var go = Instantiate(cardUIPrefab, grid);
+
+            go.GetComponent<CardUI>().Initialize(c);
+
+            if (draggable && go.TryGetComponent<CardDragHandler>(out var d))
+                d.Card = c;
+
+            else if (go.TryGetComponent<CardDragHandler>(out var d2))
+                Destroy(d2);
+
+            if (hide)
+            {
+                var cg = go.GetComponent<CanvasGroup>() ?? go.AddComponent<CanvasGroup>();
+                cg.alpha = 0f;
+                cg.blocksRaycasts = false;
+            }
+
+            go.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        }
+    }
+    public void UpdateDiscardUI()
+    {
+        UpdateZoneUI(discardGrid, discardPile, false, hide: false);
     }
 }
