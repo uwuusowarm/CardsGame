@@ -163,7 +163,7 @@ public class GameManager : MonoBehaviour
         {
             targetForSelfEffects.AddMovementPoints(PlayedCardEffectCache.Instance.PendingMovement);
             Debug.Log($"Player gained {PlayedCardEffectCache.Instance.PendingMovement} Movement Points.");
-            UnitManager.Instance.PrepareUnitForMovement(targetForSelfEffects);
+            UnitManager.Instance.HandleUnitSelected(targetForSelfEffects.gameObject);
         }
 
         if (PlayedCardEffectCache.Instance.PendingDamage > 0)
