@@ -14,6 +14,9 @@ public class CardData : ScriptableObject
     public List<CardEffect> leftEffects = new List<CardEffect>();
     public List<CardEffect> rightEffects = new List<CardEffect>();
     public List<CardEffect> alwaysEffects = new List<CardEffect>();
+    [Header("Icons")]
+    public Sprite leftEffectIcon;
+    public Sprite rightEffectIcon;
 
     [TextArea] public string description;
 }

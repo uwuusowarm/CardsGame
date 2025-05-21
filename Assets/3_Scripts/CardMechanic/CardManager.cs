@@ -2,13 +2,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum DropType { Hand, Left, Right, Discard }
+
 public class CardManager : MonoBehaviour
 {
     public static CardManager Instance { get; private set; }
 
-    [SerializeField] private List<CardData> cardDatabase;
     [SerializeField, Min(1)] private int drawCount = 4;
-
+    [SerializeField] private List<CardData> cardDatabase;
     [SerializeField] private Transform handGrid;
     [SerializeField] private Transform discardGrid;
     [SerializeField] private Transform leftGrid;
@@ -16,12 +17,16 @@ public class CardManager : MonoBehaviour
     [SerializeField] private GameObject cardUIPrefab;
     [SerializeField] private Button deckButton;
 
-    private List<CardData> deck = new List<CardData>();
-    private List<CardData> hand = new List<CardData>();
-    private List<CardData> discard = new List<CardData>();
-    private List<CardData> left = new List<CardData>();
-    private List<CardData> right = new List<CardData>();
+    private List<CardData> deck = new();
+    private List<CardData> hand = new();
+    private List<CardData> discardPile = new();
+    private List<CardData> leftZone = new();
+    private List<CardData> rightZone = new();
 
+    public RectTransform HandGridRect => handGrid as RectTransform;
+    public RectTransform LeftGridRect => leftGrid as RectTransform;
+    public RectTransform RightGridRect => rightGrid as RectTransform;
+    public RectTransform DiscardGridRect => discardGrid as RectTransform;
 
     private void Awake()
     {
@@ -30,134 +35,137 @@ public class CardManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
-//        deckButton.onClick.AddListener(OnDeckClicked);
+        deckButton.onClick.AddListener(OnDeckClicked);
     }
 
     private void Start()
     {
         deck = new List<CardData>(cardDatabase);
         Shuffle(deck);
-        UpdateHandUI();
-        UpdateDiscardUI();
+        UpdateAllUI();
     }
-    
+
+    public void DrawInitialCards() => DrawCards(drawCount);
+    public void DrawCard() => DrawCards(drawCount);
+    public void DrawCard(int urmom) => DrawCards(urmom);
+    public void OnDeckClicked()
+    {
+        discardPile.AddRange(hand);
+        discardPile.AddRange(leftZone);
+        discardPile.AddRange(rightZone);
+
+        hand.Clear();
+        leftZone.Clear();
+        rightZone.Clear();
+
+        if (deck.Count < drawCount && discardPile.Count > 0)
+        {
+            deck.AddRange(discardPile);
+            discardPile.Clear();
+            Shuffle(deck);
+        }
+
+        DrawCards(drawCount);
+        UpdateAllUI();
+    }
+
+    private void DrawCards(int count)
+    {
+        for (int i = 0; i < count && deck.Count > 0; i++)
+        {
+            hand.Add(deck[0]);
+            deck.RemoveAt(0);
+        }
+    }
+
     private void Shuffle(List<CardData> list)
     {
         for (int i = 0; i < list.Count; i++)
         {
-            int r = Random.Range(i, list.Count);
-            var tmp = list[i];
-            list[i] = list[r];
-            list[r] = tmp;
+            int randomIndex = Random.Range(i, list.Count);
+            (list[i], list[randomIndex]) = (list[randomIndex], list[i]);
         }
     }
 
-    public void OnDeckClicked()
-    {
-        if (hand.Count > 0)
-        {
-            discard.AddRange(hand);
-            hand.Clear();
-            UpdateDiscardUI();
-        }
-        DrawCard(drawCount);
-    }
-
-    public void DrawCard(int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            if (deck.Count == 0)
-            {
-                deck.AddRange(discard);
-                discard.Clear();
-                Shuffle(deck);
-                UpdateDiscardUI();
-                if (deck.Count == 0) break;
-            }
-            var card = deck[0];
-            deck.RemoveAt(0);
-            hand.Add(card);
-        }
-        UpdateHandUI();
-    }
-
-    public void DrawInitialCards()
-    {
-        DrawCard(drawCount);
-    }
     public void MoveToZone(CardData card, DropType zone)
     {
-        if (hand.Contains(card)) 
-            hand.Remove(card);
+        hand.Remove(card);
 
-        if (zone == DropType.Discard)
-            discard.Add(card);
-        else if (zone == DropType.Left)
-            left.Add(card);
-        else if (zone == DropType.Right)
-            right.Add(card);
-        else
-            hand.Add(card);
-
-        UpdateHandUI();
-        UpdateRightLeftUI();
-        UpdateDiscardUI();
-    }
-    
-    private void UpdateRightLeftUI()
-    {
-        foreach (Transform t in leftGrid) Destroy(t.gameObject);
-        foreach (var card in left)
+        switch (zone)
         {
-            var go = Instantiate(cardUIPrefab, leftGrid);
-            var ui = go.GetComponent<CardUI>();
-            ui.Initialize(card);
-            var drag = go.GetComponent<CardDragHandler>();
-            if (drag != null) drag.Card = card;
+            case DropType.Left:
+                discardPile.AddRange(rightZone);
+                discardPile.AddRange(leftZone);
+                rightZone.Clear();
+                leftZone.Clear();
+                leftZone.Add(card);
+                break;
+
+            case DropType.Right:
+                discardPile.AddRange(leftZone);
+                discardPile.AddRange(rightZone);
+                leftZone.Clear();
+                rightZone.Clear();
+                rightZone.Add(card);
+                break;
+
+            case DropType.Discard:
+                discardPile.Add(card);
+                break;
+
+            default:
+                hand.Add(card);
+                break;
         }
+
+        UpdateAllUI();
         
-        foreach (Transform t in rightGrid) Destroy(t.gameObject);
-        foreach (var card in right)
-        {
-            var go = Instantiate(cardUIPrefab, rightGrid);
-            var ui = go.GetComponent<CardUI>();
-            ui.Initialize(card);
-            var drag = go.GetComponent<CardDragHandler>();
-            if (drag != null) drag.Card = card;       
-        }
-    }
-    
-    private void UpdateHandUI()
-    {
-        foreach (Transform t in handGrid) Destroy(t.gameObject);
-        foreach (var card in hand)
-        {
-            var go = Instantiate(cardUIPrefab, handGrid);
-            var ui = go.GetComponent<CardUI>();
-            ui.Initialize(card);
-            var drag = go.GetComponent<CardDragHandler>();
-            if (drag != null) drag.Card = card;
-        }
     }
 
     public void UpdateDiscardUI()
     {
-        if (discardGrid == null) return;
-        foreach (Transform t in discardGrid) Destroy(t.gameObject);
-        foreach (var card in discard)
-        {
-            var go = Instantiate(cardUIPrefab, discardGrid);
-            var ui = go.GetComponent<CardUI>();
-            ui.Initialize(card);
-            var drag = go.GetComponent<CardDragHandler>();
-            if (drag != null) Destroy(drag);
-        }
+        UpdateZoneUI(discardGrid, discardPile, false, disableRaycast: true);
     }
 
-    public RectTransform HandGridRect => handGrid as RectTransform;
-    public RectTransform LeftGridRect => leftGrid as RectTransform;
-    public RectTransform RightGridRect => rightGrid as RectTransform;
-    public RectTransform DiscardGridRect => discardGrid as RectTransform;
+    private void UpdateAllUI()
+    {
+        UpdateZoneUI(handGrid, hand, true);
+        UpdateZoneUI(leftGrid, leftZone, false);
+        UpdateZoneUI(rightGrid, rightZone, false);
+        UpdateZoneUI(discardGrid, discardPile, false, disableRaycast: true);
+      
+    }
+
+    private void UpdateZoneUI(Transform grid, List<CardData> cards, bool draggable, bool disableRaycast = false)
+    {
+        foreach (Transform child in grid)
+            Destroy(child.gameObject);
+
+        foreach (var card in cards)
+        {
+            var cardUI = Instantiate(cardUIPrefab, grid);
+            cardUI.GetComponent<CardUI>().Initialize(card);
+
+            if (draggable)
+            {
+                if (cardUI.TryGetComponent<CardDragHandler>(out var handler))
+                    handler.Card = card;
+            }
+            else
+            {
+                if (cardUI.TryGetComponent<CardDragHandler>(out var handler))
+                    Destroy(handler);
+
+                cardUI.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            }
+
+            if (disableRaycast)
+            {
+                var canvasGroup = cardUI.GetComponent<CanvasGroup>() ?? cardUI.AddComponent<CanvasGroup>();
+                canvasGroup.blocksRaycasts = false;
+            }
+        }
+    }
 }
