@@ -92,10 +92,14 @@ public class CardManager : MonoBehaviour
             case DropType.Left:
                 leftZone.Add(card);
                 StartCoroutine(ZoneCooldown(card, DropType.Left));
+                GameManager.Instance.ProcessPlayedCard(card, true);
+
                 break;
             case DropType.Right:
                 rightZone.Add(card);
                 StartCoroutine(ZoneCooldown(card, DropType.Right));
+                GameManager.Instance.ProcessPlayedCard(card, false);
+
                 break;
             case DropType.Discard:
                 discardPile.Add(card);
