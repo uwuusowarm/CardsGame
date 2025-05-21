@@ -6,61 +6,64 @@ using System.Collections.Generic;
 [CustomEditor(typeof(CardManager))]
 public class CardManagerEditor : Editor
 {
-    private CardManager manager;
-    private FieldInfo deckF;
-    private FieldInfo handF;
-    private FieldInfo discardF;
-    private FieldInfo leftF;
-    private FieldInfo rightF;
+    private CardManager cardManager;
+
+    private FieldInfo deckField;
+    private FieldInfo handField;
+    private FieldInfo discardField;
+    private FieldInfo leftField;
+    private FieldInfo rightField;
 
     private bool showDeck = true;
     private bool showHand = true;
     private bool showDiscard = true;
-    private bool showLeft = true; 
+    private bool showLeft = true;
     private bool showRight = true;
 
     public override bool RequiresConstantRepaint() => Application.isPlaying;
 
     private void OnEnable()
     {
-        var t = typeof(CardManager);
+        var managerType = typeof(CardManager);
+        cardManager = (CardManager)target;
 
-        manager = (CardManager)target;
-        deckF = t.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
-        handF = t.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
-        discardF = t.GetField("discard", BindingFlags.NonPublic | BindingFlags.Instance);
-        leftF = t.GetField("left", BindingFlags.NonPublic | BindingFlags.Instance);
-        rightF = t.GetField("right", BindingFlags.NonPublic | BindingFlags.Instance);
+        deckField = managerType.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
+        handField = managerType.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
+        discardField = managerType.GetField("discardPile", BindingFlags.NonPublic | BindingFlags.Instance);
+        leftField = managerType.GetField("leftZone", BindingFlags.NonPublic | BindingFlags.Instance);
+        rightField = managerType.GetField("rightZone", BindingFlags.NonPublic | BindingFlags.Instance);
     }
 
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-        GUILayout.Space(8);
-        EditorGUILayout.LabelField("Runtime Card Lists", EditorStyles.boldLabel);
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField("Zones", EditorStyles.boldLabel);
 
-        DrawList(deckF, ref showDeck, "Deck");
-        DrawList(handF, ref showHand, "Hand");
-        DrawList(discardF, ref showDiscard, "Discard");
-        DrawList(leftF, ref showLeft, "Left Zone");
-        DrawList(rightF, ref showRight, "Right Zone");
+        DrawCardList(deckField, ref showDeck, "Deck");
+        DrawCardList(handField, ref showHand, "Hand");
+        DrawCardList(discardField, ref showDiscard, "Discard Pile");
+        DrawCardList(leftField, ref showLeft, "Left Zone");
+        DrawCardList(rightField, ref showRight, "Right Zone");
 
         if (Application.isPlaying)
             Repaint();
     }
 
-    private void DrawList(FieldInfo fi, ref bool fold, string label)
+    private void DrawCardList(FieldInfo field, ref bool foldout, string label)
     {
-        var list = fi.GetValue(manager) as List<CardData>;
-        int count = list?.Count ?? 0;
+        var cards = field.GetValue(cardManager) as List<CardData>;
+        int cardCount = cards?.Count ?? 0;
 
-        fold = EditorGUILayout.Foldout(fold, $"{label} ({count})");
+        foldout = EditorGUILayout.Foldout(foldout, $"{label} ({cardCount})");
 
-        if (fold && list != null)
+        if (foldout && cards != null)
         {
             EditorGUI.indentLevel++;
-            foreach (var c in list)
-                EditorGUILayout.LabelField("• " + c.cardName);
+            foreach (var card in cards)
+            {
+                EditorGUILayout.LabelField("• " + card.cardName);
+            }
             EditorGUI.indentLevel--;
         }
     }
