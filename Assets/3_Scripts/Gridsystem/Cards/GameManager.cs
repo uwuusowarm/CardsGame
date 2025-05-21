@@ -259,13 +259,9 @@ public class GameManager : MonoBehaviour
     private IEnumerator EnemyTurnRoutine()
     {
             Debug.Log("Starting Enemy Turn Routine.");
-            if (UnitManager.Instance == null)
-            {
+            
                 Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
                 StartPlayerTurn();
                 yield break;
-            }
-            Debug.Log("Enemy Turn Finished.");
-            StartPlayerTurn();
     }
 }
