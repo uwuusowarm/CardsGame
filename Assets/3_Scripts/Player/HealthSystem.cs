@@ -21,7 +21,19 @@ public class HealthSystem : MonoBehaviour
         extraHealthUnlocked = new bool[maxExtraHealth];
         InitializeHealth(maxBaseHealth);
     }
-
+    
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+    
     public void InitializeHealth(int startingHealth)
     {
         currentHealth = startingHealth;

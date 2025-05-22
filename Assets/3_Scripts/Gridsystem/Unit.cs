@@ -29,6 +29,15 @@ public class Unit : MonoBehaviour
         {
             Debug.LogError("GlowHighlight component missing on Unit!", gameObject);
         }
+        
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
     }
     private void Start()
     {
@@ -46,7 +55,7 @@ public class Unit : MonoBehaviour
 
     public void Heal(int amount)
     {
-        HealthSystem.Instance.AddHealth(amount);
+        HealthSystem.Instance.Heal(amount);
     }
     
     public void PlayerTakeDamage(int damage)
