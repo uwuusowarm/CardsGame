@@ -87,8 +87,8 @@ public class GameManager : MonoBehaviour
             Debug.LogError("CardManager.Instance is null for card draw.");
             return;
         }
-        Debug.Log("Calling CardManager.OnDeckClicked() to discard hand and draw new cards.");
-        CardManager.Instance.OnDeckClicked();
+        Debug.Log("Calling CardManager.DrawCards() to discard hand and draw new cards.");
+        CardManager.Instance.DrawCards(4);
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
@@ -141,11 +141,11 @@ public class GameManager : MonoBehaviour
             if(PlayedCardEffectCache.Instance != null) PlayedCardEffectCache.Instance.ClearCache();
             PlayedCardEffectCache.Instance.PrintCachedEffects();
         }
-        else
+        /*else
         {
             isWaitingForPlayerActionResolution = true;
             Debug.Log("Waiting for player to select a target or resolve action.");
-        }
+        }*/
     }
 
     private void ApplyCachedEffects()

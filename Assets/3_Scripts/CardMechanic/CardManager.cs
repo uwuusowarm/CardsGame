@@ -73,7 +73,7 @@ public class CardManager : MonoBehaviour
         DrawCards(drawCount);
     }
 
-    private void DrawCards(int count)
+    public void DrawCards(int count)
     {
         if (hand.Count > 0) 
             return;
@@ -120,9 +120,11 @@ public class CardManager : MonoBehaviour
         {
             case DropType.Left:
                 leftZone.Add(card);
+                GameManager.Instance.ProcessPlayedCard(card, true);
                 break;
             case DropType.Right:
                 rightZone.Add(card);
+                GameManager.Instance.ProcessPlayedCard(card, false);
                 break;
             case DropType.Discard:
                 discardPile.Add(card);
