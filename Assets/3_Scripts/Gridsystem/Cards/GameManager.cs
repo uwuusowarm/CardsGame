@@ -67,6 +67,7 @@ public class GameManager : MonoBehaviour
         isWaitingForPlayerActionResolution = false;
         playerUnit.shieldPoints = 0;
         playerUnit.movementPoints = 0;
+        ActionPointSystem.Instance.AddActionPoints(4);
         
         if (isFirstTurn)
         {
@@ -93,6 +94,14 @@ public class GameManager : MonoBehaviour
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
     {
+        int AP = ActionPointSystem.Instance.GetCurrentActionPoints();
+        
+        if (AP <= 0)
+        {
+            Debug.LogWarning("Cannot process card. No action points left.");
+            return;    
+        }
+        
         if (!IsPlayerTurn || isWaitingForPlayerActionResolution)
         {
             Debug.LogWarning("Cannot process card. Not player's turn or waiting for action resolution.");
@@ -146,6 +155,8 @@ public class GameManager : MonoBehaviour
             isWaitingForPlayerActionResolution = true;
             Debug.Log("Waiting for player to select a target or resolve action.");
         }
+        
+        ActionPointSystem.Instance.UseActionPoints(1);
     }
 
     private void ApplyCachedEffects()
@@ -253,7 +264,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Player initiated end of turn.");
         IsPlayerTurn = false;
         ShieldSystem.Instance.LoseShields(100);
-
         StartCoroutine(EnemyTurnRoutine());
     }
 

@@ -12,12 +12,15 @@ public class ActionPointSystem : MonoBehaviour
 
     private int currentActionPoints;
     private bool[] pointsUnlocked; 
+    
+    public static ActionPointSystem Instance { get; private set; }
+
 
     private void Start()
     {
         if (actionPointIcons.Count != maxActionPoints)
         {
-            Debug.LogError($"Es werden genau {maxActionPoints} ActionPoint-Icons benötigt!");
+            Debug.LogError($"Es werden genau {maxActionPoints} ActionPoint-Icons benï¿½tigt!");
             return;
         }
 
@@ -25,6 +28,19 @@ public class ActionPointSystem : MonoBehaviour
         InitializeActionPoints(2); 
     }
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Debug.LogWarning("Another instance of ActionPointSystem found, destroying this one.");
+            Destroy(gameObject);
+        }
+    }
+    
     public void InitializeActionPoints(int startingPoints)
     {
         currentActionPoints = Mathf.Clamp(startingPoints, 0, maxActionPoints);

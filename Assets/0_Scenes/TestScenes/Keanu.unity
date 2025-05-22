@@ -1316,6 +1316,11 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: b3dbb89751212e14fa32e5ed90fbb2d1,
+        type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
     - target: {fileID: 919132149155446097, guid: b3dbb89751212e14fa32e5ed90fbb2d1,
         type: 3}
       propertyPath: m_Name
@@ -1474,7 +1479,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxActionPoints: 4
-  actionPointIcons: []
+  actionPointIcons:
+  - {fileID: 199058393}
+  - {fileID: 920292291}
+  - {fileID: 1461433569}
+  - {fileID: 1141993167}
 --- !u!114 &539961747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3964,6 +3973,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d14f729b695d0244785e44b94b61a3ce,
         type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d14f729b695d0244785e44b94b61a3ce,
+        type: 3}
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
@@ -3974,11 +3988,11 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d14f729b695d0244785e44b94b61a3ce,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1379147705}
+      addedObject: {fileID: 1379147704}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d14f729b695d0244785e44b94b61a3ce,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1379147704}
+      addedObject: {fileID: 1379147709}
   m_SourcePrefab: {fileID: 100100000, guid: d14f729b695d0244785e44b94b61a3ce, type: 3}
 --- !u!1 &1379147703 stripped
 GameObject:
@@ -4009,7 +4023,7 @@ CapsuleCollider:
   m_Height: 0.109830685
   m_Direction: 1
   m_Center: {x: -0.0032440051, y: 0.03936737, z: -0.005418301}
---- !u!114 &1379147705
+--- !u!114 &1379147709
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
