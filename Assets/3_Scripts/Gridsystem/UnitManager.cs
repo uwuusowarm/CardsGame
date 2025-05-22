@@ -17,6 +17,8 @@ public class UnitManager : MonoBehaviour
     private Hex previouslySelectedHex;
     public Unit SelectedUnit => selectedUnit;
     private bool isFirstTurn = true;
+    
+    public Animator animator;
 
     void Awake()
     {
@@ -98,6 +100,7 @@ public class UnitManager : MonoBehaviour
         else
         {
             movementSystem.MoveUnit();
+            animator.SetBool("IsWalking", true);
             selectedUnit.MovementFinished += OnMovementFinished;
             ClearOldSelection();
         }
@@ -106,6 +109,9 @@ public class UnitManager : MonoBehaviour
     private void OnMovementFinished(Unit unit)
     {
         unit.MovementFinished -= OnMovementFinished;
+        animator.SetBool("IsWalking", false);
+
+        
     }
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)
