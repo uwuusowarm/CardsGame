@@ -8,7 +8,9 @@ public class CardData : ScriptableObject
     public int manaCost;
     public Sprite cardArt;
     public CardClass cardClass;
+    public Sprite backgroundSprite;
     public CardRarity rarity;
+    public Sprite borderSprite;
 
     [Header("Effects")]
     public List<CardEffect> leftEffects = new List<CardEffect>();
