@@ -10,26 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a96a61ce38373274c97e49ef39b7eb27, type: 3}
-  m_Name: Card_Attack
+  m_Name: Card_Sword Attack
   m_EditorClassIdentifier: 
-  cardName: Attack
+  cardName: Sword Attack
   manaCost: 0
-  cardArt: {fileID: 21300000, guid: 1f395fed01465f04490c65c2afb08259, type: 3}
-  cardClass: 0
-  rarity: 0
+  cardArt: {fileID: 21300000, guid: 73673c29f71a29e48b4c376f4edca0aa, type: 3}
+  cardClass: 2
+  backgroundSprite: {fileID: 21300000, guid: fe895dc48ad4ffb42b69a131436c1a0c, type: 3}
+  rarity: 1
+  borderSprite: {fileID: 21300000, guid: 168c1ee8bc10775439fe38671b50fe8e, type: 3}
   leftEffects:
   - effectType: 0
-    value: 3
+    value: 5
     isTemporary: 0
     duration: 0
     range: 0
   rightEffects:
-  - effectType: 1
+  - effectType: 4
     value: 1
     isTemporary: 0
     duration: 0
     range: 0
   alwaysEffects: []
   leftEffectIcon: {fileID: 21300000, guid: 8587820d2bca2ef429dec60d514637f5, type: 3}
-  rightEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
+  rightEffectIcon: {fileID: 21300000, guid: a3140e3babcf7c740b0fabd24226422c, type: 3}
   description: 

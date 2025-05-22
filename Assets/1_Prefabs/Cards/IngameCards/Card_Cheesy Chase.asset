@@ -10,28 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a96a61ce38373274c97e49ef39b7eb27, type: 3}
-  m_Name: Card_Evade
+  m_Name: Card_Cheesy Chase
   m_EditorClassIdentifier: 
-  cardName: Evade
+  cardName: Cheesy Chase
   manaCost: 0
-  cardArt: {fileID: 21300000, guid: 609b592996b99404189b4222c3ae6a17, type: 3}
-  cardClass: 0
-  backgroundSprite: {fileID: 21300000, guid: 1c87bf15bcfbd534c8c42929c190054c, type: 3}
-  rarity: 0
-  borderSprite: {fileID: 21300000, guid: f27e6455f35991d43b1d632dbc02a8fe, type: 3}
+  cardArt: {fileID: 21300000, guid: b876d106c57729e4aa9d515867e141e3, type: 3}
+  cardClass: 3
+  backgroundSprite: {fileID: 21300000, guid: e64cc4fb4f722334c9fd9dbc37ec1ed4, type: 3}
+  rarity: 1
+  borderSprite: {fileID: 21300000, guid: 168c1ee8bc10775439fe38671b50fe8e, type: 3}
   leftEffects:
   - effectType: 1
-    value: 2
+    value: 4
     isTemporary: 0
     duration: 0
     range: 0
   rightEffects:
-  - effectType: 4
+  - effectType: 0
     value: 2
     isTemporary: 0
     duration: 0
     range: 0
   alwaysEffects: []
   leftEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
-  rightEffectIcon: {fileID: 21300000, guid: a3140e3babcf7c740b0fabd24226422c, type: 3}
+  rightEffectIcon: {fileID: 21300000, guid: 8587820d2bca2ef429dec60d514637f5, type: 3}
   description: 
