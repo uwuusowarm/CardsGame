@@ -158,7 +158,14 @@ public class CardCreatorWindow : EditorWindow
         {
             newCard.rightEffectIcon = rightIcon;
         }
-        
+        if (classBackgrounds.TryGetValue(newCard.cardClass.ToString(), out Sprite bgSprite))
+        {
+            newCard.backgroundSprite = bgSprite;
+        }
+        if (rarityBorders.TryGetValue(newCard.rarity, out Sprite border))
+        {
+            newCard.borderSprite = border;
+        }
         AssetDatabase.CreateAsset(newCard, path);
         AssetDatabase.SaveAssets();
         CreateCardPrefab(path);

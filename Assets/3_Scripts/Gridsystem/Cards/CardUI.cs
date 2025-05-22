@@ -55,6 +55,18 @@ public class CardUI : MonoBehaviour
         {
             cardImage.sprite = data.cardArt;
         }
+        if (cardData.backgroundSprite != null)
+        {
+            backgroundImage.sprite = cardData.backgroundSprite;
+        }
+        if (cardData.borderSprite != null)
+        {
+            borderImage.sprite = cardData.borderSprite;
+        }
+        else
+        {
+            Debug.LogWarning($"No background sprite for card {cardData.cardName}");
+        }
     }
 
     public void SetBackground(Sprite background)
@@ -65,7 +77,7 @@ public class CardUI : MonoBehaviour
         }
     }
 
-    public void SetBorder(Sprite border)
+    public void SetBorder(Sprite border)  
     {
         if (borderImage != null)
         {
