@@ -10,6 +10,7 @@ public class MovementSystem : MonoBehaviour
     private int remainingMovementPoints;
     private Unit selectedUnit;
     private HexGrid hexGrid;
+    public Animator animator;
 
     public void Initialize(Unit unit, HexGrid grid)
     {
@@ -142,7 +143,6 @@ public class MovementSystem : MonoBehaviour
     public void MoveUnit()
     {
         if (currentPath.Count == 0) return;
-
         selectedUnit.MoveTroughPath(currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList());
         ClearPath();
     }

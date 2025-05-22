@@ -141,11 +141,11 @@ public class GameManager : MonoBehaviour
             if(PlayedCardEffectCache.Instance != null) PlayedCardEffectCache.Instance.ClearCache();
             PlayedCardEffectCache.Instance.PrintCachedEffects();
         }
-        /*else
+        else
         {
             isWaitingForPlayerActionResolution = true;
             Debug.Log("Waiting for player to select a target or resolve action.");
-        }*/
+        }
     }
 
     private void ApplyCachedEffects()
@@ -252,6 +252,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Player initiated end of turn.");
         IsPlayerTurn = false;
+        ShieldSystem.Instance.LoseShields(100);
 
         StartCoroutine(EnemyTurnRoutine());
     }
