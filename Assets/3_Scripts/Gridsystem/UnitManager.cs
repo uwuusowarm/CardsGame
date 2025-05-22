@@ -32,12 +32,19 @@ public class UnitManager : MonoBehaviour
 
     public void HandleUnitSelected(GameObject unit)
     {
-        if (!PlayersTurn) return;
+        if (!PlayersTurn)
+        {
+            Debug.Log("Not player's turn. Cannot select unit.");
+            return;
+        }
 
-        if (!unit.TryGetComponent<Unit>(out var unitReference)) return;
+        if (!unit.TryGetComponent<Unit>(out var unitReference))
+        {
+            Debug.LogWarning($"Unit {unit.name} does not have a Unit component!");
+            return;
+        }
 
-        if (CheckIfTheSameUnitSelected(unitReference)) return;
-
+        Debug.Log($"Unit {unitReference.name} selected.");
         PrepareUnitForMovement(unitReference);
     }
 
@@ -69,14 +76,14 @@ public class UnitManager : MonoBehaviour
 
         selectedUnit = unitReference;
         selectedUnit.Select();
-        movementSystem.ShowRange(selectedUnit, hexGrid);
+        movementSystem.Initialize(selectedUnit, hexGrid);
     }
 
     public void ClearOldSelection()
     {
         previouslySelectedHex = null;
         selectedUnit?.Deselect();
-        movementSystem.HideRange(hexGrid);
+        movementSystem.HideRange();
         selectedUnit = null;
         AttackManager.Instance?.ClearHighlights();
     }
@@ -86,12 +93,11 @@ public class UnitManager : MonoBehaviour
         if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
         {
             previouslySelectedHex = selectedHex;
-            movementSystem.ShowPath(selectedHex.HexCoords, hexGrid);
+            movementSystem.AddToPath(selectedHex.HexCoords);
         }
         else
         {
-            movementSystem.MoveUnit(selectedUnit, hexGrid);
-            PlayersTurn = false;
+            movementSystem.MoveUnit();
             selectedUnit.MovementFinished += OnMovementFinished;
             ClearOldSelection();
         }
@@ -100,7 +106,6 @@ public class UnitManager : MonoBehaviour
     private void OnMovementFinished(Unit unit)
     {
         unit.MovementFinished -= OnMovementFinished;
-        EndPlayerTurn();
     }
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)
@@ -123,13 +128,19 @@ public class UnitManager : MonoBehaviour
         return false;
     }
 
-    public void EndPlayerTurn()
+    public void ReduceActionPoints(Unit unit, int amount)
+    {
+        unit.actionPoints -= amount;
+    }
+
+    public void StartEnemyTurn()
     {
         PlayersTurn = false;
         ClearOldSelection();
         if (CardManager.Instance != null)
         {
-            CardManager.Instance.UpdateDiscardUI();
+            // Statt UpdateDiscardUI nun UpdateAllUI aufrufen
+            CardManager.Instance.UpdateAllUI();
         }
 
         StartCoroutine(EnemyTurnRoutine());
@@ -141,11 +152,10 @@ public class UnitManager : MonoBehaviour
         {
             if (enemy != null)
             {
-                //enemy.MoveTowardsPlayer();
+                enemy.AttackPlayer();
                 yield return new WaitForSeconds(0.5f);
             }
         }
-        StartPlayerTurn();
     }
 
     public void StartPlayerTurn()
@@ -176,12 +186,12 @@ public class UnitManager : MonoBehaviour
     {
         if (!PlayersTurn) return;
         Unit[] playerUnits = FindObjectsByType<Unit>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-                            .Where(unit => unit.GetComponent<EnemyUnit>() == null) 
+                            .Where(unit => unit.GetComponent<EnemyUnit>() == null)
                             .ToArray();
 
         if (playerUnits.Length > 0)
         {
-            PrepareUnitForMovement(playerUnits[0]); 
+            PrepareUnitForMovement(playerUnits[0]);
         }
         else
         {

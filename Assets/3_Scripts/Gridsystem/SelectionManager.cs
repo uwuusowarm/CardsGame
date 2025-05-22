@@ -19,17 +19,23 @@ public class SelectionManager : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
     }
+    
+    private bool IsUnit(GameObject obj)
+    {
+        return obj.GetComponent<Unit>() != null;
+    }
+
+    private bool IsEnemy(GameObject obj)
+    {
+        return obj.GetComponent<EnemyUnit>() != null;
+    }
 
     public void HandleClick(Vector3 mousePosition)
     {
         GameObject result;
         if (FindTarget(mousePosition, out result))
         {
-            if (UnitySelected(result))
-            {
-                OnUnitySelected?.Invoke(result);
-            }
-            else
+            if (!IsUnit(result) && !IsEnemy(result))
             {
                 TerrainSelected.Invoke(result);
             }

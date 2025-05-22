@@ -6,12 +6,16 @@ using UnityEngine;
 [SelectionBase]
 public class Unit : MonoBehaviour
 {
-    [SerializeField] public int maxHealth = 10;
+    [SerializeField] public int maxHealth = 5;
     [SerializeField] public int currentHealth;
-    [SerializeField] private int movementPoints = 20;
+    [SerializeField] public int movementPoints = 0;
+    [SerializeField] public int actionPoints = 4;
+    public int shieldPoints = 0;
     protected Hex currentHex;
     public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
+    
+    public static Unit Instance { get; private set; }
 
     [SerializeField] private float movementDuration = 1, rotationDuration = 0.3f;
     private GlowHighlight glowHighlight;
@@ -35,18 +39,43 @@ public class Unit : MonoBehaviour
         StartCoroutine(InitializeHexPosition());
     }
 
-    public void Attack(int damage)
+    public void AddBlock(int amount)
     {
-        
+        ShieldSystem.Instance.AddShields(amount);
     }
 
     public void Heal(int amount)
     {
-        
+        HealthSystem.Instance.AddHealth(amount);
     }
+    
+    public void PlayerTakeDamage(int damage)
+    {
+        int remainingDamage = damage;
+
+        if (ShieldSystem.Instance.GetCurrentShields() > 0)
+        {
+            int shieldDamage = Mathf.Min(remainingDamage, ShieldSystem.Instance.GetCurrentShields());
+            ShieldSystem.Instance.LoseShields(shieldDamage);
+            remainingDamage -= shieldDamage;
+
+            Debug.Log($"Shields took {shieldDamage} damage. Remaining shields: {ShieldSystem.Instance.GetCurrentShields()}");
+        }
+
+        if (remainingDamage > 0)
+        {
+            HealthSystem.Instance.LoseHealth(remainingDamage);
+            Debug.Log($"Health took {remainingDamage} damage. Remaining health: {HealthSystem.Instance.GetCurrentHealth()}");
+        }    }
+    
     public void AddMovementPoints(int points)
     {
-        movementPoints += points;
+        movementPoints += (points*10);
+    }
+    
+    public void ResetMovementPoints()
+    {
+        movementPoints = 0;
     }
 
     protected IEnumerator InitializeHexPosition()
@@ -85,6 +114,11 @@ public class Unit : MonoBehaviour
 
     internal void MoveTroughPath(List<Vector3> currentPath)
     {
+        if (currentPath.Count > movementPoints)
+        {
+            Debug.LogWarning("Not enough movement points!");
+            return;
+        }
         pathPositions = new Queue<Vector3>(currentPath);
         Vector3 firstTarget = pathPositions.Dequeue();
         StartCoroutine(RotationCoroutine(firstTarget, rotationDuration, true));
@@ -152,6 +186,8 @@ public class Unit : MonoBehaviour
         else
         {
             Debug.Log("Movement finished!");
+            movementPoints = 0;
+                
             MovementFinished?.Invoke(this);
         }
     }

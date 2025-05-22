@@ -8,29 +8,27 @@ public class CardManagerEditor : Editor
 {
     private CardManager manager;
     private FieldInfo deckF;
-    private FieldInfo handF;
     private FieldInfo discardF;
+    private FieldInfo handF;
     private FieldInfo leftF;
     private FieldInfo rightF;
 
     private bool showDeck = true;
     private bool showHand = true;
     private bool showDiscard = true;
-    private bool showLeft = true; 
+    private bool showLeft = true;
     private bool showRight = true;
-
     public override bool RequiresConstantRepaint() => Application.isPlaying;
 
     private void OnEnable()
     {
         var t = typeof(CardManager);
-
         manager = (CardManager)target;
         deckF = t.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
         handF = t.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
-        discardF = t.GetField("discard", BindingFlags.NonPublic | BindingFlags.Instance);
-        leftF = t.GetField("left", BindingFlags.NonPublic | BindingFlags.Instance);
-        rightF = t.GetField("right", BindingFlags.NonPublic | BindingFlags.Instance);
+        discardF = t.GetField("discardPile", BindingFlags.NonPublic | BindingFlags.Instance);
+        leftF = t.GetField("leftZone", BindingFlags.NonPublic | BindingFlags.Instance);
+        rightF = t.GetField("rightZone", BindingFlags.NonPublic | BindingFlags.Instance);
     }
 
     public override void OnInspectorGUI()
@@ -38,10 +36,9 @@ public class CardManagerEditor : Editor
         DrawDefaultInspector();
         GUILayout.Space(8);
         EditorGUILayout.LabelField("Runtime Card Lists", EditorStyles.boldLabel);
-
         DrawList(deckF, ref showDeck, "Deck");
         DrawList(handF, ref showHand, "Hand");
-        DrawList(discardF, ref showDiscard, "Discard");
+        DrawList(discardF, ref showDiscard, "Discard Pile");
         DrawList(leftF, ref showLeft, "Left Zone");
         DrawList(rightF, ref showRight, "Right Zone");
 

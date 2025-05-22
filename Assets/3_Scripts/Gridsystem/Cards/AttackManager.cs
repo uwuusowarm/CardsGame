@@ -18,9 +18,28 @@ public class AttackManager : MonoBehaviour
 
     public void PrepareAttack(int damage, int range)
     {
+        if (UnitManager.Instance == null)
+        {
+            Debug.LogError("AttackManager: PrepareAttack - UnitManager.Instance is NULL. Cannot proceed.");
+            ReturnCardToHand();
+            ClearHighlights(); 
+            return;
+        }
+
+        if (UnitManager.Instance.SelectedUnit == null)
+        {
+            Debug.LogError(
+                "AttackManager: PrepareAttack - UnitManager.Instance.SelectedUnit (Player Unit) is NULL. Cannot proceed.");
+            Debug.LogWarning(
+                "Possible causes: Player unit destroyed? SelectedUnit in UnitManager incorrectly set to null after previous action?");
+            Debug.Log(
+                $"PrepareAttack called by card for damage: {damage}, range: {range}. StackTrace: {StackTraceUtility.ExtractStackTrace()}");
+        }
+
         currentAttackDamage = damage;
         currentAttackRange = range;
         HighlightEnemiesInRange();
+        
     }
 
     private void HighlightEnemiesInRange()
@@ -48,7 +67,7 @@ public class AttackManager : MonoBehaviour
             Vector3Int current = queue.Dequeue();
             int currentDist = distances[current];
 
-            if (currentDist > currentAttackRange) continue;
+           // if (currentDist > currentAttackRange) continue;
 
             foreach (Vector3Int neighbor in HexGrid.Instance.GetNeighborsFor(current))
             {
@@ -56,26 +75,34 @@ public class AttackManager : MonoBehaviour
                 {
                     distances[neighbor] = currentDist + 1;
                     queue.Enqueue(neighbor);
-                    if (currentDist <= currentAttackRange)
-                    {
-                        hexesInRange.Add(neighbor);
-                    }
+
+                    hexesInRange.Add(neighbor);
+                    Debug.Log($"Added hex {neighbor} to range");
                 }
             }
         }
         bool enemiesFound = false;
         foreach (Vector3Int hexCoord in hexesInRange)
         {
+            Debug.Log($"Checking hex {hexCoord}");
+
             Hex hex = HexGrid.Instance.GetTileAt(hexCoord);
-            if (hex != null && hex.UnitOnHex != null)
+            
+            Debug.Log($"Checking hex {hexCoord}. GetTileAt returned: {(hex != null ? hex.name : "NULL HEX OBJECT")}"); 
+            if (hex != null && hex.EnemyUnitOnHex != null)
             {
-                EnemyUnit enemy = hex.UnitOnHex.GetComponent<EnemyUnit>();
+                Debug.Log($"Checking existing hex {hexCoord}");
+                EnemyUnit enemy = hex.EnemyUnitOnHex.GetComponent<EnemyUnit>();
                 if (enemy != null)
                 {
                     enemiesFound = true;
                     enemy.ToggleHighlight(true);
                     highlightedEnemies.Add(enemy);
                     Debug.Log($"Enemy found at {hexCoord} (Distance: {distances[hexCoord]})");
+                }
+                else
+                {
+                    Debug.Log($"No enemy found at {hexCoord}");
                 }
             }
         }
@@ -131,7 +158,7 @@ public class AttackManager : MonoBehaviour
         {
             enemy.TakeDamage(currentAttackDamage);
             ClearHighlights();
-            UnitManager.Instance.EndPlayerTurn();
+            GameManager.Instance.PlayerActionResolved(true);
         }
     }
 
