@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 [SelectionBase]
 public class Hex : MonoBehaviour
@@ -11,6 +12,7 @@ public class Hex : MonoBehaviour
     private HexCoordinates hexCoordinates;
     [SerializeField] private HexType hexType;
     public Unit UnitOnHex { get; private set; }
+    public EnemyUnit EnemyUnitOnHex { get; private set; }
 
     public Vector3Int hexCoords => hexCoordinates.GetHexCoords();
 
@@ -27,7 +29,7 @@ public class Hex : MonoBehaviour
 
     public bool IsObstacle()
     {
-        return this.hexType == HexType.Obstacle || UnitOnHex != null;
+        return this.hexType == HexType.Obstacle || UnitOnHex != null || EnemyUnitOnHex != null;
     }
 
     private void Awake()
@@ -55,24 +57,46 @@ public class Hex : MonoBehaviour
     }
     public bool IsOccupied()
     {
-        return UnitOnHex != null || this.hexType == HexType.Obstacle;
+        return UnitOnHex != null || this.hexType == HexType.Obstacle || EnemyUnitOnHex != null;
     }
 
     public void SetUnit(Unit unit)
     {
         if (unit != null)
         {
-            //Debug.Log($"Setting unit {unit.name} on hex {hexCoords}");
+            Debug.Log($"Setting unit {unit.name} on hex {hexCoords}");
             UnitOnHex = unit;
         }
     }
 
+    public void SetEnemyUnit(EnemyUnit enemy)
+    {
+        if (enemy != null)
+        {
+            Debug.Log($"Setting unit {enemy.name} on hex {hexCoords}");
+            EnemyUnitOnHex = enemy;
+        }
+    }
+    
     public void ClearUnit()
     {
         UnitOnHex = null;
     }
+    
+    public void ClearEnemyUnit()
+    {
+        EnemyUnitOnHex = null;
+    }
+
+    public void ClearAll()
+    {
+        UnitOnHex = null;
+        EnemyUnitOnHex = null;
+    }
 
     private Unit unitOnHex;
+    
+    
 
     public Unit GetUnit()
     {

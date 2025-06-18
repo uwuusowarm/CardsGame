@@ -4,6 +4,7 @@ using UnityEngine;
 public class EnemyUnit : MonoBehaviour
 {
     [Header("Health Settings")]
+    public int damage = 3;
     public int maxHealth = 3;
     public int currentHealth { get; private set; }
 
@@ -54,14 +55,14 @@ public class EnemyUnit : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int amount)
     {
-        currentHealth -= damage;
+        currentHealth -= amount;
         Debug.Log($"Enemy hit! Remaining HP: {currentHealth}");
 
         if (currentHealth <= 0)
         {
-            Destroy(gameObject);
+           Destroy(gameObject);
         }
     }
 
@@ -75,5 +76,11 @@ public class EnemyUnit : MonoBehaviour
             Debug.LogError("Enemy not on grid!");
         else
             Debug.Log($"Enemy registered at {hexCoords}");
+            currentHex.SetEnemyUnit(this);
+    }
+
+    public void AttackPlayer()
+    {
+
     }
 }

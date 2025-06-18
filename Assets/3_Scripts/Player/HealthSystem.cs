@@ -7,23 +7,85 @@ public class HealthSystem : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private int maxBaseHealth = 5;
-    [SerializeField] private int maxExtraHealth = 10; 
+    [SerializeField] private int maxExtraHealth = 10;
 
     [Header("Assigned UI Images")]
     [SerializeField] private List<Image> healthIcons = new List<Image>();
 
     private int currentHealth;
-    private bool[] extraHealthUnlocked; 
+    private bool[] extraHealthUnlocked;
+    public static HealthSystem Instance { get; private set; }
 
     private void Start()
     {
         extraHealthUnlocked = new bool[maxExtraHealth];
         InitializeHealth(maxBaseHealth);
     }
-
+    
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+    
     public void InitializeHealth(int startingHealth)
     {
         currentHealth = startingHealth;
+        UpdateHealthDisplay();
+    }
+    public void Heal(int amount)
+    {
+        int maxPossibleHealth = maxBaseHealth;
+        for (int i = 0; i < maxExtraHealth; i++)
+        {
+            if (extraHealthUnlocked[i])
+                maxPossibleHealth++;
+            else
+                break; 
+        }
+
+        if (currentHealth < maxPossibleHealth)
+        {
+            int healAmount = Mathf.Min(amount, maxPossibleHealth - currentHealth);
+            currentHealth += healAmount;
+            UpdateHealthDisplay();
+            Debug.Log($"Heal {healAmount}. Now: {currentHealth}/{maxPossibleHealth}");
+        }
+        else
+        {
+            Debug.Log("Full!");
+        }
+    }
+    public void UnlockExtraHealth(int amount)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            int nextSlot = -1;
+            for (int j = 0; j < maxExtraHealth; j++)
+            {
+                if (!extraHealthUnlocked[j])
+                {
+                    nextSlot = j;
+                    break;
+                }
+            }
+            if (nextSlot != -1)
+            {
+                extraHealthUnlocked[nextSlot] = true;
+                Debug.Log($"Extra! (Slot {nextSlot})");
+            }
+            else
+            {
+                Debug.Log("No Extra!");
+                break;
+            }
+        }
         UpdateHealthDisplay();
     }
 
@@ -48,6 +110,7 @@ public class HealthSystem : MonoBehaviour
         currentHealth = Mathf.Max(currentHealth - amount, 0);
         UpdateHealthDisplay();
     }
+
 
     private void UpdateHealthDisplay()
     {

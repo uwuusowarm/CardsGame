@@ -65,9 +65,9 @@ public class GameManager : MonoBehaviour
         Debug.Log("Starting Player Turn.");
         IsPlayerTurn = true;
         isWaitingForPlayerActionResolution = false;
-
-        //if (UnitManager.Instance != null) UnitManager.Instance.NotifyPlayerTurnStart(); //noch besprechen
-        //else Debug.LogError("UnitManager.Instance is null.");
+        playerUnit.shieldPoints = 0;
+        playerUnit.movementPoints = 0;
+        ActionPointSystem.Instance.AddActionPoints(4);
         
         if (isFirstTurn)
         {
@@ -88,12 +88,20 @@ public class GameManager : MonoBehaviour
             Debug.LogError("CardManager.Instance is null for card draw.");
             return;
         }
-        Debug.Log("Calling CardManager.OnDeckClicked() to discard hand and draw new cards.");
-        CardManager.Instance.OnDeckClicked();
+        Debug.Log("Calling CardManager.DrawCards() to discard hand and draw new cards.");
+        CardManager.Instance.DrawCards(4);
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
     {
+        int AP = ActionPointSystem.Instance.GetCurrentActionPoints();
+        
+        if (AP <= 0)
+        {
+            Debug.LogWarning("Cannot process card. No action points left.");
+            return;    
+        }
+        
         if (!IsPlayerTurn || isWaitingForPlayerActionResolution)
         {
             Debug.LogWarning("Cannot process card. Not player's turn or waiting for action resolution.");
@@ -112,6 +120,11 @@ public class GameManager : MonoBehaviour
         }
         PlayedCardEffectCache.Instance.CacheCardEffect(cardData, isLeftEffectChosen);
 
+        if (playerUnit != null && UnitManager.Instance != null)
+        {
+            UnitManager.Instance.HandleUnitSelected(playerUnit.gameObject);
+        }
+       
         if (cardData.alwaysEffects != null)
         {
             foreach (var effect in cardData.alwaysEffects)
@@ -125,21 +138,25 @@ public class GameManager : MonoBehaviour
         if (CardManager.Instance != null)
         {
             CardManager.Instance.MoveToZone(cardData, DropType.Discard);
+            UnitManager.Instance.ReduceActionPoints(playerUnit, 1);
         }
         else
         {
-            Debug.LogError("_CardManager.Instance is null. Cannot move card to discard.");
+            Debug.LogError("CardManager.Instance is null. Cannot move card to discard.");
         }
 
         if (!PlayedCardEffectCache.Instance.HasPendingEffects || !IsAttackPending())
         {
             if(PlayedCardEffectCache.Instance != null) PlayedCardEffectCache.Instance.ClearCache();
+            PlayedCardEffectCache.Instance.PrintCachedEffects();
         }
         else
         {
             isWaitingForPlayerActionResolution = true;
             Debug.Log("Waiting for player to select a target or resolve action.");
         }
+        
+        ActionPointSystem.Instance.UseActionPoints(1);
     }
 
     private void ApplyCachedEffects()
@@ -150,7 +167,7 @@ public class GameManager : MonoBehaviour
 
         if (PlayedCardEffectCache.Instance.PendingBlock > 0 && targetForSelfEffects != null)
         {
-//            targetForSelfEffects.AddBlock(PlayedCardEffectCache.Instance.PendingBlock);
+            targetForSelfEffects.AddBlock(PlayedCardEffectCache.Instance.PendingBlock);
             Debug.Log($"Player gained {PlayedCardEffectCache.Instance.PendingBlock} Block.");
         }
         if (PlayedCardEffectCache.Instance.PendingHealing > 0 && targetForSelfEffects != null)
@@ -162,6 +179,7 @@ public class GameManager : MonoBehaviour
         {
             targetForSelfEffects.AddMovementPoints(PlayedCardEffectCache.Instance.PendingMovement);
             Debug.Log($"Player gained {PlayedCardEffectCache.Instance.PendingMovement} Movement Points.");
+            UnitManager.Instance.HandleUnitSelected(targetForSelfEffects.gameObject);
         }
 
         if (PlayedCardEffectCache.Instance.PendingDamage > 0)
@@ -207,7 +225,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"Healed {effectiveTarget.name} for {effect.value}.");
                 break;
             case CardEffect.EffectType.Block:
-  //              effectiveTarget.AddBlock(effect.value);
+                effectiveTarget.AddBlock(effect.value);
                 Debug.Log($"{effectiveTarget.name} gained {effect.value} Block.");
                 break;
         }
@@ -245,24 +263,16 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Player initiated end of turn.");
         IsPlayerTurn = false;
-
-  //      if (UnitManager.Instance != null) UnitManager.Instance.NotifyPlayerTurnEnd(); //something like this
-        //else Debug.LogError("UnitManager.Instance is null.");
-
+        ShieldSystem.Instance.LoseShields(100);
         StartCoroutine(EnemyTurnRoutine());
     }
 
     private IEnumerator EnemyTurnRoutine()
     {
-        Debug.Log("Starting Enemy Turn Routine.");
-        if (UnitManager.Instance == null)
-        {
-            Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
-            StartPlayerTurn();
-            yield break;
-        }
- //       yield return StartCoroutine(UnitManager.Instance.ExecuteEnemyTurns(enemyTurnDelay)); //somethiing like this
-        Debug.Log("Enemy Turn Finished.");
-        StartPlayerTurn();
+            Debug.Log("Starting Enemy Turn Routine.");
+            
+                Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
+                StartPlayerTurn();
+                yield break;
     }
 }
