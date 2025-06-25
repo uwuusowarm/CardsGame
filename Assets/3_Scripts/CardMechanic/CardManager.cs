@@ -36,6 +36,9 @@ public class CardManager : MonoBehaviour
     private bool isPlaying = false;
     private bool hasDrawnStartHand = false;
     public void DrawCard() => DrawCards(1);
+    
+    public int DrawCount => drawCount;
+
     public void DrawCard(int count) => DrawCards(count);
 
     private void Awake()
@@ -75,23 +78,42 @@ public class CardManager : MonoBehaviour
 
     public void DrawCards(int count)
     {
-        if (hand.Count > 0) 
-            return;
+        if (hand.Count > 0) return;
 
-        if (deck.Count == 0 && discardPile.Count > 0)
+        if (deck.Count < count)
         {
-            deck.AddRange(discardPile);
-            discardPile.Clear();
-            Shuffle(deck);
+            int remainingCards = deck.Count;
+            for (int i = 0; i < remainingCards; i++)
+            {
+                hand.Add(deck[0]);
+                deck.RemoveAt(0);
+            }
+
+            if (discardPile.Count > 0)
+            {
+                deck.AddRange(discardPile);
+                discardPile.Clear();
+                Shuffle(deck);
+                ExhaustionSystem.Instance.AddExhaustionStack();
+                ExhaustionSystem.Instance.ExhaustCards(deck);
+                
+                int additionalCards = Mathf.Min(count - remainingCards, deck.Count);
+                for (int i = 0; i < additionalCards; i++)
+                {
+                    hand.Add(deck[0]);
+                    deck.RemoveAt(0);
+                }
+            }
         }
-
-        int toDraw = Mathf.Min(count, deck.Count);
-
-        for (int i = 0; i < toDraw; i++)
+        else
         {
-            hand.Add(deck[0]);
-            deck.RemoveAt(0);
+            for (int i = 0; i < count; i++)
+            {
+                hand.Add(deck[0]);
+                deck.RemoveAt(0);
+            }
         }
+        
         UpdateAllUI();
     }
 
@@ -109,9 +131,19 @@ public class CardManager : MonoBehaviour
             UpdateAllUI();
             return;
         }
+        
+        if ((type == DropType.Left || type == DropType.Right) && 
+            ActionPointSystem.Instance.GetCurrentActionPoints() <= 0)
+        {
+            Debug.Log("Not enough action points to play this card!");
+            hand.Add(card); 
+            UpdateAllUI();
+            return;
+        }
 
         if (isPlaying) return;
         isPlaying = true;
+
 
         int idx = hand.IndexOf(card);
         if (idx >= 0) hand.RemoveAt(idx);
