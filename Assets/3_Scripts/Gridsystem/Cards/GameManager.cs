@@ -119,6 +119,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         PlayedCardEffectCache.Instance.CacheCardEffect(cardData, isLeftEffectChosen);
+        FindAnyObjectByType<Sound_Manager>().Play("Coin");
 
         if (playerUnit != null && UnitManager.Instance != null)
         {
