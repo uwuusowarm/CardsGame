@@ -14,6 +14,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     RectTransform handZone;
     RectTransform leftZone;
     RectTransform rightZone;
+    RectTransform discardZone;
 
     void Awake()
     {
@@ -25,6 +26,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         handZone = grab.HandGridRect;
         leftZone = grab.LeftGridRect;
         rightZone = grab.RightGridRect;
+        discardZone = grab.DiscardGridRect;
     }
 
     public void OnBeginDrag(PointerEventData e)
@@ -46,6 +48,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         cg.blocksRaycasts = true;
 
+
         bool droppedOnLeft = RectTransformUtility.RectangleContainsScreenPoint(
             leftZone, e.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
@@ -56,6 +59,11 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
         );
 
+        bool droppedOnDiscard = RectTransformUtility.RectangleContainsScreenPoint(
+            discardZone, e.position,
+            gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
+        );
+
         if (droppedOnLeft)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Left);
@@ -63,6 +71,10 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         else if (droppedOnRight)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Right);
+        }
+        else if (droppedOnDiscard) 
+        {
+            CardManager.Instance.MoveToZone(Card, DropType.Discard);
         }
         else
         {
