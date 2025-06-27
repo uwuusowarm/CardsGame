@@ -263,7 +263,6 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Player initiated end of turn.");
         IsPlayerTurn = false;
-        ShieldSystem.Instance.LoseShields(100);
         StartCoroutine(EnemyTurnRoutine());
     }
 
@@ -288,6 +287,7 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(enemyTurnDelay);
             }
         }
+        ShieldSystem.Instance.LoseShields(100);
         StartPlayerTurn();
     }
 }

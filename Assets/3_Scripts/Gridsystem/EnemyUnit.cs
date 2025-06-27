@@ -101,6 +101,26 @@ public class EnemyUnit : MonoBehaviour
 
     }
 
+    private void AttackPlayer(int damage)
+    {
+        int shields = ShieldSystem.Instance.GetCurrentShields();
+        int restDamage = damage;
+
+        if (shields > 0)
+        {
+            int shieldDamage = Mathf.Min(restDamage, shields);
+            ShieldSystem.Instance.LoseShields(shieldDamage);
+            restDamage -= shieldDamage;
+            Debug.Log($"{name} zerstört {shieldDamage} Schilde des Spielers.");
+        }
+
+        if (restDamage > 0)
+        {
+            HealthSystem.Instance.LoseHealth(restDamage);
+            Debug.Log($"{name} macht {restDamage} Schaden an den Herzen des Spielers.");
+        }
+    }
+
     public void DrawCards(int count)
     {
         for (int i = 0; i < count; i++)
@@ -190,7 +210,7 @@ public class EnemyUnit : MonoBehaviour
                     Debug.Log($"{name} bewegt sich {effect.value} Felder Richtung Spieler.");
                     break;
                 case CardEffect.EffectType.Attack:
-                    //AttackPlayer(effect.value);
+                    AttackPlayer(effect.value);
                     Debug.Log($"{name} greift Spieler an für {effect.value} Schaden.");
                     break;
                 case CardEffect.EffectType.Block:
