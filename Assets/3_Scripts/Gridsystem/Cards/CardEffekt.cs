@@ -16,6 +16,13 @@ public class CardEffect
         Move,
         Heal,
         Burn,
-        Block
+        Block,
+        
+        Draw,
+        Discard,
+        Freeze,
+        Poison,
+        ActionPlus,
+        None
     }
 }
