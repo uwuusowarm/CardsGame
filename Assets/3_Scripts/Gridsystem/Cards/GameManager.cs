@@ -13,8 +13,6 @@ public class GameManager : MonoBehaviour
     private bool isWaitingForPlayerActionResolution = false;
 
     private Unit playerUnit; 
-    
-    int carryOverActionPoints = ActionPointSystem.Instance.GetCurrentActionPoints();
 
     private void Awake()
     {
@@ -51,9 +49,7 @@ public class GameManager : MonoBehaviour
                                          HexGrid.Instance != null &&
                                          AttackManager.Instance != null &&
                                          PlayedCardEffectCache.Instance != null &&
-                                         ExhaustionSystem.Instance != null &&
                                          playerUnit != null);
-
         StartGame();
     }
 
@@ -68,26 +64,20 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Starting Player Turn.");
         IsPlayerTurn = true;
-
         isWaitingForPlayerActionResolution = false;
         playerUnit.shieldPoints = 0;
         playerUnit.movementPoints = 0;
-        
-        ActionPointSystem.Instance.ResetActionPoints();
-        ActionPointSystem.Instance.AddActionPoints(2); 
-        
-        if (carryOverActionPoints > 0)
-        {
-            ActionPointSystem.Instance.AddActionPoints(1); 
-            carryOverActionPoints = 0;
-            Debug.Log("Added 1 carried over action point");
-        }
+        ActionPointSystem.Instance.AddActionPoints(4);
         
         if (isFirstTurn)
         {
             Debug.Log("First turn of the game.");
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
+        }
+        else
+        {
+            DrawPlayerCards();
         }
     }
 
@@ -98,8 +88,8 @@ public class GameManager : MonoBehaviour
             Debug.LogError("CardManager.Instance is null for card draw.");
             return;
         }
-        Debug.Log("Drawing new cards based on exhaustion level.");
-        CardManager.Instance.DrawCards(CardManager.Instance.DrawCount);
+        Debug.Log("Calling CardManager.DrawCards() to discard hand and draw new cards.");
+        CardManager.Instance.DrawCards(4);
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
@@ -129,7 +119,6 @@ public class GameManager : MonoBehaviour
             return;
         }
         PlayedCardEffectCache.Instance.CacheCardEffect(cardData, isLeftEffectChosen);
-        FindAnyObjectByType<Sound_Manager>().Play("Coin");
 
         if (playerUnit != null && UnitManager.Instance != null)
         {
@@ -271,24 +260,34 @@ public class GameManager : MonoBehaviour
             if(PlayedCardEffectCache.Instance != null) PlayedCardEffectCache.Instance.ClearCache();
             return;
         }
-        
-        int currentAP = ActionPointSystem.Instance.GetCurrentActionPoints();
-        carryOverActionPoints = Mathf.Min(currentAP, 1);
 
         Debug.Log("Player initiated end of turn.");
         IsPlayerTurn = false;
-        ShieldSystem.Instance.LoseShields(100);
-        
         StartCoroutine(EnemyTurnRoutine());
     }
 
-
     private IEnumerator EnemyTurnRoutine()
     {
-            Debug.Log("Starting Enemy Turn Routine.");
-            
-                Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
-                StartPlayerTurn();
-                yield break;
+        Debug.Log("Starting Enemy Turn Routine.");
+
+        /*if (UnitManager.Instance == null)
+        {
+            Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
+            StartPlayerTurn();
+            yield break;
+        }*/
+
+        foreach (var enemy in UnitManager.Instance.GetEnemyUnits())
+        {
+            Debug.Log($"Enemy {enemy.name} is taking its turn.");
+            if (enemy != null)
+            {
+                Debug.Log($"Starting turn for enemy: {enemy.name}");
+                yield return StartCoroutine(enemy.EnemyTurnRoutine());
+                yield return new WaitForSeconds(enemyTurnDelay);
+            }
+        }
+        ShieldSystem.Instance.LoseShields(100);
+        StartPlayerTurn();
     }
 }

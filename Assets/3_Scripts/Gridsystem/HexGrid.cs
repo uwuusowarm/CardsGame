@@ -52,7 +52,7 @@ public class HexGrid : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Keine Einheit für Bewegung gefunden!");
+            Debug.LogWarning("Keine Einheit fï¿½r Bewegung gefunden!");
         }
     }
     private void InitializeGrid()
@@ -140,6 +140,13 @@ public class HexGrid : MonoBehaviour
         }
 
         return result;
+    }
+
+    public Vector3 GetWorldPosition(Vector3Int hexCoordinates)
+    {
+        float x = hexCoordinates.x * xOffset;
+        float z = hexCoordinates.z * zOffset;
+        return new Vector3(x, 0, z);
     }
 }
 
