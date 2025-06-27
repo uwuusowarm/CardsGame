@@ -58,6 +58,15 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             rightZone, e.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
         );
+        
+        if ((droppedOnLeft || droppedOnRight) && ActionPointSystem.Instance.GetCurrentActionPoints() <= 0)
+        {
+            Debug.Log("Not enough action points to play this card!");
+            CardManager.Instance.MoveToZone(Card, DropType.Hand);
+            Destroy(gameObject);
+            return;
+        }
+
 
         bool droppedOnDiscard = RectTransformUtility.RectangleContainsScreenPoint(
             discardZone, e.position,
