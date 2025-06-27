@@ -137,11 +137,11 @@ public class EnemyUnit : MonoBehaviour
         DrawCards(handSize - hand.Count);
 
         int cardsPlayed = 0;
-        int maxCardsPerTurn = 2;
+        int maxCardsPerTurn = 1;
 
         while (cardsPlayed < maxCardsPerTurn && hand.Count > 0)
         {
-            bool playerInRange = IsPlayerInRange(playerDetectRange);
+            bool playerInRange = IsPlayerInRange(2); 
 
             CardData cardToPlay = null;
 
@@ -170,17 +170,25 @@ public class EnemyUnit : MonoBehaviour
 
     public IEnumerator EnemyTurnRoutine()
     {
-        DrawCards(2);
+        if (hand.Count == 0)
+            DrawCards(2);
 
-        var hand = this.hand.ToList(); 
         int played = 0;
-        foreach (var card in hand)
+        var handCopy = hand.ToList(); 
+
+        foreach (var card in handCopy)
         {
-            if (played >= 2) break;
-            yield return new WaitForSeconds(0.5f); 
+            if (played >= 1) break; 
+
+            bool playerInRange = IsPlayerInRange(2);
+            if (card.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack) && !playerInRange)
+                continue;
+
+            yield return new WaitForSeconds(0.5f);
             PlayCard(card, false);
             played++;
         }
+
         yield return new WaitForSeconds(0.5f);
     }
 
@@ -206,7 +214,7 @@ public class EnemyUnit : MonoBehaviour
             switch (effect.effectType)
             {
                 case CardEffect.EffectType.Move:
-                    //MoveTowardsPlayer(effect.value);
+                    MoveTowardsPlayer(effect.value);
                     Debug.Log($"{name} bewegt sich {effect.value} Felder Richtung Spieler.");
                     break;
                 case CardEffect.EffectType.Attack:
@@ -220,7 +228,7 @@ public class EnemyUnit : MonoBehaviour
         hand.Remove(card);
     }
 
-    /*private void MoveTowardsPlayer(int steps)
+    private void MoveTowardsPlayer(int steps)
     {
         var player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) return;
@@ -228,34 +236,38 @@ public class EnemyUnit : MonoBehaviour
         Vector3Int playerHex = HexGrid.Instance.GetClosestHex(player.transform.position);
         Vector3Int myHex = HexGrid.Instance.GetClosestHex(transform.position);
 
-        for (int i = 0; i < steps; i++)
+        var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHex, steps);
+        List<Vector3Int> path = GetPathToTarget(bfsResult, myHex, playerHex);
+
+        int moveSteps = Mathf.Min(steps, path.Count - 1); 
+        for (int i = 1; i <= moveSteps; i++)
         {
-            Vector3Int nextHex = GetNextHexTowards(myHex, playerHex);
+            Vector3Int nextHex = path[i];
             Hex nextTile = HexGrid.Instance.GetTileAt(nextHex);
             if (nextTile != null && !nextTile.HasEnemyUnit())
             {
                 transform.position = HexGrid.Instance.GetWorldPosition(nextHex);
-                myHex = nextHex;
                 currentHex?.SetEnemyUnit(null);
                 currentHex = nextTile;
                 currentHex.SetEnemyUnit(this);
             }
             else
             {
-                break;
+                break; 
             }
         }
     }
 
-    private Vector3Int GetNextHexTowards(Vector3Int from, Vector3Int to)
+    private List<Vector3Int> GetPathToTarget(BFSResult bfsResult, Vector3Int start, Vector3Int target)
     {
-        Vector3Int direction = new Vector3Int(
-            to.x > from.x ? 1 : (to.x < from.x ? -1 : 0),
-            to.y > from.y ? 1 : (to.y < from.y ? -1 : 0),
-            to.z > from.z ? 1 : (to.z < from.z ? -1 : 0)
-        );
-
-        Vector3Int next = from + direction;
-        return next;
-    }*/
+        var path = new List<Vector3Int>();
+        var current = target;
+        while (current != start && bfsResult.visitedNodesDict.ContainsKey(current))
+        {
+            path.Insert(0, current);
+            current = bfsResult.visitedNodesDict[current] ?? start;
+        }
+        path.Insert(0, start);
+        return path;
+    }
 }
