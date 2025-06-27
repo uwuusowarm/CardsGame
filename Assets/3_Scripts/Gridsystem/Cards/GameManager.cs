@@ -68,7 +68,6 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Starting Player Turn.");
         IsPlayerTurn = true;
-        FeedbackSystem.Instance.ShowNoEnergyFeedback();
 
         isWaitingForPlayerActionResolution = false;
         playerUnit.shieldPoints = 0;
