@@ -32,6 +32,11 @@ public class UnitManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        
+    }
+
     public void HandleUnitSelected(GameObject unit)
     {
         if (!PlayersTurn)
@@ -145,7 +150,6 @@ public class UnitManager : MonoBehaviour
         ClearOldSelection();
         if (CardManager.Instance != null)
         {
-            // Statt UpdateDiscardUI nun UpdateAllUI aufrufen
             CardManager.Instance.UpdateAllUI();
         }
 
@@ -158,7 +162,7 @@ public class UnitManager : MonoBehaviour
         {
             if (enemy != null)
             {
-                enemy.AttackPlayer();
+                enemy.EnemyTurn();
                 yield return new WaitForSeconds(0.5f);
             }
         }
@@ -178,9 +182,7 @@ public class UnitManager : MonoBehaviour
     public void RegisterEnemy(EnemyUnit enemy)
     {
         if (!enemyUnits.Contains(enemy))
-        {
             enemyUnits.Add(enemy);
-        }
     }
 
     public void UnregisterEnemy(EnemyUnit enemy)
@@ -203,5 +205,11 @@ public class UnitManager : MonoBehaviour
         {
             Debug.LogWarning("Keine Spieler-Unit (ohne EnemyUnit-Skript) gefunden!");
         }
+    }
+
+    public List<EnemyUnit> GetEnemyUnits()
+    {
+        enemyUnits.RemoveAll(e => e == null);
+        return enemyUnits;
     }
 }

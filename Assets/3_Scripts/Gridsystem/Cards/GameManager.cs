@@ -53,7 +53,6 @@ public class GameManager : MonoBehaviour
                                          PlayedCardEffectCache.Instance != null &&
                                          ExhaustionSystem.Instance != null &&
                                          playerUnit != null);
-
         StartGame();
     }
 
@@ -68,11 +67,10 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Starting Player Turn.");
         IsPlayerTurn = true;
-
         isWaitingForPlayerActionResolution = false;
         playerUnit.shieldPoints = 0;
         playerUnit.movementPoints = 0;
-        
+
         ActionPointSystem.Instance.ResetActionPoints();
         ActionPointSystem.Instance.AddActionPoints(2); 
         
@@ -276,18 +274,31 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Player initiated end of turn.");
         IsPlayerTurn = false;
-        ShieldSystem.Instance.LoseShields(100);
-        
         StartCoroutine(EnemyTurnRoutine());
     }
 
-
     private IEnumerator EnemyTurnRoutine()
     {
-            Debug.Log("Starting Enemy Turn Routine.");
-            
-                Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
-                StartPlayerTurn();
-                yield break;
+        Debug.Log("Starting Enemy Turn Routine.");
+
+        /*if (UnitManager.Instance == null)
+        {
+            Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
+            StartPlayerTurn();
+            yield break;
+        }*/
+
+        foreach (var enemy in UnitManager.Instance.GetEnemyUnits())
+        {
+            Debug.Log($"Enemy {enemy.name} is taking its turn.");
+            if (enemy != null)
+            {
+                Debug.Log($"Starting turn for enemy: {enemy.name}");
+                yield return StartCoroutine(enemy.EnemyTurnRoutine());
+                yield return new WaitForSeconds(enemyTurnDelay);
+            }
+        }
+        ShieldSystem.Instance.LoseShields(100);
+        StartPlayerTurn();
     }
 }
