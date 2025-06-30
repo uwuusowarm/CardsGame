@@ -73,6 +73,7 @@ public class CardManager : MonoBehaviour
         if (hasDrawnStartHand) 
             return;
         hasDrawnStartHand = true;
+        Debug.Log("Drawing " + drawCount + " cards for the start of the game.");
         DrawCards(drawCount);
     }
 
