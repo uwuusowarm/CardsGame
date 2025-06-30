@@ -83,14 +83,16 @@ public class GameManager : MonoBehaviour
         {
             if (isFirstTurn)
             {
-                ActionPointSystem.Instance.InitializeActionPoints(2);
+                int startingAP = 2 + EquipmentManager.Instance.GetTotalAPBonus();
+                ActionPointSystem.Instance.InitializeActionPoints(startingAP);
             }
             else
             {
                 ActionPointSystem.Instance.ResetActionPoints();
-                ActionPointSystem.Instance.AddActionPoints(2);
+                int turnAP = 2 + EquipmentManager.Instance.GetTotalAPBonus();
+                ActionPointSystem.Instance.AddActionPoints(turnAP);
             }
-        
+
             if (carryOverActionPoints > 0)
             {
                 ActionPointSystem.Instance.AddActionPoints(1);
@@ -194,46 +196,68 @@ public class GameManager : MonoBehaviour
 
         if (PlayedCardEffectCache.Instance.PendingBlock > 0 && targetForSelfEffects != null)
         {
-            targetForSelfEffects.AddBlock(PlayedCardEffectCache.Instance.PendingBlock);
-            Debug.Log($"Player gained {PlayedCardEffectCache.Instance.PendingBlock} Block.");
+            int blockAmount = PlayedCardEffectCache.Instance.PendingBlock;
+            int defenseBonus = EquipmentManager.Instance.GetTotalDefenseBonus();
+            int totalBlock = blockAmount + defenseBonus;
+            
+            targetForSelfEffects.AddBlock(totalBlock);
+            Debug.Log($"Player gained {totalBlock} Block (Base: {blockAmount}, Equipment: {defenseBonus})");
         }
+
         if (PlayedCardEffectCache.Instance.PendingHealing > 0 && targetForSelfEffects != null)
         {
-            targetForSelfEffects.Heal(PlayedCardEffectCache.Instance.PendingHealing);
-            Debug.Log($"Player healed for {PlayedCardEffectCache.Instance.PendingHealing}.");
+            int healAmount = PlayedCardEffectCache.Instance.PendingHealing;
+            int healBonus = EquipmentManager.Instance.GetTotalHealBonus();
+            int totalHeal = healAmount + healBonus;
+            
+            targetForSelfEffects.Heal(totalHeal);
+            Debug.Log($"Player healed for {totalHeal} (Base: {healAmount}, Equipment: {healBonus})");
         }
+
         if (PlayedCardEffectCache.Instance.PendingMovement > 0 && targetForSelfEffects != null)
         {
-            targetForSelfEffects.AddMovementPoints(PlayedCardEffectCache.Instance.PendingMovement);
-            Debug.Log($"Player gained {PlayedCardEffectCache.Instance.PendingMovement} Movement Points.");
+            int moveAmount = PlayedCardEffectCache.Instance.PendingMovement;
+            int moveBonus = EquipmentManager.Instance.GetTotalMovementSpeedBonus();
+            int totalMove = moveAmount + moveBonus;
+            
+            targetForSelfEffects.AddMovementPoints(totalMove);
+            Debug.Log($"Player gained {totalMove} Movement Points (Base: {moveAmount}, Equipment: {moveBonus})");
             UnitManager.Instance.HandleUnitSelected(targetForSelfEffects.gameObject);
         }
 
         if (PlayedCardEffectCache.Instance.PendingDamage > 0)
         {
             Unit attacker = UnitManager.Instance.SelectedUnit;
-            if (attacker == null) attacker = playerUnit; 
+            if (attacker == null) attacker = playerUnit;
 
             if (AttackManager.Instance != null && attacker != null)
             {
-                Debug.Log($"Preparing attack from {attacker.name} with {PlayedCardEffectCache.Instance.PendingDamage} damage and range {PlayedCardEffectCache.Instance.PendingRange}.");
-                AttackManager.Instance.PrepareAttack(
-                    PlayedCardEffectCache.Instance.PendingDamage,
-                    PlayedCardEffectCache.Instance.PendingRange
-                );
+                int damageAmount = PlayedCardEffectCache.Instance.PendingDamage;
+                int damageBonus = EquipmentManager.Instance.GetTotalDamageBonus();
+                int totalDamage = damageAmount + damageBonus;
+                
+                int baseRange = PlayedCardEffectCache.Instance.PendingRange;
+                int weaponRange = EquipmentManager.Instance.GetWeaponRange() - 1; // -1 because weapon range is absolute
+                int totalRange = baseRange + weaponRange;
+
+                Debug.Log($"Preparing attack from {attacker.name} with {totalDamage} damage (Base: {damageAmount}, Equipment: {damageBonus}) " +
+                         $"and range {totalRange} (Base: {baseRange}, Weapon: {weaponRange + 1})");
+                
+                AttackManager.Instance.PrepareAttack(totalDamage, totalRange);
                 isWaitingForPlayerActionResolution = true;
             }
             else Debug.LogError("AttackManager or Attacker (SelectedUnit/PlayerUnit) is null. Cannot prepare attack.");
         }
     }
-    
+
     private void ApplyImmediateEffect(CardEffect effect, Unit defaultTarget)
     {
         if (effect == null) return;
 
-        Unit effectiveTarget = defaultTarget; 
+        Unit effectiveTarget = defaultTarget;
 
-        if (effectiveTarget == null) {
+        if (effectiveTarget == null)
+        {
             Debug.LogWarning($"No effective target found for immediate effect {effect.effectType}. Tried default: {defaultTarget?.name}");
             return;
         }
@@ -241,22 +265,30 @@ public class GameManager : MonoBehaviour
         switch (effect.effectType)
         {
             case CardEffect.EffectType.Attack:
-                Debug.Log($"Applying direct Attack {effect.value} from {effectiveTarget.name}.");
+                int totalDamage = effect.value + EquipmentManager.Instance.GetTotalDamageBonus();
+                Debug.Log($"Applying direct Attack {totalDamage} (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalDamageBonus()}) from {effectiveTarget.name}.");
                 break;
+                
             case CardEffect.EffectType.Move:
-                effectiveTarget.AddMovementPoints(effect.value);
-                Debug.Log($"Added {effect.value} movement points to {effectiveTarget.name}.");
+                int totalMove = effect.value + EquipmentManager.Instance.GetTotalMovementSpeedBonus();
+                effectiveTarget.AddMovementPoints(totalMove);
+                Debug.Log($"Added {totalMove} movement points (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalMovementSpeedBonus()}) to {effectiveTarget.name}.");
                 break;
+                
             case CardEffect.EffectType.Heal:
-                effectiveTarget.Heal(effect.value);
-                Debug.Log($"Healed {effectiveTarget.name} for {effect.value}.");
+                int totalHeal = effect.value + EquipmentManager.Instance.GetTotalHealBonus();
+                effectiveTarget.Heal(totalHeal);
+                Debug.Log($"Healed {effectiveTarget.name} for {totalHeal} (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalHealBonus()}).");
                 break;
+                
             case CardEffect.EffectType.Block:
-                effectiveTarget.AddBlock(effect.value);
-                Debug.Log($"{effectiveTarget.name} gained {effect.value} Block.");
+                int totalBlock = effect.value + EquipmentManager.Instance.GetTotalDefenseBonus();
+                effectiveTarget.AddBlock(totalBlock);
+                Debug.Log($"{effectiveTarget.name} gained {totalBlock} Block (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalDefenseBonus()}).");
                 break;
         }
     }
+
 
     private bool IsAttackPending()
     {
