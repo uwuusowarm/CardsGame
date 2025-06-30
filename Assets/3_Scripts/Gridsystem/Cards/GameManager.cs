@@ -14,11 +14,19 @@ public class GameManager : MonoBehaviour
 
     private Unit playerUnit; 
     
-    int carryOverActionPoints = ActionPointSystem.Instance.GetCurrentActionPoints();
+    int carryOverActionPoints = 0;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(this);
+        }
+
     }
 
     private void Start()
@@ -71,22 +79,33 @@ public class GameManager : MonoBehaviour
         playerUnit.shieldPoints = 0;
         playerUnit.movementPoints = 0;
 
-        ActionPointSystem.Instance.ResetActionPoints();
-        ActionPointSystem.Instance.AddActionPoints(2); 
-        
-        if (carryOverActionPoints > 0)
+        if (ActionPointSystem.Instance != null)
         {
-            ActionPointSystem.Instance.AddActionPoints(1); 
-            carryOverActionPoints = 0;
-            Debug.Log("Added 1 carried over action point");
-        }
+            if (isFirstTurn)
+            {
+                ActionPointSystem.Instance.InitializeActionPoints(2);
+            }
+            else
+            {
+                ActionPointSystem.Instance.ResetActionPoints();
+                ActionPointSystem.Instance.AddActionPoints(2);
+            }
         
+            if (carryOverActionPoints > 0)
+            {
+                ActionPointSystem.Instance.AddActionPoints(1);
+                carryOverActionPoints = 0;
+                Debug.Log("Added 1 carried over action point");
+            }
+        }
+    
         if (isFirstTurn)
         {
             Debug.Log("First turn of the game.");
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
         }
+
     }
 
     private void DrawPlayerCards()
