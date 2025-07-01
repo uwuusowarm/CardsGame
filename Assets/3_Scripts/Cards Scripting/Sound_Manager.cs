@@ -35,9 +35,15 @@ public class Sound_Manager : MonoBehaviour
 
     }
 
+
     public void Play(string name)
     {
         SoundMusic s = Array.Find(sounds, sound => sound.Name == name);
+        if (s == null)
+        {
+            Debug.LogError($"Sound '{name}' not found in Sound Manager!");
+            return;
+        }
         s.source.Play();
     }
 }
