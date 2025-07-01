@@ -25,7 +25,6 @@ public class ActionPointSystem : MonoBehaviour
 
         pointsUnlocked = new bool[maxActionPoints];
         InitializeActionPoints(2);
-
     }
 
     private void Awake()
