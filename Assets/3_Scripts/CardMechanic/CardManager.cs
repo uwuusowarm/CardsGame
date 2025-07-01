@@ -59,6 +59,7 @@ public class CardManager : MonoBehaviour
 
     private void Shuffle(List<CardData> list)
     {
+        Sound_Manager.instance.Play("Deck_Shuffle");
         for (int i = 0; i < list.Count; i++)
         {
             int r = Random.Range(i, list.Count);
@@ -73,13 +74,15 @@ public class CardManager : MonoBehaviour
         if (hasDrawnStartHand) 
             return;
         hasDrawnStartHand = true;
+        Debug.Log("Drawing " + drawCount + " cards for the start of the game.");
         DrawCards(drawCount);
     }
 
     public void DrawCards(int count)
     {
-        if (hand.Count > 0) return;
+        if (hand.Count > 0) return;  
 
+        
         if (deck.Count < count)
         {
             int remainingCards = deck.Count;
@@ -104,6 +107,7 @@ public class CardManager : MonoBehaviour
                     deck.RemoveAt(0);
                 }
             }
+       
         }
         else
         {
@@ -113,8 +117,15 @@ public class CardManager : MonoBehaviour
                 deck.RemoveAt(0);
             }
         }
-        
-        UpdateAllUI();
+        if (Random.Range(0, 2) == 0)
+        {
+            Sound_Manager.instance.Play("Draw_Card");
+        }
+        else
+        {
+            Sound_Manager.instance.Play("Draw_Card_V2");
+        }
+            UpdateAllUI();
     }
 
     public void OnDeckClicked()
@@ -140,7 +151,7 @@ public class CardManager : MonoBehaviour
             UpdateAllUI();
             return;
         }
-
+        
         if (isPlaying) return;
         isPlaying = true;
 
@@ -160,6 +171,7 @@ public class CardManager : MonoBehaviour
                 break;
             case DropType.Discard:
                 discardPile.Add(card);
+                PlayDiscardSound(1);
                 break;
             default:
                 hand.Add(card);
@@ -191,6 +203,7 @@ public class CardManager : MonoBehaviour
                 rightZone.Remove(card);
                 break;
         }
+        PlayDiscardSound(1);
         discardPile.Add(card);
         UpdateAllUI();
     }
@@ -217,6 +230,24 @@ public class CardManager : MonoBehaviour
             else if (!draggable && go.TryGetComponent<CardDragHandler>(out var d2))
                 Destroy(d2);
             go.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        }
+    }
+    private void PlayDiscardSound(int count)
+    {
+        if (count <= 0) return;
+
+
+        if (count == 1)
+        {
+            Sound_Manager.instance.Play("Discard");
+        }
+        else if (count == 2)
+        {
+            Sound_Manager.instance.Play("Multiple_Discard");
+        }
+        else if (count >= 3)
+        {
+            Sound_Manager.instance.Play("Multiple_Discard_V2");
         }
     }
 }
