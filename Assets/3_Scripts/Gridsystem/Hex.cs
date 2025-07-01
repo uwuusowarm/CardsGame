@@ -102,6 +102,11 @@ public class Hex : MonoBehaviour
     {
         return unitOnHex;
     }
+
+    public bool HasEnemyUnit()
+    {
+        return EnemyUnitOnHex != null;
+    }
 }
 
 public enum HexType
