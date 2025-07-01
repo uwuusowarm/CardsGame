@@ -176,6 +176,16 @@ public class Unit : MonoBehaviour
         }
         transform.position = endPosition;
 
+        if (intendedEndPosition.HasValue)
+        {
+            float dist = Vector3.Distance(transform.position, intendedEndPosition.Value);
+            if (dist > 0.1f)
+            {
+                Debug.LogWarning($"Error! Finish was {intendedEndPosition.Value}, stopt at {transform.position}");
+            }
+            intendedEndPosition = null; 
+        }
+
         Vector3Int newHexCoords = hexGrid.GetClosestHex(endPosition);
         currentHex = hexGrid.GetTileAt(newHexCoords);
         if (currentHex != null)
@@ -196,8 +206,14 @@ public class Unit : MonoBehaviour
         {
             Debug.Log("Movement finished!");
             movementPoints = 0;
-                
             MovementFinished?.Invoke(this);
         }
+    }
+
+    private Vector3? intendedEndPosition = null;
+
+    public void SetIntendedEndPosition(Vector3 pos)
+    {
+        intendedEndPosition = pos;
     }
 }

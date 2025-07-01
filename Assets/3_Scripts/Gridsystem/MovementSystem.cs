@@ -82,6 +82,18 @@ public class MovementSystem : MonoBehaviour
     {
         if (currentPath.Count == 0) return;
 
+        Vector3Int endHexPos = currentPath[currentPath.Count - 1];
+        Hex endHex = hexGrid.GetTileAt(endHexPos);
+        if (endHex == null || endHex.IsOccupied())
+        {
+            Debug.LogWarning("Endposition ist nicht mehr frei! Bewegung abgebrochen.");
+            ClearPath();
+            return;
+        }
+
+        Vector3 endWorldPos = hexGrid.GetTileAt(endHexPos).transform.position;
+        selectedUnit.SetIntendedEndPosition(endWorldPos); 
+
         selectedUnit.MoveTroughPath(currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList());
         ClearPath();
     }

@@ -141,24 +141,36 @@ public class EnemyUnit : MonoBehaviour
 
         while (cardsPlayed < maxCardsPerTurn && hand.Count > 0)
         {
-            bool playerInRange = IsPlayerInRange(2); 
+            bool playerInRange = IsPlayerInRange(2);
 
             CardData cardToPlay = null;
+            bool playLeft = false;
 
             if (playerInRange)
             {
-                cardToPlay = hand.FirstOrDefault(c => c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack));
+                cardToPlay = hand.FirstOrDefault(c =>
+                    c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack) ||
+                    c.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Attack));
+                if (cardToPlay != null)
+                    playLeft = cardToPlay.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Attack);
             }
             else
             {
-                cardToPlay = hand.FirstOrDefault(c => c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Move));
+                cardToPlay = hand.FirstOrDefault(c =>
+                    c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Move) ||
+                    c.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Move));
+                if (cardToPlay != null)
+                    playLeft = cardToPlay.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Move);
             }
+
             if (cardToPlay == null)
-                cardToPlay = hand.FirstOrDefault(c => c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Block));
+                cardToPlay = hand.FirstOrDefault(c =>
+                    c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Block) ||
+                    c.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Block));
 
             if (cardToPlay != null)
             {
-                PlayCard(cardToPlay, false);
+                PlayCard(cardToPlay, playLeft);
                 cardsPlayed++;
             }
             else
@@ -174,18 +186,36 @@ public class EnemyUnit : MonoBehaviour
             DrawCards(2);
 
         int played = 0;
-        var handCopy = hand.ToList(); 
+        var handCopy = hand.ToList();
 
         foreach (var card in handCopy)
         {
-            if (played >= 1) break; 
+            if (played >= 1) break;
 
             bool playerInRange = IsPlayerInRange(2);
-            if (card.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack) && !playerInRange)
-                continue;
+            bool playLeft = false;
+
+            if (playerInRange)
+            {
+                if (card.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack))
+                    playLeft = false;
+                else if (card.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Attack))
+                    playLeft = true;
+                else
+                    continue; 
+            }
+            else
+            {
+                if (card.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Move))
+                    playLeft = false;
+                else if (card.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Move))
+                    playLeft = true;
+                else
+                    continue; 
+            }
 
             yield return new WaitForSeconds(0.5f);
-            PlayCard(card, false);
+            PlayCard(card, playLeft);
             played++;
         }
 
@@ -214,8 +244,11 @@ public class EnemyUnit : MonoBehaviour
             switch (effect.effectType)
             {
                 case CardEffect.EffectType.Move:
-                    MoveTowardsPlayer(effect.value);
-                    Debug.Log($"{name} bewegt sich {effect.value} Felder Richtung Spieler.");
+                    bool moved = MoveTowardsPlayer(effect.value * 10);
+                    if (moved)
+                        Debug.Log($"{name} bewegt sich {effect.value} Felder Richtung Spieler.");
+                    else
+                        Debug.Log($"{name} konnte sich nicht bewegen.");
                     break;
                 case CardEffect.EffectType.Attack:
                     AttackPlayer(effect.value);
@@ -228,16 +261,25 @@ public class EnemyUnit : MonoBehaviour
         hand.Remove(card);
     }
 
-    private void MoveTowardsPlayer(int steps)
+    private bool MoveTowardsPlayer(int steps)
     {
         var player = GameObject.FindGameObjectWithTag("Player");
-        if (player == null) return;
+        if (player == null) return false;
 
         Vector3Int playerHex = HexGrid.Instance.GetClosestHex(player.transform.position);
         Vector3Int myHex = HexGrid.Instance.GetClosestHex(transform.position);
 
         var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHex, steps);
         List<Vector3Int> path = GetPathToTarget(bfsResult, myHex, playerHex);
+
+        Debug.Log($"{name} Path length: {path.Count} | Start: {myHex} | Ziel: {playerHex}");
+        Debug.Log($"{name} BFS-Range Felder: {string.Join(", ", bfsResult.GetRangePositions())}");
+
+        if (path.Count <= 1)
+        {
+            Debug.Log($"{name} kann keinen Pfad zum Spieler finden oder steht schon am Ziel.");
+            return false;
+        }
 
         int moveSteps = Mathf.Min(steps, path.Count - 1); 
         for (int i = 1; i <= moveSteps; i++)
@@ -253,9 +295,11 @@ public class EnemyUnit : MonoBehaviour
             }
             else
             {
+                Debug.Log($"{name} Bewegung blockiert bei {nextHex}.");
                 break; 
             }
         }
+        return true;
     }
 
     private List<Vector3Int> GetPathToTarget(BFSResult bfsResult, Vector3Int start, Vector3Int target)

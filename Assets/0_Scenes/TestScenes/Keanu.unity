@@ -4707,6 +4707,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
+    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
+    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
+        type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
     - target: {fileID: -8679921383154817045, guid: 3f3f3c0bcb0b3a84b8af68b6b16cf24a,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -4797,21 +4812,6 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
-    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
-    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
-        type: 3}
-      propertyPath: m_Materials.Array.data[1]
-      value: 
-      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
-    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
-        type: 3}
-      propertyPath: m_Materials.Array.data[2]
-      value: 
-      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6937,6 +6937,7 @@ GameObject:
   - component: {fileID: 1651346450}
   - component: {fileID: 1651346449}
   - component: {fileID: 1651346451}
+  - component: {fileID: 1651346452}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -6982,6 +6983,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d983b27ab25477249abde4fe4b9c3beb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1651346452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651346448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96fa4bd5855b4b94ca7598cb34df5828, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1661261916
@@ -8704,6 +8717,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
+    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
+    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
+        type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
     - target: {fileID: -8679921383154817045, guid: 3f3f3c0bcb0b3a84b8af68b6b16cf24a,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -8789,21 +8817,6 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
-    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
-    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
-        type: 3}
-      propertyPath: m_Materials.Array.data[1]
-      value: 
-      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
-    - target: {fileID: -7511558181221131132, guid: d14f729b695d0244785e44b94b61a3ce,
-        type: 3}
-      propertyPath: m_Materials.Array.data[2]
-      value: 
-      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
