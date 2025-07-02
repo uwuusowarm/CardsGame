@@ -122,15 +122,15 @@ public class EnemyUnit : MonoBehaviour
     }
 
     public void DrawCards(int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            if (deck.Count == 0) break;
-            var card = deck[0];
-            deck.RemoveAt(0);
-            hand.Add(card);
-        }
-    }
+         {
+             for (int i = 0; i < count; i++)
+             {
+                 if (deck.Count == 0) break;
+                 var card = deck[0];
+                 deck.RemoveAt(0);
+                 hand.Add(card);
+             }
+         }
 
     public void EnemyTurn()
     {
@@ -234,8 +234,18 @@ public class EnemyUnit : MonoBehaviour
 
     private int HexDistance(Vector3Int a, Vector3Int b)
     {
-        return (Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y) + Mathf.Abs(a.z - b.z)) / 2;
+        int dx = Mathf.Abs(a.x - b.x);
+        int dz = Mathf.Abs(a.z - b.z);
+    
+        if ((a.z % 2 == 1 && b.z % 2 == 0) || (a.z % 2 == 0 && b.z % 2 == 1))
+        {
+            if (a.x < b.x)
+                dx = Mathf.Max(0, dx - 1);
+        }
+    
+        return dx + Mathf.Max(0, dz - (dx + 1) / 2);
     }
+
 
     private void PlayCard(CardData card, bool isLeft)
     {
@@ -258,9 +268,11 @@ public class EnemyUnit : MonoBehaviour
                     break;
             }
         }
-        hand.Remove(card);
+        Debug.Log($"{name} behält die Karte '{card.cardName}' in der Hand");
     }
 
+
+    
     private bool MoveTowardsPlayer(int steps)
     {
         var player = GameObject.FindGameObjectWithTag("Player");
@@ -270,35 +282,56 @@ public class EnemyUnit : MonoBehaviour
         Vector3Int myHex = HexGrid.Instance.GetClosestHex(transform.position);
 
         var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHex, steps);
-        List<Vector3Int> path = GetPathToTarget(bfsResult, myHex, playerHex);
+        var availablePositions = bfsResult.visitedNodesDict.Keys.ToList();
+        
+        Debug.Log($"{name} BFS-Range Felder: {string.Join(", ", availablePositions)}");
 
-        Debug.Log($"{name} Path length: {path.Count} | Start: {myHex} | Ziel: {playerHex}");
-        Debug.Log($"{name} BFS-Range Felder: {string.Join(", ", bfsResult.GetRangePositions())}");
-
-        if (path.Count <= 1)
+        if (availablePositions.Count == 0)
         {
-            Debug.Log($"{name} kann keinen Pfad zum Spieler finden oder steht schon am Ziel.");
+            Debug.Log($"{name} kann sich nicht bewegen.");
             return false;
         }
 
-        int moveSteps = Mathf.Min(steps, path.Count - 1); 
-        for (int i = 1; i <= moveSteps; i++)
+        Vector3Int bestPosition = myHex;
+        int shortestDistance = int.MaxValue;
+
+        foreach (var pos in availablePositions)
         {
-            Vector3Int nextHex = path[i];
-            Hex nextTile = HexGrid.Instance.GetTileAt(nextHex);
-            if (nextTile != null && !nextTile.HasEnemyUnit())
+            var hex = HexGrid.Instance.GetTileAt(pos);
+            if (hex != null && !hex.HasEnemyUnit() && !hex.IsObstacle())
             {
-                transform.position = HexGrid.Instance.GetWorldPosition(nextHex);
-                currentHex?.SetEnemyUnit(null);
-                currentHex = nextTile;
-                currentHex.SetEnemyUnit(this);
-            }
-            else
-            {
-                Debug.Log($"{name} Bewegung blockiert bei {nextHex}.");
-                break; 
+                int distance = Mathf.Abs(pos.x - playerHex.x) + Mathf.Abs(pos.z - playerHex.z);
+                if (distance < shortestDistance)
+                {
+                    shortestDistance = distance;
+                    bestPosition = pos;
+                }
             }
         }
+
+        if (bestPosition == myHex)
+        {
+            Debug.Log($"{name} findet keine bessere Position.");
+            return false;
+        }
+
+        var targetHex = HexGrid.Instance.GetTileAt(bestPosition);
+        var propsTransform = targetHex.transform.Find("Props");
+        
+        if (propsTransform == null)
+        {
+            Debug.LogError($"Props child not found on hex at position {bestPosition}");
+            return false;
+        }
+
+        transform.SetParent(propsTransform); 
+        transform.localPosition = new Vector3(0.03f, 0.4f, 0.54f); 
+
+        currentHex?.SetEnemyUnit(null);
+        currentHex = targetHex;
+        currentHex.SetEnemyUnit(this);
+        
+        Debug.Log($"{name} bewegt sich zu Position {bestPosition}");
         return true;
     }
 
