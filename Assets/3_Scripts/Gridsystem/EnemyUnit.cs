@@ -249,20 +249,32 @@ public class EnemyUnit : MonoBehaviour
 
     private void PlayCard(CardData card, bool isLeft)
     {
-        foreach (var effect in isLeft ? card.leftEffects : card.rightEffects)
+        var effects = new List<CardEffect>();
+        if (card.leftEffects != null) effects.AddRange(card.leftEffects);
+        // if (card.bottomEffects != null) effects.AddRange(card.bottomEffects);
+        if (card.rightEffects != null) effects.AddRange(card.rightEffects);
+
+        foreach (var effect in effects)
         {
             switch (effect.effectType)
             {
                 case CardEffect.EffectType.Move:
                     bool moved = MoveTowardsPlayer(effect.value * 10);
                     if (moved)
-                        Debug.Log($"{name} bewegt sich {effect.value} Felder Richtung Spieler.");
+                        Debug.Log($"{name} move by {effect.value} to player.");
                     else
-                        Debug.Log($"{name} konnte sich nicht bewegen.");
+                        Debug.Log($"{name} cant move.");
                     break;
                 case CardEffect.EffectType.Attack:
-                    AttackPlayer(effect.value);
-                    Debug.Log($"{name} greift Spieler an für {effect.value} Schaden.");
+                    if (IsPlayerInRange(2))
+                    {
+                        AttackPlayer(effect.value);
+                        Debug.Log($"{name} attack player by {effect.value} damage.");
+                    }
+                    else
+                    {
+                        Debug.Log($"{name} cant attack because of range.");
+                    }
                     break;
                 case CardEffect.EffectType.Block:
                     break;
@@ -311,7 +323,7 @@ public class EnemyUnit : MonoBehaviour
 
         if (bestPosition == myHex)
         {
-            Debug.Log($"{name} findet keine bessere Position.");
+            Debug.Log($"{name} cant find a better position.");
             return false;
         }
 
@@ -331,7 +343,7 @@ public class EnemyUnit : MonoBehaviour
         currentHex = targetHex;
         currentHex.SetEnemyUnit(this);
         
-        Debug.Log($"{name} bewegt sich zu Position {bestPosition}");
+        Debug.Log($"{name} moves to position {bestPosition}");
         return true;
     }
 
