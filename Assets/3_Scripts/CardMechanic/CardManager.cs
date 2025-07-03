@@ -9,16 +9,22 @@ public class CardManager : MonoBehaviour
 {
     public static CardManager Instance { get; private set; }
 
+    [Header("Zentrale Kartendatenbank")]
+    [Tooltip("Die ScriptableObject-Datei, die die Master-Liste aller Karten enthält.")]
+    [SerializeField] private CardDatabaseSO cardDatabase;
+
     [Header("Einstellungen")]
     [SerializeField, Min(1)] private int drawCount = 4;
-    [SerializeField] private List<CardData> cardDatabase;
 
-    [Header("UI-Referenzen")]
+    [Header("UI-Referenzen (Nur für Spiel-Szene)")]
+    [Tooltip("Die UI-Elemente, die als Zonen für die Karten im Spiel dienen.")]
     [SerializeField] private Transform handGrid;
     [SerializeField] private Transform leftGrid;
     [SerializeField] private Transform rightGrid;
     [SerializeField] private Transform discardGrid;
-    [SerializeField] private GameObject cardPrefab;
+    [SerializeField] private GameObject cardPrefab; 
+
+    [Header("Gameplay")]
     [SerializeField] private float playCooldown = 0.5f;
     [SerializeField] private float autoDiscardDelay = 3f;
 
@@ -35,31 +41,35 @@ public class CardManager : MonoBehaviour
 
     private bool isPlaying = false;
     private bool hasDrawnStartHand = false;
-    public void DrawCard() => DrawCards(1);
-    
-    public int DrawCount => drawCount;
 
+    public void DrawCard() => DrawCards(1);
     public void DrawCard(int count) => DrawCards(count);
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) 
+        if (Instance != null && Instance != this)
             Destroy(gameObject);
         else Instance = this;
     }
 
     private void Start()
     {
+        if (cardDatabase == null)
+        {
+            Debug.LogError("FATAL: CardDatabaseSO wurde nicht im CardManager zugewiesen! Das Spiel kann nicht starten.");
+            return;
+        }
+
         deck.Clear();
-        deck.AddRange(cardDatabase);
+        deck.AddRange(cardDatabase.allCards);
         Shuffle(deck);
+
         DrawInitialCards();
         UpdateAllUI();
     }
 
     private void Shuffle(List<CardData> list)
     {
-        Sound_Manager.instance.Play("Deck_Shuffle");
         for (int i = 0; i < list.Count; i++)
         {
             int r = Random.Range(i, list.Count);
@@ -71,61 +81,32 @@ public class CardManager : MonoBehaviour
 
     public void DrawInitialCards()
     {
-        if (hasDrawnStartHand) 
+        if (hasDrawnStartHand)
             return;
         hasDrawnStartHand = true;
-        Debug.Log("Drawing " + drawCount + " cards for the start of the game.");
         DrawCards(drawCount);
     }
 
     public void DrawCards(int count)
     {
-        if (hand.Count > 0) return;  
+        if (hand.Count > 0)
+            return;
 
-        
-        if (deck.Count < count)
+        if (deck.Count == 0 && discardPile.Count > 0)
         {
-            int remainingCards = deck.Count;
-            for (int i = 0; i < remainingCards; i++)
-            {
-                hand.Add(deck[0]);
-                deck.RemoveAt(0);
-            }
+            deck.AddRange(discardPile);
+            discardPile.Clear();
+            Shuffle(deck);
+        }
 
-            if (discardPile.Count > 0)
-            {
-                deck.AddRange(discardPile);
-                discardPile.Clear();
-                Shuffle(deck);
-                ExhaustionSystem.Instance.AddExhaustionStack();
-                ExhaustionSystem.Instance.ExhaustCards(deck);
-                
-                int additionalCards = Mathf.Min(count - remainingCards, deck.Count);
-                for (int i = 0; i < additionalCards; i++)
-                {
-                    hand.Add(deck[0]);
-                    deck.RemoveAt(0);
-                }
-            }
-       
-        }
-        else
+        int toDraw = Mathf.Min(count, deck.Count);
+
+        for (int i = 0; i < toDraw; i++)
         {
-            for (int i = 0; i < count; i++)
-            {
-                hand.Add(deck[0]);
-                deck.RemoveAt(0);
-            }
+            hand.Add(deck[0]);
+            deck.RemoveAt(0);
         }
-        if (Random.Range(0, 2) == 0)
-        {
-            Sound_Manager.instance.Play("Draw_Card");
-        }
-        else
-        {
-            Sound_Manager.instance.Play("Draw_Card_V2");
-        }
-            UpdateAllUI();
+        UpdateAllUI();
     }
 
     public void OnDeckClicked()
@@ -138,23 +119,13 @@ public class CardManager : MonoBehaviour
         if ((type == DropType.Left && leftZone.Contains(card)) ||
             (type == DropType.Right && rightZone.Contains(card)))
         {
-            Debug.Log($"[CardManager] Karte '{card.cardName}' wurde bereits in Zone '{type}' gelegt.");
+            Debug.Log($"[CardManager] Karte '{card.name}' wurde bereits in Zone '{type}' gelegt.");
             UpdateAllUI();
             return;
         }
-        
-        if ((type == DropType.Left || type == DropType.Right) && 
-            ActionPointSystem.Instance.GetCurrentActionPoints() <= 0)
-        {
-            Debug.Log("Not enough action points to play this card!");
-            hand.Add(card); 
-            UpdateAllUI();
-            return;
-        }
-        
+
         if (isPlaying) return;
         isPlaying = true;
-
 
         int idx = hand.IndexOf(card);
         if (idx >= 0) hand.RemoveAt(idx);
@@ -163,17 +134,14 @@ public class CardManager : MonoBehaviour
         {
             case DropType.Left:
                 leftZone.Add(card);
-                GameManager.Instance.ProcessPlayedCard(card, true);
                 break;
             case DropType.Right:
                 rightZone.Add(card);
-                GameManager.Instance.ProcessPlayedCard(card, false);
                 break;
             case DropType.Discard:
                 discardPile.Add(card);
-                PlayDiscardSound(1);
                 break;
-            default:
+            default: 
                 hand.Add(card);
                 break;
         }
@@ -203,51 +171,33 @@ public class CardManager : MonoBehaviour
                 rightZone.Remove(card);
                 break;
         }
-        PlayDiscardSound(1);
         discardPile.Add(card);
         UpdateAllUI();
     }
 
     public void UpdateAllUI()
     {
-        RebuildContainer(handGrid, hand, true);
-        RebuildContainer(leftGrid, leftZone, false);
-        RebuildContainer(rightGrid, rightZone, false);
-        RebuildContainer(discardGrid, discardPile, false);
+        if (handGrid != null) RebuildContainer(handGrid, hand, true);
+        if (leftGrid != null) RebuildContainer(leftGrid, leftZone, false);
+        if (rightGrid != null) RebuildContainer(rightGrid, rightZone, false);
+        if (discardGrid != null) RebuildContainer(discardGrid, discardPile, false);
     }
 
     private void RebuildContainer(Transform parent, List<CardData> list, bool draggable)
     {
         for (int i = parent.childCount - 1; i >= 0; i--)
-            DestroyImmediate(parent.GetChild(i).gameObject);
+            Destroy(parent.GetChild(i).gameObject);
 
         foreach (var c in list)
         {
             var go = Instantiate(cardPrefab, parent);
-            go.GetComponent<CardUI>().Initialize(c);
+
             if (draggable && go.TryGetComponent<CardDragHandler>(out var d))
                 d.Card = c;
             else if (!draggable && go.TryGetComponent<CardDragHandler>(out var d2))
                 Destroy(d2);
+
             go.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        }
-    }
-    private void PlayDiscardSound(int count)
-    {
-        if (count <= 0) return;
-
-
-        if (count == 1)
-        {
-            Sound_Manager.instance.Play("Discard");
-        }
-        else if (count == 2)
-        {
-            Sound_Manager.instance.Play("Multiple_Discard");
-        }
-        else if (count >= 3)
-        {
-            Sound_Manager.instance.Play("Multiple_Discard_V2");
         }
     }
 }
