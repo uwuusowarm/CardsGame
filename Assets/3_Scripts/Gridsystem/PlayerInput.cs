@@ -9,15 +9,21 @@ public class PlayerInput : MonoBehaviour
 
     private void Update()
     {
-        DetectMouseClick();
+        DetectInput();
     }
 
-    private void DetectMouseClick()
+    private void DetectInput()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Vector3 mousePos = Input.mousePosition;
-            PointerClick?.Invoke(mousePos);
+            Vector3 pointerPos = Input.mousePosition;
+            PointerClick?.Invoke(pointerPos);
+        }
+        else if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            Vector3 touchPos = Input.GetTouch(0).position;
+            PointerClick?.Invoke(touchPos);
         }
     }
+
 }
