@@ -328,23 +328,38 @@ public class EnemyUnit : MonoBehaviour
         }
 
         var targetHex = HexGrid.Instance.GetTileAt(bestPosition);
-        var propsTransform = targetHex.transform.Find("Props");
-        
-        if (propsTransform == null)
-        {
-            Debug.LogError($"Props child not found on hex at position {bestPosition}");
-            return false;
-        }
-
-        transform.SetParent(propsTransform); 
-        transform.localPosition = new Vector3(0.03f, 0.4f, 0.54f); 
+        StartCoroutine(MoveToHexSmooth(targetHex)); 
 
         currentHex?.SetEnemyUnit(null);
         currentHex = targetHex;
         currentHex.SetEnemyUnit(this);
-        
+
         Debug.Log($"{name} moves to position {bestPosition}");
         return true;
+    }
+
+    private IEnumerator MoveToHexSmooth(Hex targetHex, float duration = 0.3f)
+    {
+        var propsTransform = targetHex.transform.Find("Props");
+        if (propsTransform == null)
+        {
+            Debug.LogError($"Props child not found on hex at position {targetHex.hexCoords}");
+            yield break;
+        }
+
+        Vector3 start = transform.position;
+        Vector3 end = propsTransform.TransformPoint(new Vector3(0.03f, 0.4f, 0.54f));
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            transform.position = Vector3.Lerp(start, end, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = end;
+        transform.SetParent(propsTransform);
+        transform.localPosition = new Vector3(0.03f, 0.4f, 0.54f);
     }
 
     private List<Vector3Int> GetPathToTarget(BFSResult bfsResult, Vector3Int start, Vector3Int target)
