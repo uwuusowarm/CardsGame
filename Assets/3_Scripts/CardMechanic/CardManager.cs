@@ -10,18 +10,20 @@ public class CardManager : MonoBehaviour
     public static CardManager Instance { get; private set; }
 
     [Header("Zentrale Kartendatenbank")]
+    [Tooltip("Die ScriptableObject-Datei, die die Master-Liste aller Karten enthält.")]
     [SerializeField] private CardDatabaseSO cardDatabase;
 
     [Header("Einstellungen")]
-    [SerializeField, Min(1)] private int drawCount = 4;
-    public int DrawCount => drawCount;
+    [SerializeField, Min(1)]
+    public int drawCount = 4;
 
     [Header("UI-Referenzen (Nur für Spiel-Szene)")]
+    [Tooltip("Die UI-Elemente, die als Zonen für die Karten im Spiel dienen.")]
     [SerializeField] private Transform handGrid;
     [SerializeField] private Transform leftGrid;
     [SerializeField] private Transform rightGrid;
     [SerializeField] private Transform discardGrid;
-    [SerializeField] private GameObject cardPrefab;
+    [SerializeField] private GameObject cardPrefab; 
 
     [Header("Gameplay")]
     [SerializeField] private float playCooldown = 0.5f;
@@ -47,13 +49,8 @@ public class CardManager : MonoBehaviour
     private void Awake()
     {
         if (Instance != null && Instance != this)
-        {
             Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
+        else Instance = this;
     }
 
     private void Start()
@@ -145,7 +142,7 @@ public class CardManager : MonoBehaviour
             case DropType.Discard:
                 discardPile.Add(card);
                 break;
-            default:
+            default: 
                 hand.Add(card);
                 break;
         }
@@ -192,21 +189,34 @@ public class CardManager : MonoBehaviour
         for (int i = parent.childCount - 1; i >= 0; i--)
             Destroy(parent.GetChild(i).gameObject);
 
-        foreach (var c in list)
+        foreach (var cardData in list)
         {
-            var go = Instantiate(cardPrefab, parent);
+            var cardObject = Instantiate(cardPrefab, parent);
 
-            if (go.TryGetComponent<CardUI>(out var cardUI))
+            var cardUI = cardObject.GetComponent<CardUI>();
+            if (cardUI != null)
             {
-                cardUI.Initialize(c);
+                cardUI.Initialize(cardData);
+            }
+            else
+            {
+                Debug.LogError($"CardUI component missing on card prefab! Card: {cardData.name}");
             }
 
-            if (draggable && go.TryGetComponent<CardDragHandler>(out var d))
-                d.Card = c;
-            else if (!draggable && go.TryGetComponent<CardDragHandler>(out var d2))
-                Destroy(d2);
+            if (draggable)
+            {
+                if (cardObject.TryGetComponent<CardDragHandler>(out var dragHandler))
+                    dragHandler.Card = cardData;
+            }
+            else
+            {
+                if (cardObject.TryGetComponent<CardDragHandler>(out var dragHandler))
+                    Destroy(dragHandler);
+            }
 
-            go.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            cardObject.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
         }
     }
+
+
 }
