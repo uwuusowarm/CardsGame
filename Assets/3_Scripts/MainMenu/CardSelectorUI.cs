@@ -12,7 +12,7 @@ public class CardSelectorUI : MonoBehaviour
     private CardData assignedCard;
     private CardMenuManager manager;
 
-    public void Initialize(CardData card, CardMenuManager menuManager, bool isSelected)
+    public void Initialize(CardData card, CardMenuManager menuManager, bool isSelected, Vector2 targetSize)
     {
         this.assignedCard = card;
         this.manager = menuManager;
@@ -26,7 +26,7 @@ public class CardSelectorUI : MonoBehaviour
         {
             GameObject visualCardInstance = Instantiate(card.cardPrefab, cardParent);
             TameCardInstance(visualCardInstance);
-            ScaleCardToFit(visualCardInstance, cardParent);
+            ScaleCardToFit(visualCardInstance, cardParent, targetSize);
         }
 
         SetHighlight(isSelected);
@@ -34,7 +34,7 @@ public class CardSelectorUI : MonoBehaviour
         GetComponent<Button>().onClick.RemoveAllListeners();
         GetComponent<Button>().onClick.AddListener(OnCardClicked);
     }
-
+    
     private void TameCardInstance(GameObject cardInstance)
     {
         if (cardInstance.TryGetComponent<CardDragHandler>(out var dragHandler))
@@ -58,24 +58,28 @@ public class CardSelectorUI : MonoBehaviour
         }
     }
 
-    private void ScaleCardToFit(GameObject cardInstance, Transform parentContainer)
+    private void ScaleCardToFit(GameObject cardInstance, Transform parentContainer, Vector2 targetSize)
     {
-        RectTransform cardRect = cardInstance.GetComponent<RectTransform>();
+        RectTransform cardRect = cardInstance.GetComponent<RectTransform>(); 
         RectTransform parentRect = parentContainer.GetComponent<RectTransform>();
         if (cardRect == null || parentRect == null) return;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
+        Canvas.ForceUpdateCanvases();
 
         cardRect.anchorMin = cardRect.anchorMax = cardRect.pivot = new Vector2(0.5f, 0.5f);
+    
+        Vector2 availableSpace = targetSize;
 
         float cardWidth = cardRect.rect.width;
         float cardHeight = cardRect.rect.height;
-        float parentWidth = parentRect.rect.width;
-        float parentHeight = parentRect.rect.height;
 
-        if (cardWidth == 0 || cardHeight == 0) return;
+        if (cardWidth <= 0 || cardHeight <= 0) return;
 
-        float scaleRatio = Mathf.Min(parentWidth / cardWidth, parentHeight / cardHeight);
+        float scaleRatio = Mathf.Min(
+            availableSpace.x / cardWidth,
+            availableSpace.y / cardHeight
+        );
 
         cardRect.localScale = new Vector3(scaleRatio, scaleRatio, 1f);
         cardRect.anchoredPosition = Vector2.zero;

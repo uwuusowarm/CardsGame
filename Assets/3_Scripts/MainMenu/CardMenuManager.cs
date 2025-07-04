@@ -52,9 +52,13 @@ public class CardMenuManager : MonoBehaviour
 
         if (allAvailableCards == null) return;
 
+        GridLayoutGroup gridLayout = allCardsContainer.GetComponent<GridLayoutGroup>();
+
+        Vector2 targetCellSize = gridLayout.cellSize;
+
         foreach (var cardData in allAvailableCards)
         {
-            if (cardData.cardPrefab == null) continue; // Überspringe Karten ohne zugewiesenes Prefab
+            if (cardData.cardPrefab == null) continue;
 
             GameObject wrapperGO = Instantiate(cardInListPrefab, allCardsContainer);
             wrapperGO.name = "Wrapper_" + cardData.cardName;
@@ -63,7 +67,7 @@ public class CardMenuManager : MonoBehaviour
             if (cardUI != null)
             {
                 bool isSelected = currentlySelectedCards.Contains(cardData);
-                cardUI.Initialize(cardData, this, isSelected);
+                cardUI.Initialize(cardData, this, isSelected, targetCellSize);
                 spawnedCardUIs.Add(cardUI);
             }
         }
