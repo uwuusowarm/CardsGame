@@ -5,16 +5,16 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 {
     public CardData Card;
 
-    RectTransform rt;
-    CanvasGroup cg;
-    Canvas gameCanvas;
-    Vector2 startPos;
-    Transform startParent;
+    private RectTransform rt;
+    private CanvasGroup cg;
+    private Canvas gameCanvas;
+    private Vector2 startPos;
+    private Transform startParent;
 
-    RectTransform handZone;
-    RectTransform leftZone;
-    RectTransform rightZone;
-    RectTransform discardZone;
+    private RectTransform handZone;
+    private RectTransform leftZone;
+    private RectTransform rightZone;
+    private RectTransform discardZone;
 
     void Awake()
     {
@@ -22,15 +22,20 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         cg = GetComponent<CanvasGroup>();
         gameCanvas = GetComponentInParent<Canvas>();
 
-        var grab = CardManager.Instance;
-        handZone = grab.HandGridRect;
-        leftZone = grab.LeftGridRect;
-        rightZone = grab.RightGridRect;
-        discardZone = grab.DiscardGridRect;
+        if (CardManager.Instance != null)
+        {
+            var grab = CardManager.Instance;
+            handZone = grab.HandGridRect;
+            leftZone = grab.LeftGridRect;
+            rightZone = grab.RightGridRect;
+            discardZone = grab.DiscardGridRect;
+        }
     }
 
     public void OnBeginDrag(PointerEventData e)
     {
+        if (CardManager.Instance == null) return;
+
         startParent = transform.parent;
         startPos = rt.anchoredPosition;
 
@@ -41,13 +46,16 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnDrag(PointerEventData e)
     {
+        if (CardManager.Instance == null) return;
+
         rt.position = e.position;
     }
 
     public void OnEndDrag(PointerEventData e)
     {
-        cg.blocksRaycasts = true;
+        if (CardManager.Instance == null) return;
 
+        cg.blocksRaycasts = true;
 
         bool droppedOnLeft = RectTransformUtility.RectangleContainsScreenPoint(
             leftZone, e.position,
@@ -58,17 +66,8 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             rightZone, e.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
         );
-        
-        if ((droppedOnLeft || droppedOnRight) && ActionPointSystem.Instance.GetCurrentActionPoints() <= 0)
-        {
-            Debug.Log("Not enough action points to play this card!");
-            CardManager.Instance.MoveToZone(Card, DropType.Hand);
-            Destroy(gameObject);
-            return;
-        }
 
-
-        bool droppedOnDiscard = RectTransformUtility.RectangleContainsScreenPoint(
+        bool droppedOnDiscard = discardZone != null && RectTransformUtility.RectangleContainsScreenPoint(
             discardZone, e.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
         );
@@ -81,7 +80,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         {
             CardManager.Instance.MoveToZone(Card, DropType.Right);
         }
-        else if (droppedOnDiscard) 
+        else if (droppedOnDiscard)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Discard);
         }

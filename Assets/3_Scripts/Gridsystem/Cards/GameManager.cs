@@ -332,13 +332,6 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Starting Enemy Turn Routine.");
 
-        /*if (UnitManager.Instance == null)
-        {
-            Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
-            StartPlayerTurn();
-            yield break;
-        }*/
-
         foreach (var enemy in UnitManager.Instance.GetEnemyUnits())
         {
             Debug.Log($"Enemy {enemy.name} is taking its turn.");
