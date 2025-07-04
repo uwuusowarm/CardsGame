@@ -40,13 +40,23 @@ public class MovementSystem : MonoBehaviour
         if (selectedHex == null || selectedHex.IsOccupied()) return;
 
         int moveCost = selectedHex.GetCost();
+        if (currentPath.Count > 0)
+        {
+            if (!hexGrid.GetNeighborsFor(currentPath[currentPath.Count - 1]).Contains(selectedHexPosition))
+                return;
+        }
+        else
+        {
+            Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.transform.position);
+            if (!hexGrid.GetNeighborsFor(unitPos).Contains(selectedHexPosition))
+                return;
+        }
         if (moveCost > remainingMovementPoints) return;
-        currentPath.Clear();
+
         currentPath.Add(selectedHexPosition);
         remainingMovementPoints -= moveCost;
         selectedHex.HighLightPath();
-
-        ConfirmPath();
+        UpdateMovementRange();
     }
 
     private void UpdateMovementRange()
@@ -72,24 +82,20 @@ public class MovementSystem : MonoBehaviour
     {
         if (currentPath.Count == 0) return;
 
-        Vector3Int endHexPos = currentPath[0];
+        Vector3Int endHexPos = currentPath[currentPath.Count - 1];
         Hex endHex = hexGrid.GetTileAt(endHexPos);
         if (endHex == null || endHex.IsOccupied())
         {
-            Debug.LogWarning("Error MovementSystem: End hex is null or occupied!");
+            Debug.LogWarning("Endposition ist nicht mehr frei! Bewegung abgebrochen.");
             ClearPath();
             return;
         }
 
-        Vector3 endWorldPos = endHex.transform.position;
-        selectedUnit.SetIntendedEndPosition(endWorldPos);
+        Vector3 endWorldPos = hexGrid.GetTileAt(endHexPos).transform.position;
+        selectedUnit.SetIntendedEndPosition(endWorldPos); 
 
-        selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
+        selectedUnit.MoveTroughPath(currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList());
         ClearPath();
-        if (remainingMovementPoints > 0)
-        {
-            CalculateRange();
-        }
     }
 
     public void ClearPath()
@@ -151,18 +157,5 @@ public class MovementSystem : MonoBehaviour
         if (currentPath.Count == 0) return;
         selectedUnit.MoveTroughPath(currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList());
         ClearPath();
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            if (selectedUnit != null)
-            {
-                remainingMovementPoints = 4;
-                CalculateRange();
-                Debug.Log("Test: Movement aktiviert mit 4 Schritten!");
-            }
-        }
     }
 }
