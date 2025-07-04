@@ -29,10 +29,9 @@ public class CardCreatorWindow : EditorWindow
 
     private void LoadResources()
     {
-
         cardPrefabTemplate = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/3_Scripts/Gridsystem/Cards/Card.prefab");
 
-        string bgPath = "Assets/2_Art/Cards/Card Layouts";
+        string bgPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Card Layouts";
         classBackgrounds = new Dictionary<string, Sprite>()
         {
             { "Wizard", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Wizard_v1_NC.png") },
@@ -42,7 +41,7 @@ public class CardCreatorWindow : EditorWindow
             { "Base", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Base_v1_NC.png") }
         };
 
-        string rarityPath = "Assets/2_Art/Cards/Rarity Layer";
+        string rarityPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Rarity Layer";
         rarityBorders = new Dictionary<CardRarity, Sprite>()
         {
             { CardRarity.Common, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Common_v1_NC.png") },
@@ -51,7 +50,7 @@ public class CardCreatorWindow : EditorWindow
             { CardRarity.Monster, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Monster_v1_NC.png") }
         };
 
-        string iconsPath = "Assets/2_Art/Cards/Card Icons";
+        string iconsPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Card Icons";
         effectIcons = new Dictionary<CardEffect.EffectType, Sprite>()
         {
             { CardEffect.EffectType.Attack, AssetDatabase.LoadAssetAtPath<Sprite>($"{iconsPath}/Card_Icon_Core_Attack_v1_NC.png") },
