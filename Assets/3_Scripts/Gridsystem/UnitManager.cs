@@ -71,8 +71,8 @@ public class UnitManager : MonoBehaviour
 
         if (!hexGO.TryGetComponent<Hex>(out var selectedHex)) return;
 
-        if (HandleHexOutOfRange(selectedHex.HexCoords) ||
-            HandleSelectedHexIsUnitHex(selectedHex.HexCoords)) return;
+        if (HandleHexOutOfRange(selectedHex.hexCoords) ||
+            HandleSelectedHexIsUnitHex(selectedHex.hexCoords)) return;
 
         HandleTargetHexSelected(selectedHex);
     }
@@ -97,18 +97,7 @@ public class UnitManager : MonoBehaviour
 
     private void HandleTargetHexSelected(Hex selectedHex)
     {
-        if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
-        {
-            previouslySelectedHex = selectedHex;
-            movementSystem.AddToPath(selectedHex.HexCoords);
-        }
-        else
-        {
-            movementSystem.MoveUnit();
-            animator.SetBool("IsWalking", true);
-            selectedUnit.MovementFinished += OnMovementFinished;
-            ClearOldSelection();
-        }
+        movementSystem.AddToPath(selectedHex.hexCoords); 
     }
 
     private void OnMovementFinished(Unit unit)
@@ -133,7 +122,7 @@ public class UnitManager : MonoBehaviour
     {
         if (!movementSystem.IsHexInRange(hexPosition))
         {
-            Debug.Log("Hex out of range!");
+            Debug.Log($"Hex out of range! Hex: {hexPosition}");
             return true;
         }
         return false;

@@ -35,18 +35,40 @@ public class MovementSystem : MonoBehaviour
 
     public void AddToPath(Vector3Int selectedHexPosition)
     {
-        if (!IsHexInRange(selectedHexPosition)) return;
+        Debug.Log("AddToPath: " + selectedHexPosition);
+
+        if (!IsHexInRange(selectedHexPosition))
+        {
+            Debug.Log("Nicht in Range!");
+            return;
+        }
 
         Hex selectedHex = hexGrid.GetTileAt(selectedHexPosition);
-        if (selectedHex == null || selectedHex.IsOccupied()) return;
+        if (selectedHex == null)
+        {
+            Debug.Log("SelectedHex ist null!");
+            return;
+        }
+        if (selectedHex.IsOccupied())
+        {
+            Debug.Log("SelectedHex ist besetzt!");
+            return;
+        }
 
         int moveCost = selectedHex.GetCost();
-        if (moveCost > remainingMovementPoints) return;
+        Debug.Log($"MoveCost: {moveCost}, Remaining: {remainingMovementPoints}");
+        if (moveCost > remainingMovementPoints)
+        {
+            Debug.Log("Nicht genug Bewegungspunkte!");
+            return;
+        }
+
         currentPath.Clear();
         currentPath.Add(selectedHexPosition);
         remainingMovementPoints -= moveCost;
         selectedHex.HighLightPath();
 
+        Debug.Log("ConfirmPath wird aufgerufen");
         ConfirmPath();
     }
 
