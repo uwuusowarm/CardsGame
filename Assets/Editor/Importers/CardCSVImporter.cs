@@ -192,8 +192,10 @@ public class CardCSVImporter
             }
 
             cardUI.Initialize(cardData);
-            
-            PrefabUtility.SaveAsPrefabAsset(cardInstance, prefabPath);
+        
+            GameObject prefabAsset = PrefabUtility.SaveAsPrefabAsset(cardInstance, prefabPath);
+            cardData.cardPrefab = prefabAsset;
+            EditorUtility.SetDirty(cardData);
         }
         finally
         {
@@ -203,6 +205,7 @@ public class CardCSVImporter
             }
         }
     }
+
     
     private static int ParseInt(string value, int defaultValue = 0)
     {
