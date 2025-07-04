@@ -25,7 +25,7 @@ public class GlowHighlight : MonoBehaviour
         }
     }
 
-    internal void ResetGlowHighlight()
+    public void ResetGlowHighlight()
     {
         if (isGlowing == false) return;
         foreach (Renderer renderer in originalMaterials.Keys)
@@ -38,7 +38,7 @@ public class GlowHighlight : MonoBehaviour
         }
     }
 
-    internal void HighlightValidPath()
+    public void HighlightValidPath()
     {
         if (isGlowing == false) return;
         foreach (Renderer renderer in originalMaterials.Keys)

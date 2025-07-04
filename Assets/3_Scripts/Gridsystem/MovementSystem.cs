@@ -11,24 +11,25 @@ public class MovementSystem : MonoBehaviour
     private Unit selectedUnit;
     private HexGrid hexGrid;
     public Animator animator;
+    private Vector3Int lastUnitHex;
 
     public void Initialize(Unit unit, HexGrid grid)
     {
         selectedUnit = unit;
         hexGrid = grid;
         remainingMovementPoints = unit.MovementPoints;
+        lastUnitHex = hexGrid.GetClosestHex(selectedUnit.transform.position);
         CalculateRange();
     }
 
     private void CalculateRange()
     {
-        movementRange = GraphSearch.BFSGetRange(hexGrid,
-            hexGrid.GetClosestHex(selectedUnit.transform.position),
-            remainingMovementPoints);
-
+        movementRange = GraphSearch.BFSGetRange(hexGrid, lastUnitHex, 1);
+        Debug.Log("Range: " + string.Join(", ", movementRange.GetRangePositions()));
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
-            hexGrid.GetTileAt(hexPosition).EnableHighlight();
+            if (hexPosition != lastUnitHex)
+                hexGrid.GetTileAt(hexPosition).EnableHighlight();
         }
     }
 
@@ -83,8 +84,8 @@ public class MovementSystem : MonoBehaviour
 
         Vector3 endWorldPos = endHex.transform.position;
         selectedUnit.SetIntendedEndPosition(endWorldPos);
-
         selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
+        lastUnitHex = endHexPos;
         ClearPath();
         if (remainingMovementPoints > 0)
         {

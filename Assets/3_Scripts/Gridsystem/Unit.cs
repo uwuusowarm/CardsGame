@@ -79,7 +79,7 @@ public class Unit : MonoBehaviour
     
     public void AddMovementPoints(int points)
     {
-        movementPoints += (points*10);
+        movementPoints += 0 /*+= (points*10)*/;
     }
     
     public void ResetMovementPoints()
@@ -152,6 +152,7 @@ public class Unit : MonoBehaviour
             transform.rotation = endRotation;
         }
         StartCoroutine(MovementCoroutine(endPosition));
+        yield break;
     }
 
     private IEnumerator MovementCoroutine(Vector3 endPosition)
@@ -205,7 +206,7 @@ public class Unit : MonoBehaviour
         else
         {
             Debug.Log("Movement finished!");
-            movementPoints = 0;
+            //movementPoints = 0;
             MovementFinished?.Invoke(this);
         }
     }
