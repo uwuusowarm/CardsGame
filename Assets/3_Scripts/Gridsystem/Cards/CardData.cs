@@ -20,6 +20,8 @@ public class CardData : ScriptableObject
     [Header("Icons")]
     public Sprite leftEffectIcon;
     public Sprite rightEffectIcon;
+    [Header("Visuals")]
+    public GameObject cardPrefab;
 
     [TextArea] public string description;
 }

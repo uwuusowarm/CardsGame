@@ -67,7 +67,6 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             return;
         }
 
-
         bool droppedOnDiscard = RectTransformUtility.RectangleContainsScreenPoint(
             discardZone, e.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
@@ -76,10 +75,19 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         if (droppedOnLeft)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Left);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ProcessPlayedCard(Card, true);
+            }
+
         }
         else if (droppedOnRight)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Right);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ProcessPlayedCard(Card, false);
+            }
         }
         else if (droppedOnDiscard) 
         {

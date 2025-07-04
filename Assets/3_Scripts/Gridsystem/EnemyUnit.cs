@@ -122,15 +122,15 @@ public class EnemyUnit : MonoBehaviour
     }
 
     public void DrawCards(int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            if (deck.Count == 0) break;
-            var card = deck[0];
-            deck.RemoveAt(0);
-            hand.Add(card);
-        }
-    }
+         {
+             for (int i = 0; i < count; i++)
+             {
+                 if (deck.Count == 0) break;
+                 var card = deck[0];
+                 deck.RemoveAt(0);
+                 hand.Add(card);
+             }
+         }
 
     public void EnemyTurn()
     {
@@ -141,24 +141,36 @@ public class EnemyUnit : MonoBehaviour
 
         while (cardsPlayed < maxCardsPerTurn && hand.Count > 0)
         {
-            bool playerInRange = IsPlayerInRange(2); 
+            bool playerInRange = IsPlayerInRange(2);
 
             CardData cardToPlay = null;
+            bool playLeft = false;
 
             if (playerInRange)
             {
-                cardToPlay = hand.FirstOrDefault(c => c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack));
+                cardToPlay = hand.FirstOrDefault(c =>
+                    c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack) ||
+                    c.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Attack));
+                if (cardToPlay != null)
+                    playLeft = cardToPlay.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Attack);
             }
             else
             {
-                cardToPlay = hand.FirstOrDefault(c => c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Move));
+                cardToPlay = hand.FirstOrDefault(c =>
+                    c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Move) ||
+                    c.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Move));
+                if (cardToPlay != null)
+                    playLeft = cardToPlay.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Move);
             }
+
             if (cardToPlay == null)
-                cardToPlay = hand.FirstOrDefault(c => c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Block));
+                cardToPlay = hand.FirstOrDefault(c =>
+                    c.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Block) ||
+                    c.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Block));
 
             if (cardToPlay != null)
             {
-                PlayCard(cardToPlay, false);
+                PlayCard(cardToPlay, playLeft);
                 cardsPlayed++;
             }
             else
@@ -174,18 +186,36 @@ public class EnemyUnit : MonoBehaviour
             DrawCards(2);
 
         int played = 0;
-        var handCopy = hand.ToList(); 
+        var handCopy = hand.ToList();
 
         foreach (var card in handCopy)
         {
-            if (played >= 1) break; 
+            if (played >= 1) break;
 
             bool playerInRange = IsPlayerInRange(2);
-            if (card.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack) && !playerInRange)
-                continue;
+            bool playLeft = false;
+
+            if (playerInRange)
+            {
+                if (card.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Attack))
+                    playLeft = false;
+                else if (card.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Attack))
+                    playLeft = true;
+                else
+                    continue; 
+            }
+            else
+            {
+                if (card.rightEffects.Any(e => e.effectType == CardEffect.EffectType.Move))
+                    playLeft = false;
+                else if (card.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Move))
+                    playLeft = true;
+                else
+                    continue; 
+            }
 
             yield return new WaitForSeconds(0.5f);
-            PlayCard(card, false);
+            PlayCard(card, playLeft);
             played++;
         }
 
@@ -204,58 +234,132 @@ public class EnemyUnit : MonoBehaviour
 
     private int HexDistance(Vector3Int a, Vector3Int b)
     {
-        return (Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y) + Mathf.Abs(a.z - b.z)) / 2;
+        int dx = Mathf.Abs(a.x - b.x);
+        int dz = Mathf.Abs(a.z - b.z);
+    
+        if ((a.z % 2 == 1 && b.z % 2 == 0) || (a.z % 2 == 0 && b.z % 2 == 1))
+        {
+            if (a.x < b.x)
+                dx = Mathf.Max(0, dx - 1);
+        }
+    
+        return dx + Mathf.Max(0, dz - (dx + 1) / 2);
     }
+
 
     private void PlayCard(CardData card, bool isLeft)
     {
-        foreach (var effect in isLeft ? card.leftEffects : card.rightEffects)
+        var effects = new List<CardEffect>();
+        if (card.leftEffects != null) effects.AddRange(card.leftEffects);
+        // if (card.bottomEffects != null) effects.AddRange(card.bottomEffects);
+        if (card.rightEffects != null) effects.AddRange(card.rightEffects);
+
+        foreach (var effect in effects)
         {
             switch (effect.effectType)
             {
                 case CardEffect.EffectType.Move:
-                    MoveTowardsPlayer(effect.value);
-                    Debug.Log($"{name} bewegt sich {effect.value} Felder Richtung Spieler.");
+                    bool moved = MoveTowardsPlayer(effect.value * 10);
+                    if (moved)
+                        Debug.Log($"{name} move by {effect.value} to player.");
+                    else
+                        Debug.Log($"{name} cant move.");
                     break;
                 case CardEffect.EffectType.Attack:
-                    AttackPlayer(effect.value);
-                    Debug.Log($"{name} greift Spieler an für {effect.value} Schaden.");
+                    if (IsPlayerInRange(2))
+                    {
+                        AttackPlayer(effect.value);
+                        Debug.Log($"{name} attack player by {effect.value} damage.");
+                    }
+                    else
+                    {
+                        Debug.Log($"{name} cant attack because of range.");
+                    }
                     break;
                 case CardEffect.EffectType.Block:
                     break;
             }
         }
-        hand.Remove(card);
+        Debug.Log($"{name} behält die Karte '{card.cardName}' in der Hand");
     }
 
-    private void MoveTowardsPlayer(int steps)
+
+    
+    private bool MoveTowardsPlayer(int steps)
     {
         var player = GameObject.FindGameObjectWithTag("Player");
-        if (player == null) return;
+        if (player == null) return false;
 
         Vector3Int playerHex = HexGrid.Instance.GetClosestHex(player.transform.position);
         Vector3Int myHex = HexGrid.Instance.GetClosestHex(transform.position);
 
         var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHex, steps);
-        List<Vector3Int> path = GetPathToTarget(bfsResult, myHex, playerHex);
+        var availablePositions = bfsResult.visitedNodesDict.Keys.ToList();
+        
+        Debug.Log($"{name} BFS-Range Felder: {string.Join(", ", availablePositions)}");
 
-        int moveSteps = Mathf.Min(steps, path.Count - 1); 
-        for (int i = 1; i <= moveSteps; i++)
+        if (availablePositions.Count == 0)
         {
-            Vector3Int nextHex = path[i];
-            Hex nextTile = HexGrid.Instance.GetTileAt(nextHex);
-            if (nextTile != null && !nextTile.HasEnemyUnit())
+            Debug.Log($"{name} kann sich nicht bewegen.");
+            return false;
+        }
+
+        Vector3Int bestPosition = myHex;
+        int shortestDistance = int.MaxValue;
+
+        foreach (var pos in availablePositions)
+        {
+            var hex = HexGrid.Instance.GetTileAt(pos);
+            if (hex != null && !hex.HasEnemyUnit() && !hex.IsObstacle())
             {
-                transform.position = HexGrid.Instance.GetWorldPosition(nextHex);
-                currentHex?.SetEnemyUnit(null);
-                currentHex = nextTile;
-                currentHex.SetEnemyUnit(this);
-            }
-            else
-            {
-                break; 
+                int distance = Mathf.Abs(pos.x - playerHex.x) + Mathf.Abs(pos.z - playerHex.z);
+                if (distance < shortestDistance)
+                {
+                    shortestDistance = distance;
+                    bestPosition = pos;
+                }
             }
         }
+
+        if (bestPosition == myHex)
+        {
+            Debug.Log($"{name} cant find a better position.");
+            return false;
+        }
+
+        var targetHex = HexGrid.Instance.GetTileAt(bestPosition);
+        StartCoroutine(MoveToHexSmooth(targetHex)); 
+
+        currentHex?.SetEnemyUnit(null);
+        currentHex = targetHex;
+        currentHex.SetEnemyUnit(this);
+
+        Debug.Log($"{name} moves to position {bestPosition}");
+        return true;
+    }
+
+    private IEnumerator MoveToHexSmooth(Hex targetHex, float duration = 0.3f)
+    {
+        var propsTransform = targetHex.transform.Find("Props");
+        if (propsTransform == null)
+        {
+            Debug.LogError($"Props child not found on hex at position {targetHex.hexCoords}");
+            yield break;
+        }
+
+        Vector3 start = transform.position;
+        Vector3 end = propsTransform.TransformPoint(new Vector3(0.03f, 0.4f, 0.54f));
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            transform.position = Vector3.Lerp(start, end, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = end;
+        transform.SetParent(propsTransform);
+        transform.localPosition = new Vector3(0.03f, 0.4f, 0.54f);
     }
 
     private List<Vector3Int> GetPathToTarget(BFSResult bfsResult, Vector3Int start, Vector3Int target)

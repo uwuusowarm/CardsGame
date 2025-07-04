@@ -60,6 +60,8 @@ public class GameManager : MonoBehaviour
                                          AttackManager.Instance != null &&
                                          PlayedCardEffectCache.Instance != null &&
                                          ExhaustionSystem.Instance != null &&
+                                         ActionPointSystem.Instance != null &&
+                                         EquipmentManager.Instance != null &&
                                          playerUnit != null);
         StartGame();
     }
@@ -118,7 +120,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         Debug.Log("Drawing new cards based on exhaustion level.");
-        CardManager.Instance.DrawCards(CardManager.Instance.DrawCount);
+        CardManager.Instance.DrawCards(CardManager.Instance.drawCount);
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
@@ -331,13 +333,6 @@ public class GameManager : MonoBehaviour
     private IEnumerator EnemyTurnRoutine()
     {
         Debug.Log("Starting Enemy Turn Routine.");
-
-        /*if (UnitManager.Instance == null)
-        {
-            Debug.LogError("UnitManager.Instance is null. Enemies cannot take their turn.");
-            StartPlayerTurn();
-            yield break;
-        }*/
 
         foreach (var enemy in UnitManager.Instance.GetEnemyUnits())
         {
