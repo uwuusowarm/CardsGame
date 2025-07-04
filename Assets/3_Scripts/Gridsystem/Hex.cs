@@ -21,9 +21,9 @@ public class Hex : MonoBehaviour
     public int GetCost()
         => hexType switch
         {
-            HexType.Difficult => 20,
-            HexType.Default => 10,
-            HexType.Road => 5,
+            HexType.Difficult => 2,
+            HexType.Default => 1,
+            HexType.Road => 0,
             _ => throw new Exception($"Hex of type {hexType} not supported")
         };
 
