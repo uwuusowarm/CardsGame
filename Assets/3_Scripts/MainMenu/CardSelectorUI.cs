@@ -10,7 +10,8 @@ public class CardSelectorUI : MonoBehaviour
     private CardData assignedCard;
     private CardMenuManager manager;
 
-    public void Initialize(CardData card, CardMenuManager menuManager, bool isSelected)
+    // Die Methode empfängt das visuelle Prefab jetzt als neuen Parameter
+    public void Initialize(CardData card, GameObject visualPrefab, CardMenuManager menuManager, bool isSelected)
     {
         this.assignedCard = card;
         this.manager = menuManager;
@@ -20,35 +21,28 @@ public class CardSelectorUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        if (cardParent != null && assignedCard.cardPrefab != null)
+        // Benutze das übergebene Prefab
+        if (cardParent != null && visualPrefab != null)
         {
-            GameObject visualCardInstance = Instantiate(assignedCard.cardPrefab, cardParent);
+            GameObject visualCardInstance = Instantiate(visualPrefab, cardParent);
 
-            // --- FINALE LÖSUNG ZUR DEAKTIVIERUNG ALLER INTERAKTIONEN ---
-
-            // 1. Zerstöre den DragHandler komplett, anstatt ihn nur zu deaktivieren.
             CardDragHandler dragHandler = visualCardInstance.GetComponentInChildren<CardDragHandler>(true);
             if (dragHandler != null)
             {
                 Destroy(dragHandler);
             }
 
-            // 2. Deaktiviere die Raycast-Blockade der Canvas Group.
             CanvasGroup canvasGroup = visualCardInstance.GetComponentInChildren<CanvasGroup>(true);
             if (canvasGroup != null)
             {
                 canvasGroup.blocksRaycasts = false;
             }
 
-            // 3. Deaktiviere "Raycast Target" auf ALLEN grafischen Elementen (Images, Text etc.) der Karte.
-            // Dies ist der aggressivste und sicherste Schritt, um die Karte "durchklickbar" zu machen.
             Graphic[] graphics = visualCardInstance.GetComponentsInChildren<Graphic>(true);
             foreach (Graphic g in graphics)
             {
                 g.raycastTarget = false;
             }
-
-            // --- ENDE FINALE LÖSUNG ---
 
             ScaleCardToFit(visualCardInstance, cardParent);
         }
@@ -64,21 +58,14 @@ public class CardSelectorUI : MonoBehaviour
         RectTransform cardRect = cardInstance.GetComponent<RectTransform>();
         RectTransform parentRect = parentContainer.GetComponent<RectTransform>();
 
-        if (cardRect == null || parentRect == null)
-        {
-            Debug.LogError("RectTransform für Skalierung nicht gefunden!");
-            return;
-        }
+        if (cardRect == null || parentRect == null) return;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
 
-        cardRect.anchorMin = new Vector2(0.5f, 0.5f);
-        cardRect.anchorMax = new Vector2(0.5f, 0.5f);
-        cardRect.pivot = new Vector2(0.5f, 0.5f);
+        cardRect.anchorMin = cardRect.anchorMax = cardRect.pivot = new Vector2(0.5f, 0.5f);
 
         float cardWidth = cardRect.rect.width;
         float cardHeight = cardRect.rect.height;
-
         float parentWidth = parentRect.rect.width;
         float parentHeight = parentRect.rect.height;
 
