@@ -356,24 +356,29 @@ public class LevelPainter : EditorWindow
         selectedHex.transform.position += new Vector3(0, amount, 0);
     }
 
-    private void PlaceObjectOnHex(Hex hex, PlaceableObject placeable)
+    private void PlaceObjectOnHex(Hex hexComponent, PlaceableObject objectToPlace)
     {
-        if (hex.PlacedObject != null) ClearObjectFromHex(hex);
-        var newObj = (GameObject)PrefabUtility.InstantiatePrefab(placeable.prefab, hex.transform);
-        Undo.RegisterCreatedObjectUndo(newObj, $"Place {placeable.name}");
+        GameObject hex = hexComponent.gameObject;
     
-        newObj.transform.localPosition = new Vector3(0, placeable.yOffset, 0);
-    
-        hex.SetPlacedObject(newObj);
-        EditorUtility.SetDirty(hex);
+        Transform propsContainer = hex.transform.Find("Props");
+        if (propsContainer == null)
+        {
+            GameObject propsObject = new GameObject("Props");
+            propsObject.transform.SetParent(hex.transform, false);
+            propsContainer = propsObject.transform;
+        }
 
-        if (!placeable.isDoor) return;
-        if (!EditorUtility.DisplayDialog("New Room?",
-                $"A door was placed. Do you want to start a new room? The next placed hexes will have Room ID {currentRoomID + 1}.",
-                "Yes, Start New Room", "No")) return;
-        currentRoomID++;
-        ShowNotification(new GUIContent($"Room counter increased to {currentRoomID}"));
+        GameObject placedObject = PrefabUtility.InstantiatePrefab(objectToPlace.prefab) as GameObject;
+        placedObject.transform.position = hex.transform.position + Vector3.up * objectToPlace.yOffset;
+        placedObject.transform.SetParent(propsContainer, true);
+    
+        hexComponent.SetPlacedObject(placedObject);
+    
+        Undo.RegisterCreatedObjectUndo(placedObject, "Place Object");
+        Undo.RegisterCreatedObjectUndo(propsContainer.gameObject, "Create Props Container");
     }
+
+
 
     private void ClearObjectFromHex(Hex hex)
     {

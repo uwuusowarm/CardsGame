@@ -34,20 +34,19 @@ public class Hex : MonoBehaviour
     {
         return this.hexType == HexType.Obstacle || UnitOnHex != null || EnemyUnitOnHex != null || PlacedObject != null;
     }
-
     private void Awake()
+    
     {
         hexCoordinates = GetComponent<HexCoordinates>();
         highlight = GetComponent<GlowHighlight>();
 
-        if (transform.childCount <= 0) return;
-        foreach (Transform child in transform)
+        Transform propsTransform = transform.Find("Props");
+        if (propsTransform != null && propsTransform.childCount > 0)
         {
-            if (child.GetComponent<Hex>() != null || child.GetComponent<GlowHighlight>() != null) continue;
-            PlacedObject = child.gameObject;
-            break;
+            PlacedObject = propsTransform.GetChild(0).gameObject;
         }
     }
+
 
     public void EnableHighlight()
     {
@@ -92,13 +91,23 @@ public class Hex : MonoBehaviour
 
     public void SetPlacedObject(GameObject obj)
     {
+        if (PlacedObject != null)
+        {
+            DestroyImmediate(PlacedObject);
+        }
         PlacedObject = obj;
     }
 
+
     public void ClearPlacedObject()
     {
-        PlacedObject = null;
+        if (PlacedObject != null)
+        {
+            DestroyImmediate(PlacedObject);
+            PlacedObject = null;
+        }
     }
+
 
     public void ClearAll()
     {
