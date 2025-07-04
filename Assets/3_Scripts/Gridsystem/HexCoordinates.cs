@@ -7,7 +7,7 @@ public class HexCoordinates : MonoBehaviour
 {
     public static float xOffset = 2, yOffset = 1, zOffset = 1.73f;
 
-    internal Vector3Int GetHexCoords()
+    public Vector3Int GetHexCoords()
         => offsetCoordinates;
 
     [Header("OFfset coordinates")]

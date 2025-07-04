@@ -227,8 +227,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1338094571}
+  m_Children: []
   m_Father: {fileID: 1954321572}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4391,6 +4390,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1338094571}
+  - component: {fileID: 1338094573}
+  - component: {fileID: 1338094572}
   m_Layer: 0
   m_Name: Content
   m_TagString: Untagged
@@ -4410,13 +4411,51 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 81306674}
+  m_Father: {fileID: 2025819423}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -117.370514, y: 486.57397}
+  m_SizeDelta: {x: 854.8605, y: 0}
   m_Pivot: {x: 0, y: 1}
+--- !u!114 &1338094572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1338094570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 0
+--- !u!114 &1338094573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1338094570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 300, y: 400}
+  m_Spacing: {x: 10, y: 10}
+  m_Constraint: 0
+  m_ConstraintCount: 2
 --- !u!1 &1389876702
 GameObject:
   m_ObjectHideFlags: 0
@@ -6064,27 +6103,14 @@ MonoBehaviour:
   deckEditorSlideout: {fileID: 2025819422}
   boostersSlideout: {fileID: 251232015}
   allCardsContainer: {fileID: 1338094571}
-  cardInListPrefab: {fileID: 45075689476298555, guid: 92a879be89147f349bf8eac4b26eb33f,
+  cardInListPrefab: {fileID: 4488407689591817773, guid: 92a879be89147f349bf8eac4b26eb33f,
     type: 3}
   saveDeckButton: {fileID: 1897934737}
   decksDisplayContainer: {fileID: 934719616}
   deckDisplayPrefab: {fileID: 2013489522614463475, guid: 2a1a47a38225589408a7e5e586ef8e48,
     type: 3}
   editDeckButton: {fileID: 661233944}
-  goldAnzeigeText: {fileID: 174377224}
-  numberOfColumns: 4
-  cardSize: {x: 150, y: 190}
-  spacing: {x: 50, y: 50}
-  padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
   cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
-  cardVisuals:
-  - cardData: {fileID: 11400000, guid: acfd15dd6554f434b95c01ef093b2095, type: 2}
-    visualPrefab: {fileID: 5264587354914885709, guid: 7e08ba8c7299453448b2dea2cec7aa54,
-      type: 3}
 --- !u!1 &1897934736
 GameObject:
   m_ObjectHideFlags: 0
@@ -6777,6 +6803,7 @@ RectTransform:
   m_Children:
   - {fileID: 1954321572}
   - {fileID: 1897934740}
+  - {fileID: 1338094571}
   m_Father: {fileID: 1889312450}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

@@ -5,6 +5,8 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 {
     public CardData Card;
 
+    private bool isInMenu = false;
+
     RectTransform rt;
     CanvasGroup cg;
     Canvas gameCanvas;
@@ -18,6 +20,10 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     void Awake()
     {
+        isInMenu = FindObjectOfType<CardMenuManager>() != null;
+        
+        if (isInMenu) return;
+
         rt = GetComponent<RectTransform>();
         cg = GetComponent<CanvasGroup>();
         gameCanvas = GetComponentInParent<Canvas>();
@@ -31,6 +37,8 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnBeginDrag(PointerEventData e)
     {
+        if (isInMenu) return;
+
         startParent = transform.parent;
         startPos = rt.anchoredPosition;
 
@@ -41,11 +49,15 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnDrag(PointerEventData e)
     {
+        if (isInMenu) return;
+
         rt.position = e.position;
     }
 
     public void OnEndDrag(PointerEventData e)
     {
+        if (isInMenu) return;
+
         cg.blocksRaycasts = true;
 
 
