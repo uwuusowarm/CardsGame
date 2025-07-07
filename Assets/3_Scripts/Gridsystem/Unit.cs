@@ -79,7 +79,7 @@ public class Unit : MonoBehaviour
     
     public void AddMovementPoints(int points)
     {
-        movementPoints += 0 /*+= (points*10)*/;
+        movementPoints += points /*+= (points*10)*/;
     }
     
     public void ResetMovementPoints()
@@ -114,11 +114,11 @@ public class Unit : MonoBehaviour
     }
     internal void Deselect()
     {
-        glowHighlight.ToggleGlow(false);
+        //glowHighlight.ToggleGlow(false);
     }
     public void Select()
     {
-        glowHighlight.ToggleGlow(true);
+        //glowHighlight.ToggleGlow(true);
     }
 
     internal void MoveTroughPath(List<Vector3> currentPath)
