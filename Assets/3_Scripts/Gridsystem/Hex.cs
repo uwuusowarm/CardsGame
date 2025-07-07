@@ -7,6 +7,7 @@ public class Hex : MonoBehaviour
     [SerializeField] private GlowHighlight highlight;
     private HexCoordinates hexCoordinates;
     public Vector3Int HexCoords { get; set; }
+    public Vector3Int hexCoords => hexCoordinates.GetHexCoords();
 
     [SerializeField] private HexType hexType;
     
@@ -18,8 +19,6 @@ public class Hex : MonoBehaviour
 
     [Tooltip("A non-unit object placed on this hex (e.g., door, chest, obstacle).")]
     public GameObject PlacedObject { get; private set; }
-
-    public Vector3Int hexCoords => hexCoordinates.GetHexCoords();
 
     public int GetCost()
         => hexType switch
