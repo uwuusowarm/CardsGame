@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 693238d7536da6748b7cd77ac204a578, type: 3}
+  m_Name: LevelPainterSettings 1
+  m_EditorClassIdentifier: 
+  hexPrefabs:
+  - name: StoneHex
+    prefab: {fileID: 4364951572052284368, guid: fa852245f05049a4088ec8985e6ba51a,
+      type: 3}
+    isDefault: 1
+  placeableObjects:
+  - name: Player
+    prefab: {fileID: 919132149155446097, guid: 0f6e5071537d5c74b816871c7566933c, type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Slime
+    prefab: {fileID: 919132149155446097, guid: 94e0dfd88ce51054c846a6c640a8ed5c, type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Goblin
+    prefab: {fileID: 919132149155446097, guid: acf33e79f66ce8e448d03cf7886f8bde, type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Chest
+    prefab: {fileID: 919132149155446097, guid: f24413542c76dc64e970890df951a5a3, type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Barrel
+    prefab: {fileID: 919132149155446097, guid: a23455ce176002e49bf83a7c29d3a9c3, type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Chest
+    prefab: {fileID: 6334953156454953566, guid: f00a33a9536e1c348a59fb7bbb1b349c,
+      type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Rock Big
+    prefab: {fileID: 1788702802343659838, guid: 25ab91a2e2be7f54b98d0db1240d1085,
+      type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Rock Small
+    prefab: {fileID: 6290007283734134260, guid: 280c8367bdd0f904d8b83a14e497b9a9,
+      type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Rock Middle
+    prefab: {fileID: 8622761421211188882, guid: 7770b6433e6fa4349b90e31d1af84a16,
+      type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Pillar 1
+    prefab: {fileID: 3484223337268436377, guid: 16938e8d6bd86ee459ad3e5e9ea799f2,
+      type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Pillar 2
+    prefab: {fileID: 1735343148228697848, guid: 07a123daa56c6be499ea24c9098c9772,
+      type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Pillar 3
+    prefab: {fileID: 5846956546623116123, guid: e537e3614c1de974b93355bbbbbbfd48,
+      type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Pillar 4
+    prefab: {fileID: 943477631835616593, guid: fd1524a95860a07438e8ac0b84e52dfa, type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Stair
+    prefab: {fileID: 2991796858447503989, guid: dca9c97250ea28d48bd45523fd52e356,
+      type: 3}
+    isDoor: 0
+    yOffset: 0
+  - name: Door
+    prefab: {fileID: 6120417593834332387, guid: f5193a10b2bf2274cb29d5e9589e7057,
+      type: 3}
+    isDoor: 1
+    yOffset: 0
+  - name: Door
+    prefab: {fileID: 6120417593834332387, guid: f5193a10b2bf2274cb29d5e9589e7057,
+      type: 3}
+    isDoor: 1
+    yOffset: 0
