@@ -90,7 +90,7 @@ public class EnemyUnit : MonoBehaviour
         currentHex = HexGrid.Instance.GetTileAt(hexCoords);
 
         if (currentHex == null)
-            Debug.LogError("Enemy not on grid!");
+            Debug.LogError($"Enemy '{name}' not on grid! ");
         else
             Debug.Log($"Enemy registered at {hexCoords}");
             currentHex.SetEnemyUnit(this);
