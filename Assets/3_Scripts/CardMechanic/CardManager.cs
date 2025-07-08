@@ -121,6 +121,7 @@ public class CardManager : MonoBehaviour
             (type == DropType.Right && rightZone.Contains(card)))
         {
             Debug.Log($"[CardManager] Karte '{card.name}' wurde bereits in Zone '{type}' gelegt.");
+            Sound_Manager.instance.Play("Draw_Card_V2");
             UpdateAllUI();
             return;
         }

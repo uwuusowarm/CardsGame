@@ -114,6 +114,7 @@ public class GameManager : MonoBehaviour
 
     private void DrawPlayerCards()
     {
+        
         if (CardManager.Instance == null)
         {
             Debug.LogError("CardManager.Instance is null for card draw.");
@@ -121,6 +122,7 @@ public class GameManager : MonoBehaviour
         }
         Debug.Log("Drawing new cards based on exhaustion level.");
         CardManager.Instance.DrawCards(CardManager.Instance.drawCount);
+        Sound_Manager.instance.Play("Draw_Card_V2");
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
