@@ -174,6 +174,7 @@ public class CardManager : MonoBehaviour
                 rightZone.Remove(card);
                 break;
         }
+        Sound_Manager.instance.Play("Discard");
         discardPile.Add(card);
         UpdateAllUI();
     }
