@@ -1,25 +1,32 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 public class ChestController : MonoBehaviour
 {
-    [Tooltip("Reference to the ItemDatabase Asset that holds all possible loot.")]
+    [Tooltip("Reference to the ItemDatabase asset that holds all possible loot.")]
     [SerializeField] private ItemDatabase itemDatabase;
 
     private Hex currentHex;
-    private bool isOpened = false;
+    private bool isOpen = false;
 
     private void Start()
     {
+        if (itemDatabase == null)
+        {
+            itemDatabase = FindObjectOfType<ItemDatabase>();
+            if(itemDatabase == null)
+                Debug.LogError("No ItemDatabase found in the scene or assigned to the chest!", gameObject);
+        }
+        
         StartCoroutine(InitializeHexPosition());
     }
 
     private IEnumerator InitializeHexPosition()
     {
         yield return new WaitUntil(() => HexGrid.Instance != null);
-        
+
         HexGrid hexGrid = HexGrid.Instance;
         Vector3Int hexCoords = hexGrid.GetClosestHex(transform.position);
         currentHex = hexGrid.GetTileAt(hexCoords);
@@ -27,25 +34,60 @@ public class ChestController : MonoBehaviour
         if (currentHex != null)
         {
             currentHex.SetChest(this);
-            Debug.Log($"Chest registered at {hexCoords}");
+            Debug.Log($"Chest initialized at hex {hexCoords}");
         }
         else
         {
-            Debug.LogError($"Chest not on grid! ");
+            Debug.LogError($"Chest failed to find a valid hex at position {transform.position}");
         }
     }
-
-    public void OpenChest()
+    
+    private void OnMouseDown()
     {
-        if (isOpened || itemDatabase == null) return;
-        
-        isOpened = true;
-        
+        if (isOpen) return;
+        if (!GameManager.Instance.IsPlayerTurn)
+        {
+            Debug.Log("Cannot open chest, it is not the player's turn.");
+            return;
+        }
+
+        if (ActionPointSystem.Instance.GetCurrentActionPoints() < 1)
+        {
+            Debug.Log("Not enough Action Points to open the chest.");
+            return;
+        }
+
+        Unit playerUnit = GameManager.Instance.PlayerUnit;
+        if (playerUnit == null)
+        {
+            Debug.LogError("Player unit not found in GameManager!");
+            return;
+        }
+
+        float distance = HexGrid.Instance.GetDistance(playerUnit.GetCurrentHex(), this.currentHex);
+
+        if (distance > 1) 
+        {
+            Debug.Log("Player is too far away to open the chest.");
+            return;
+        }
+
+        Debug.Log("Opening chest!");
+
+        ActionPointSystem.Instance.UseActionPoints(1);
+
+        OpenChestAndGiveLoot();
+    }
+    
+    private void OpenChestAndGiveLoot()
+    {
+        if (isOpen) return;
+        isOpen = true;
+
         ItemData randomItem = itemDatabase.GetRandomItem();
         if (randomItem != null && EquipmentManager.Instance != null)
         {
-            Debug.Log($"Chest opened! Picking up {randomItem.name}");
-            
+            Debug.Log($"Player opened a chest and found: {randomItem.name}!");
             EquipmentManager.Instance.EquipItem(randomItem);
         }
 
@@ -53,6 +95,7 @@ public class ChestController : MonoBehaviour
         {
             currentHex.ClearChest();
         }
-        Destroy(gameObject, 0.3f);
+        
+        Destroy(gameObject);
     }
 }

@@ -217,4 +217,11 @@ public class Unit : MonoBehaviour
     {
         intendedEndPosition = pos;
     }
+    
+    public Hex GetCurrentHex()
+    {
+        return currentHex;
+    }
+    
+    
 }

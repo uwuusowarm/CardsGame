@@ -170,6 +170,7 @@ public class ItemCSVImporter
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        PopulateItemDatabase();
 
         EditorUtility.DisplayDialog("Import Complete",
             $"{itemsCreated} items created, {prefabsCreated} prefabs created.\n" +
@@ -240,5 +241,42 @@ public class ItemCSVImporter
         string invalidChars = System.Text.RegularExpressions.Regex.Escape(new string(Path.GetInvalidFileNameChars()));
         string invalidRegStr = string.Format(@"([{0}]*\.+$)|([{0}]+)", invalidChars);
         return System.Text.RegularExpressions.Regex.Replace(name, invalidRegStr, "_");
+    }
+    private static void PopulateItemDatabase()
+    {
+        Debug.Log("Attempting to populate ItemDatabase...");
+
+        string[] dbGuids = AssetDatabase.FindAssets("t:ItemDatabase");
+        if (dbGuids.Length == 0)
+        {
+            Debug.LogError("Could not find an ItemDatabase asset in the project. Please create one via Assets > Create > Game > Item Database.");
+            return;
+        }
+        if (dbGuids.Length > 1)
+        {
+            Debug.LogWarning("Multiple ItemDatabase assets found. Using the first one.");
+        }
+
+        string dbPath = AssetDatabase.GUIDToAssetPath(dbGuids[0]);
+        ItemDatabase database = AssetDatabase.LoadAssetAtPath<ItemDatabase>(dbPath);
+
+        string[] itemGuids = AssetDatabase.FindAssets("t:ItemData");
+        
+        database.allItems.Clear(); 
+
+        foreach (string guid in itemGuids)
+        {
+            string itemPath = AssetDatabase.GUIDToAssetPath(guid);
+            ItemData itemData = AssetDatabase.LoadAssetAtPath<ItemData>(itemPath);
+            if (itemData != null)
+            {
+                database.allItems.Add(itemData);
+            }
+        }
+        
+        EditorUtility.SetDirty(database);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log($"Successfully populated ItemDatabase with {database.allItems.Count} items.");
     }
 }
