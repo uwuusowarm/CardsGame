@@ -250,94 +250,108 @@ public class EnemyUnit : MonoBehaviour
 
     private void PlayCard(CardData card, bool isLeft)
     {
-        var effects = new List<CardEffect>();
-        if (card.leftEffects != null) effects.AddRange(card.leftEffects);
-        // if (card.bottomEffects != null) effects.AddRange(card.bottomEffects);
-        if (card.rightEffects != null) effects.AddRange(card.rightEffects);
+        var effectsToUse = isLeft ? card.leftEffects : card.rightEffects;
 
-        foreach (var effect in effects)
+        if (card.alwaysEffects != null)
+        {
+            effectsToUse.AddRange(card.alwaysEffects);
+        }
+    
+        Debug.Log($"{name} is playing card '{card.cardName}'. Using " + (isLeft ? "Left" : "Right") + " effects.");
+
+        foreach (var effect in effectsToUse)
         {
             switch (effect.effectType)
             {
                 case CardEffect.EffectType.Move:
-                    bool moved = MoveTowardsPlayer(effect.value * 10);
+                    bool moved = MoveTowardsPlayer(effect.value);
                     if (moved)
-                        Debug.Log($"{name} move by {effect.value} to player.");
+                        Debug.Log($"{name} moves up to {effect.value} hexes towards the player.");
                     else
-                        Debug.Log($"{name} cant move.");
+                        Debug.Log($"{name} could not find a better position to move to.");
                     break;
+
                 case CardEffect.EffectType.Attack:
-                    if (IsPlayerInRange(2))
+                    if (IsPlayerInRange(1)) 
                     {
                         AttackPlayer(effect.value);
-                        Debug.Log($"{name} attack player by {effect.value} damage.");
+                        Debug.Log($"{name} attacks player for {effect.value} damage.");
                     }
                     else
                     {
-                        Debug.Log($"{name} cant attack because of range.");
+                        Debug.Log($"{name} wants to attack but player is out of range.");
                     }
                     break;
+
                 case CardEffect.EffectType.Block:
+                    // Placeholder for block logic
+                    Debug.Log($"{name} gained {effect.value} block.");
                     break;
             }
         }
-        Debug.Log($"{name} behält die Karte '{card.cardName}' in der Hand");
+    
+        hand.Remove(card);
+        Debug.Log($"{name} discarded '{card.cardName}'.");
     }
 
 
     
     private bool MoveTowardsPlayer(int steps)
+{
+    var player = GameObject.FindGameObjectWithTag("Player");
+    if (player == null) return false;
+
+    Hex playerHexObject = HexGrid.Instance.GetTileAt(HexGrid.Instance.GetClosestHex(player.transform.position));
+    if (playerHexObject == null)
     {
-        var player = GameObject.FindGameObjectWithTag("Player");
-        if (player == null) return false;
+        Debug.LogWarning("Player is not on a valid hex. Cannot move towards them.");
+        return false;
+    }
 
-        Vector3Int playerHex = HexGrid.Instance.GetClosestHex(player.transform.position);
-        Vector3Int myHex = HexGrid.Instance.GetClosestHex(transform.position);
+    Vector3Int myHex = HexGrid.Instance.GetClosestHex(transform.position);
 
-        var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHex, steps);
-        var availablePositions = bfsResult.visitedNodesDict.Keys.ToList();
-        
-        Debug.Log($"{name} BFS-Range Felder: {string.Join(", ", availablePositions)}");
+    var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHex, steps);
+    var availablePositions = bfsResult.GetRangePositions().ToList();
 
-        if (availablePositions.Count == 0)
+    if (availablePositions.Count <= 1)
+    {
+        Debug.Log($"{name} has no available hexes to move to.");
+        return false;
+    }
+
+    Vector3Int bestPosition = myHex;
+    int shortestDistance = int.MaxValue;
+
+    foreach (var pos in availablePositions)
+    {
+        var hex = HexGrid.Instance.GetTileAt(pos);
+        if (hex != null && !hex.IsObstacle() && (!hex.HasEnemyUnit() || hex.EnemyUnitOnHex == this))
         {
-            Debug.Log($"{name} kann sich nicht bewegen.");
-            return false;
-        }
-
-        Vector3Int bestPosition = myHex;
-        int shortestDistance = int.MaxValue;
-
-        foreach (var pos in availablePositions)
-        {
-            var hex = HexGrid.Instance.GetTileAt(pos);
-            if (hex != null && !hex.HasEnemyUnit() && !hex.IsObstacle())
+            int distance = HexGrid.Instance.GetDistance(hex, playerHexObject);
+            if (distance < shortestDistance)
             {
-                int distance = Mathf.Abs(pos.x - playerHex.x) + Mathf.Abs(pos.z - playerHex.z);
-                if (distance < shortestDistance)
-                {
-                    shortestDistance = distance;
-                    bestPosition = pos;
-                }
+                shortestDistance = distance;
+                bestPosition = pos;
             }
         }
-
-        if (bestPosition == myHex)
-        {
-            Debug.Log($"{name} cant find a better position.");
-            return false;
-        }
-
-        var targetHex = HexGrid.Instance.GetTileAt(bestPosition);
-        StartCoroutine(MoveToHexSmooth(targetHex)); 
-
-        currentHex?.SetEnemyUnit(null);
-        currentHex = targetHex;
-        currentHex.SetEnemyUnit(this);
-
-        Debug.Log($"{name} moves to position {bestPosition}");
-        return true;
     }
+
+    if (bestPosition == myHex)
+    {
+        Debug.Log($"{name} is already at the best possible position within range.");
+        return false;
+    }
+
+    var targetHex = HexGrid.Instance.GetTileAt(bestPosition);
+    StartCoroutine(MoveToHexSmooth(targetHex));
+
+    currentHex?.SetEnemyUnit(null);
+    currentHex = targetHex;
+    currentHex.SetEnemyUnit(this);
+
+    Debug.Log($"{name} moves towards player to position {bestPosition}");
+    return true;
+}
 
     private IEnumerator MoveToHexSmooth(Hex targetHex, float duration = 0.3f)
     {
