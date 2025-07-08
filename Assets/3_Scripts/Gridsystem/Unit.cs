@@ -15,6 +15,7 @@ public class Unit : MonoBehaviour
     public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
     
+
     [SerializeField] private float movementDuration = 1, rotationDuration = 0.3f;
     private GlowHighlight glowHighlight;
     private Queue<Vector3> pathPositions = new Queue<Vector3>();

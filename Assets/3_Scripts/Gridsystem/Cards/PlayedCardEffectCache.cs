@@ -1,20 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayedCardEffectCache : MonoBehaviour
 {
     public static PlayedCardEffectCache Instance;
-    
-    public string PlayedCardName { get; private set; }
-    public int PlayedCardManaCost { get; private set; }
-    
+
     public int PendingDamage { get; private set; }
     public int PendingRange { get; private set; }
     public int PendingMovement { get; private set; }
     public int PendingHealing { get; private set; }
     public int PendingBlock { get; private set; }
-    public bool HasPendingEffects { get; private set; }
+    
+    public bool HasPendingAttack => PendingDamage > 0;
+    public bool HasPendingMovement => PendingMovement > 0;
+
     private void Awake()
     {
         if (Instance == null)
@@ -29,88 +28,69 @@ public class PlayedCardEffectCache : MonoBehaviour
 
     public void CacheCardEffect(CardData cardData, bool isLeft)
     {
-        if (cardData == null)
-        {
-            Debug.LogError("CardData is null!");
-            return;
-        }
-        
-        PlayedCardName = cardData.cardName;
-        PlayedCardManaCost = cardData.manaCost;
-        
-        ResetEffectValues();
+        if (cardData == null) return;
         
         List<CardEffect> effectsToUse = isLeft ? cardData.leftEffects : cardData.rightEffects;
-        
-        Debug.Log($"Werte für Karte '{PlayedCardName}' (Mana: {PlayedCardManaCost}, Seite: {(isLeft ? "Links" : "Rechts")})  gespeichert.");
+        Debug.Log($"Caching effects for card '{cardData.cardName}'...");
 
         foreach (var effect in effectsToUse)
         {
             if (effect == null) continue;
 
-            HasPendingEffects = true;
-            
             switch (effect.effectType)
             {
                 case CardEffect.EffectType.Attack:
                     PendingDamage = effect.value;
                     PendingRange = effect.range;
+                    Debug.Log($"Attack armed: {PendingDamage} damage at range {PendingRange}");
                     break;
                 case CardEffect.EffectType.Move:
-                    PendingMovement = effect.value;
+                    PendingMovement += effect.value;
                     break;
                 case CardEffect.EffectType.Heal:
-                    PendingHealing = effect.value;
+                    PendingHealing += effect.value;
                     break;
                 case CardEffect.EffectType.Block:
-                    PendingBlock = effect.value;
+                    PendingBlock += effect.value;
                     break;
             }
         }
-        
-        Debug.Log($"After caching {PlayedCardName}: " + 
-                  $"Damage {PendingDamage}, " + 
-                  $"Range {PendingRange}, " +  
-                  $"Movement {PendingMovement}, " +
-                  $"Healing {PendingHealing}, " + 
-                  $"Block {PendingBlock}");
+        PrintCachedEffects();
+    }
+    
+    public void UseMovement(int amount)
+    {
+        PendingMovement = Mathf.Max(0, PendingMovement - amount);
     }
 
-    private void ResetEffectValues()
+    public void ConsumeBlock()
+    {
+        PendingBlock = 0;
+    }
+
+    public void ConsumeHealing()
+    {
+        PendingHealing = 0;
+    }
+
+    public void ConsumeAttack()
+    {
+        PendingDamage = 0;
+        PendingRange = 0;
+    }
+
+    public void ClearCacheForNewTurn()
     {
         PendingDamage = 0;
         PendingRange = 0;
         PendingMovement = 0;
         PendingHealing = 0;
         PendingBlock = 0;
-        HasPendingEffects = false;
-    }
-
-    public void ClearCache()
-    {
-        PlayedCardName = null;
-        PlayedCardManaCost = 0;
-        ResetEffectValues();
-        Debug.Log("Cache geleert.");
+        Debug.Log("Player action cache cleared for new turn.");
     }
 
     public void PrintCachedEffects()
     {
-        if (PendingDamage > 0)
-        {
-            Debug.Log($"Saved Damage {PendingDamage},Saved Range {PendingRange}");
-        }
-        if (PendingMovement > 0)
-        {
-            Debug.Log($"Saved Movement {PendingMovement}");
-        }
-        if (PendingHealing > 0)
-        {
-            Debug.Log($"Saved healing {PendingHealing}");
-        }
-        if (PendingBlock > 0)
-        {
-            Debug.Log($"Saved Cached {PendingBlock}");
-        }
+        Debug.Log($"CACHE STATE: [Dmg:{PendingDamage}, Rng:{PendingRange}, Move:{PendingMovement}, Heal:{PendingHealing}, Block:{PendingBlock}]");
     }
 }

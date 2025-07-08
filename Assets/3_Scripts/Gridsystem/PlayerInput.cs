@@ -6,6 +6,7 @@ using UnityEngine.Events;
 public class PlayerInput : MonoBehaviour
 {
     public UnityEvent<Vector3> PointerClick;
+    public UnityEvent PointerRightClick;
 
     private void Update()
     {
@@ -23,6 +24,11 @@ public class PlayerInput : MonoBehaviour
         {
             Vector3 touchPos = Input.GetTouch(0).position;
             PointerClick?.Invoke(touchPos);
+        }
+        
+        if (Input.GetMouseButtonDown(1))
+        {
+            PointerRightClick?.Invoke();
         }
     }
 
