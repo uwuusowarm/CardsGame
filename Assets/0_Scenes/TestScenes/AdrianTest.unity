@@ -610,7 +610,7 @@ MonoBehaviour:
   movementSystem: {fileID: 1611851148}
   enemyUnits:
   - {fileID: 138874252}
-  selectedUnit: {fileID: 539961747}
+  selectedUnit: {fileID: 0}
   animator: {fileID: 1973393616}
 --- !u!4 &124161441
 Transform:
@@ -633,7 +633,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 3156814888468957543}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 23215379}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a15df5a09b360084cae4de4a71ac4830, type: 3}
@@ -1912,124 +1912,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f24e858180ba80d46b622aeb43524db5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &539961734 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4886691500733961866, guid: db91694dccffe224ba6abd437549a4cb,
-    type: 3}
-  m_PrefabInstance: {fileID: 1872887274}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &539961735 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6644379802248026696, guid: db91694dccffe224ba6abd437549a4cb,
     type: 3}
   m_PrefabInstance: {fileID: 1872887274}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &539961743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 539961734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7373bce64a5dcd9418910321fa9351e7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  glowMaterial: {fileID: 2100000, guid: e367924dbc1106848859b7511a83550c, type: 2}
---- !u!114 &539961744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 539961734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10563fa16c57e654dad6b45ae5ea0764, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxShields: 11
-  shieldIcons:
-  - {fileID: 1570416115}
-  - {fileID: 1702965631}
-  - {fileID: 1499199051}
-  - {fileID: 907474880}
-  - {fileID: 1681625881}
-  - {fileID: 74912295}
-  - {fileID: 1049244930}
-  - {fileID: 1073897403}
-  - {fileID: 1627403651}
-  - {fileID: 1706819477}
-  - {fileID: 1628695743}
---- !u!114 &539961745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 539961734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59b054fdb2b63044fab3d4eceab1fb1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxBaseHealth: 5
-  maxExtraHealth: 10
-  healthIcons:
-  - {fileID: 633418862}
-  - {fileID: 1247886464}
-  - {fileID: 2102549759}
-  - {fileID: 1622372655}
-  - {fileID: 364862978}
-  - {fileID: 1079962452}
-  - {fileID: 424707485}
-  - {fileID: 207561936}
-  - {fileID: 33200578}
-  - {fileID: 1917153883}
-  - {fileID: 2043513590}
-  - {fileID: 545633702}
-  - {fileID: 1283979626}
-  - {fileID: 749004018}
-  - {fileID: 1313008252}
---- !u!114 &539961746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 539961734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e33c59b247d73ab4ab16acfcd011cbbc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxActionPoints: 4
-  actionPointIcons:
-  - {fileID: 199058393}
-  - {fileID: 920292291}
-  - {fileID: 1461433569}
-  - {fileID: 1141993167}
---- !u!114 &539961747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 539961734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 572ab7db695768440918c18de4b642b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 5
-  currentHealth: 0
-  movementPoints: 20
-  actionPoints: 4
-  shieldPoints: 0
-  IsEnemy: 0
-  movementDuration: 1
-  rotationDuration: 0.3
 --- !u!1 &545633700
 GameObject:
   m_ObjectHideFlags: 0
@@ -3295,6 +3183,369 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 33d9e4e17d0512b47888c3b730fa6d42, type: 3}
+--- !u!1 &831943157
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 831943159}
+  - component: {fileID: 831943158}
+  m_Layer: 0
+  m_Name: SoundEmpty
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &831943158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831943157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9585a2a6799c0344bdba723260f184b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - Name: Draw_Card
+    clip: {fileID: 8300000, guid: d8307a62d4f58d54cbbc2b696c25b006, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Draw_Card_V2
+    clip: {fileID: 8300000, guid: 2cfd9c4824bcdb84ca3ff238c35e5759, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Multiple_Discard
+    clip: {fileID: 8300000, guid: 938030dca5ffb124b9f3230140167346, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Multiple_Discard_V2
+    clip: {fileID: 8300000, guid: a8fc6e1954b6d9f478cd154c25bc5496, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Discard
+    clip: {fileID: 8300000, guid: 2e3d7d542a79b92499949476f186081b, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: invalid card
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Deck_Shuffle
+    clip: {fileID: 8300000, guid: 6e7aa7209a63b064d9a4e515cd665ffc, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: UI_Buttion
+    clip: {fileID: 8300000, guid: f12ec6365bbf8d243a097f457f110c72, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Hover_V1
+    clip: {fileID: 8300000, guid: 43bd0b0654ec5734e84d1c1a2e174d82, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Card_select
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Card_select_2
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Pause/Menu Open
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Deckbuilder Menu Sound
+    clip: {fileID: 8300000, guid: 0daacc7ce1cfc194781fb27baa883a6e, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Hover_V2
+    clip: {fileID: 8300000, guid: d420ea18e03a4f54a98a782f2f87f41f, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Hover_V3
+    clip: {fileID: 8300000, guid: 7bd676896903aaf41ac49b802aa7109e, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: dungeon ambience
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+--- !u!4 &831943159
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831943157}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 116.262054, y: 128.5, z: 185.5924}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -4306,6 +4557,363 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1079962450}
   m_CullTransparentMesh: 1
+--- !u!1 &1083918578
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1083918580}
+  - component: {fileID: 1083918579}
+  m_Layer: 0
+  m_Name: SoundEmpty (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1083918579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1083918578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9585a2a6799c0344bdba723260f184b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - Name: Basic_Block_Deflect
+    clip: {fileID: 8300000, guid: 408f5f6d51d095a4fb2e38dc6dc023c3, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Basic_Block_Deflect_V2
+    clip: {fileID: 8300000, guid: 91c73a56f26f0644994084082b4ef83f, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Basic_Block_Deflect_V3
+    clip: {fileID: 8300000, guid: 99c4e10bf6399e64281aa82cf85979ba, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Chest_Open
+    clip: {fileID: 8300000, guid: e80a61f4950b72240b0e9677744d6db6, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: cinematic-dramatic-11120
+    clip: {fileID: 8300000, guid: 91bedf818be71144cbf989292554c779, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Dagger_Stab_Multiple
+    clip: {fileID: 8300000, guid: 527855827d30e674cb36fdadf8945679, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Dagger_Stab_sound
+    clip: {fileID: 8300000, guid: 5801569b90d631f408907f9e4f54eb4c, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Dagger_Stab_sound_V2
+    clip: {fileID: 8300000, guid: e06dfd79c90669040bca1bca2a5c147a, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Dagger_Stab_sound_V3
+    clip: {fileID: 8300000, guid: 1a1aaa8c626b3b64596466558e2015ba, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Deck_Shuffel
+    clip: {fileID: 8300000, guid: 6e7aa7209a63b064d9a4e515cd665ffc, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Deckbuilder_Menu _Music
+    clip: {fileID: 8300000, guid: 0daacc7ce1cfc194781fb27baa883a6e, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Discard
+    clip: {fileID: 8300000, guid: 2e3d7d542a79b92499949476f186081b, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Door_open
+    clip: {fileID: 8300000, guid: 369c0e70797948a4ab3ea1470ba203e8, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Draw_Card_V2
+    clip: {fileID: 8300000, guid: 2cfd9c4824bcdb84ca3ff238c35e5759, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: dropping-single-coin-on-floor-5-38983
+    clip: {fileID: 8300000, guid: 3470711cda2cbb24ab677d475bf358f5, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Goblin_Death
+    clip: {fileID: 8300000, guid: 62acea8f407b54f4fbf7cf559756799c, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Goblin_Death_2
+    clip: {fileID: 8300000, guid: 1140efa92f624b64b8fa0159c85334c2, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Goblin_hit
+    clip: {fileID: 8300000, guid: 62f8d3e5885bba146a23aee02e26bc5a, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Hammer
+    clip: {fileID: 8300000, guid: 2581be9dcb0eccc4da7b79f66536d126, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Hammer_2
+    clip: {fileID: 8300000, guid: f53653713905a3842a132137b6914a7c, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Heavy_Punch
+    clip: {fileID: 8300000, guid: 403522ed8bb9df141b6d3b0f5cb72d68, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Hover_3
+    clip: {fileID: 8300000, guid: 7bd676896903aaf41ac49b802aa7109e, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Hover_V1
+    clip: {fileID: 8300000, guid: 43bd0b0654ec5734e84d1c1a2e174d82, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Hover_V2
+    clip: {fileID: 8300000, guid: d420ea18e03a4f54a98a782f2f87f41f, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: item_pick_select
+    clip: {fileID: 8300000, guid: cb065c1af7fe99647af8d58910224b98, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: item_pick_select_2
+    clip: {fileID: 8300000, guid: 020c420ec0481d24aab516ea42b35dc9, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Kick
+    clip: {fileID: 8300000, guid: db689da9f83e51541b4d101f1a300ba7, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Kick_2
+    clip: {fileID: 8300000, guid: 1169dc4eed969104892a12b090ff230c, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Level_Music
+    clip: {fileID: 8300000, guid: 2f4c59781f601184a916ceee6d6cf125, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Main_Menu_Music
+    clip: {fileID: 8300000, guid: 10c3b8c0637f5aa4185efa416a207ec3, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Multiple_Discard
+    clip: {fileID: 8300000, guid: 938030dca5ffb124b9f3230140167346, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Multiple_Discard_V2
+    clip: {fileID: 8300000, guid: a8fc6e1954b6d9f478cd154c25bc5496, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Music_All
+    clip: {fileID: 8300000, guid: 6341c7913bfd585408709d1ee4cf1031, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: noncopyright-music-pianos-295174
+    clip: {fileID: 8300000, guid: aa4dd74fb31eb2a4093b4be4799d9071, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Player_damage
+    clip: {fileID: 8300000, guid: 2df6cad087d618349a12594b1537c61b, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Player_damage_V2
+    clip: {fileID: 8300000, guid: f6ad7d82b1bc37d4c87d9edbd0a2a53e, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Player_damage_V3
+    clip: {fileID: 8300000, guid: 89241d597fee23247ad4bcf08b129f68, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Player_death
+    clip: {fileID: 8300000, guid: 6ed42d11a3802704ea2c8b7234d5cdaf, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Punch
+    clip: {fileID: 8300000, guid: 07aa1fe86d1dfb94e9ec61c233d8e2b7, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeAttack_V1
+    clip: {fileID: 8300000, guid: dfd7ee2c810c3ed4895dc2e1aa21a34c, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeAttack_V2
+    clip: {fileID: 8300000, guid: b161a9b955fbcf04a8fac462874f4b9c, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeAttack_V3
+    clip: {fileID: 8300000, guid: 8dc96d2ea347b234285a4b42bcff4674, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeDamage_V1
+    clip: {fileID: 8300000, guid: 7b02e2f7051241a4fb10a6b819455183, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeDamage_V2
+    clip: {fileID: 8300000, guid: 8000eaf5b8ae07b43a231dc803510ac2, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeDamage_V3
+    clip: {fileID: 8300000, guid: 28c39cbf23d0e6c42870a7ce336d5ac3, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeDeath
+    clip: {fileID: 8300000, guid: 215fcd3891f14be498f9fa731788e3e5, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeMovement_V1
+    clip: {fileID: 8300000, guid: 963a9ee20396c434d9e8e16b46e8b005, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: SlimeMovement_V2
+    clip: {fileID: 8300000, guid: eb8acef719dcf414d8589ec8aca08d70, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Swordswing
+    clip: {fileID: 8300000, guid: 4866b093d4f24a64f871b49f3d5eae1e, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Swordswing_V2
+    clip: {fileID: 8300000, guid: d71a9d7617a1cef4582fd8cdb342fccf, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: Swordswing_V3
+    clip: {fileID: 8300000, guid: 3bdbac687a119d34890eb1382cdfb871, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+  - Name: UI_Button
+    clip: {fileID: 8300000, guid: f12ec6365bbf8d243a097f457f110c72, type: 3}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
+--- !u!4 &1083918580
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1083918578}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 116.262054, y: 128.5, z: 185.5924}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1141993165
 GameObject:
   m_ObjectHideFlags: 0
@@ -8124,6 +8732,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20a0777d2da5a1e4c947cbf695e9cf71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hexWidth: 1.732
+  hexHeight: 2
 --- !u!1 &1846133022
 GameObject:
   m_ObjectHideFlags: 0
@@ -8639,27 +9249,7 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1973393615}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4886691500733961866, guid: db91694dccffe224ba6abd437549a4cb,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 539961747}
-    - targetCorrespondingSourceObject: {fileID: 4886691500733961866, guid: db91694dccffe224ba6abd437549a4cb,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 539961746}
-    - targetCorrespondingSourceObject: {fileID: 4886691500733961866, guid: db91694dccffe224ba6abd437549a4cb,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 539961745}
-    - targetCorrespondingSourceObject: {fileID: 4886691500733961866, guid: db91694dccffe224ba6abd437549a4cb,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 539961744}
-    - targetCorrespondingSourceObject: {fileID: 4886691500733961866, guid: db91694dccffe224ba6abd437549a4cb,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 539961743}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: db91694dccffe224ba6abd437549a4cb, type: 3}
 --- !u!1 &1881224938
 GameObject:
@@ -9371,48 +9961,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdb6549ff49c99449ce440c20896db0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardDatabase: {fileID: 0}
   drawCount: 4
-  cardDatabase:
-  - {fileID: 11400000, guid: acfd15dd6554f434b95c01ef093b2095, type: 2}
-  - {fileID: 11400000, guid: 7450a5ee797236d42b1de68dd831bc37, type: 2}
-  - {fileID: 11400000, guid: 5808d4e3d9b4ecc4b8663036e577dbc7, type: 2}
-  - {fileID: 11400000, guid: 6d27b92771e6f134e843db9aaad23a0e, type: 2}
-  - {fileID: 11400000, guid: da7c53acc86779b47a193e996eea5223, type: 2}
-  - {fileID: 11400000, guid: cc030a901587f074bac8aa30a3552336, type: 2}
-  - {fileID: 11400000, guid: 97354918a7e6f4d4d972e387c3d011e6, type: 2}
-  - {fileID: 11400000, guid: 20747f91c2835644d8d2b7c82d9f2895, type: 2}
-  - {fileID: 11400000, guid: 6058c87b6fe4f3543a1fb3f3850b22f3, type: 2}
-  - {fileID: 11400000, guid: acfd15dd6554f434b95c01ef093b2095, type: 2}
-  - {fileID: 11400000, guid: 7450a5ee797236d42b1de68dd831bc37, type: 2}
-  - {fileID: 11400000, guid: 5808d4e3d9b4ecc4b8663036e577dbc7, type: 2}
-  - {fileID: 11400000, guid: 6d27b92771e6f134e843db9aaad23a0e, type: 2}
-  - {fileID: 11400000, guid: da7c53acc86779b47a193e996eea5223, type: 2}
-  - {fileID: 11400000, guid: cc030a901587f074bac8aa30a3552336, type: 2}
-  - {fileID: 11400000, guid: 97354918a7e6f4d4d972e387c3d011e6, type: 2}
-  - {fileID: 11400000, guid: 20747f91c2835644d8d2b7c82d9f2895, type: 2}
-  - {fileID: 11400000, guid: 6058c87b6fe4f3543a1fb3f3850b22f3, type: 2}
-  - {fileID: 11400000, guid: acfd15dd6554f434b95c01ef093b2095, type: 2}
-  - {fileID: 11400000, guid: 7450a5ee797236d42b1de68dd831bc37, type: 2}
-  - {fileID: 11400000, guid: 5808d4e3d9b4ecc4b8663036e577dbc7, type: 2}
-  - {fileID: 11400000, guid: 6d27b92771e6f134e843db9aaad23a0e, type: 2}
-  - {fileID: 11400000, guid: da7c53acc86779b47a193e996eea5223, type: 2}
-  - {fileID: 11400000, guid: cc030a901587f074bac8aa30a3552336, type: 2}
-  - {fileID: 11400000, guid: 97354918a7e6f4d4d972e387c3d011e6, type: 2}
-  - {fileID: 11400000, guid: 20747f91c2835644d8d2b7c82d9f2895, type: 2}
-  - {fileID: 11400000, guid: 6058c87b6fe4f3543a1fb3f3850b22f3, type: 2}
-  - {fileID: 11400000, guid: acfd15dd6554f434b95c01ef093b2095, type: 2}
-  - {fileID: 11400000, guid: 7450a5ee797236d42b1de68dd831bc37, type: 2}
-  - {fileID: 11400000, guid: 5808d4e3d9b4ecc4b8663036e577dbc7, type: 2}
-  - {fileID: 11400000, guid: 6d27b92771e6f134e843db9aaad23a0e, type: 2}
-  - {fileID: 11400000, guid: da7c53acc86779b47a193e996eea5223, type: 2}
-  - {fileID: 11400000, guid: cc030a901587f074bac8aa30a3552336, type: 2}
-  - {fileID: 11400000, guid: 97354918a7e6f4d4d972e387c3d011e6, type: 2}
-  - {fileID: 11400000, guid: 20747f91c2835644d8d2b7c82d9f2895, type: 2}
-  - {fileID: 11400000, guid: 6058c87b6fe4f3543a1fb3f3850b22f3, type: 2}
-  - {fileID: 11400000, guid: 20747f91c2835644d8d2b7c82d9f2895, type: 2}
-  - {fileID: 11400000, guid: 20747f91c2835644d8d2b7c82d9f2895, type: 2}
-  - {fileID: 11400000, guid: 20747f91c2835644d8d2b7c82d9f2895, type: 2}
-  - {fileID: 11400000, guid: 20747f91c2835644d8d2b7c82d9f2895, type: 2}
   handGrid: {fileID: 571336533}
   leftGrid: {fileID: 1881224939}
   rightGrid: {fileID: 1473173885}
@@ -10187,3 +10737,5 @@ SceneRoots:
   - {fileID: 573492463}
   - {fileID: 561206344}
   - {fileID: 783143237}
+  - {fileID: 831943159}
+  - {fileID: 1083918580}
