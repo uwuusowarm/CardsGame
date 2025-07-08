@@ -118,6 +118,12 @@ public class Hex : MonoBehaviour
     {
         return EnemyUnitOnHex != null;
     }
+
+    public HexType HexType
+    {
+        get => hexType;
+        set => hexType = value;
+    }
 }
 
 public enum HexType

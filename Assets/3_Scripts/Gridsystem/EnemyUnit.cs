@@ -39,6 +39,7 @@ public class EnemyUnit : MonoBehaviour
         {
             Debug.LogWarning("UnitManager.Instance ist noch nicht gesetzt beim EnemyUnit Awake.");
         }
+        EnemyActivator.Instance?.RegisterEnemy(this);
     }
 
     private void Start()
