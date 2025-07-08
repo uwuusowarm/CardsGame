@@ -130,7 +130,7 @@ public class MainMenu : MonoBehaviour
         if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
         {
             GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(2);
         }
         else
         {
@@ -141,7 +141,12 @@ public class MainMenu : MonoBehaviour
     public void ReturnToMainMenu() { ShowPanel(mainPanel); }
     public void OpenOptionsPanel() { ShowPanel(optionsPanel); }
     public void OpenCreditsPanel() { ShowPanel(creditsPanel); }
-    public void StartButton() { OpenDeckSelectionScreen(); }
+    public void StartButton() { OpenDeckSelectionScreen(); } 
+
+    public void StartButtonBuild()
+    {
+        SceneManager.LoadScene(2);
+    }
     public void QuitGame()
     {
         Application.Quit();
