@@ -39,7 +39,6 @@ public class MainMenu : MonoBehaviour
     private void Start()
     {
         ReturnToMainMenu();
-
         if (resolutionDropdown != null)
         {
             resolutionDropdown.ClearOptions();
@@ -81,10 +80,19 @@ public class MainMenu : MonoBehaviour
         if (cardMenuPanel != null) cardMenuPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(false);
         if (deckSelectionPanel != null) deckSelectionPanel.SetActive(false);
-
         if (panelToShow != null)
         {
             panelToShow.SetActive(true);
+        }
+    }
+
+    // KORRIGIERT: Ruft jetzt explizit die Aktualisierung auf
+    public void OpenCardMenuPanel()
+    {
+        ShowPanel(cardMenuPanel);
+        if (cardMenuManager != null)
+        {
+            cardMenuManager.PopulateDeckDisplay();
         }
     }
 
@@ -93,7 +101,6 @@ public class MainMenu : MonoBehaviour
         ShowPanel(deckSelectionPanel);
         playGameButton.gameObject.SetActive(false);
         currentlySelectedDeckForPlay = null;
-
         foreach (Transform child in deckSelectionContainer) Destroy(child.gameObject);
 
         List<Deck> playerDecks = cardMenuManager.GetPlayerDecks();
@@ -123,7 +130,7 @@ public class MainMenu : MonoBehaviour
         if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
         {
             GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(2);
         }
         else
         {
@@ -131,31 +138,15 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    public void ReturnToMainMenu()
-    {
-        ShowPanel(mainPanel);
-    }
+    public void ReturnToMainMenu() { ShowPanel(mainPanel); }
+    public void OpenOptionsPanel() { ShowPanel(optionsPanel); }
+    public void OpenCreditsPanel() { ShowPanel(creditsPanel); }
+    public void StartButton() { OpenDeckSelectionScreen(); } 
 
-    public void OpenOptionsPanel()
+    public void StartButtonBuild()
     {
-        ShowPanel(optionsPanel);
+        SceneManager.LoadScene(2);
     }
-
-    public void OpenCardMenuPanel()
-    {
-        ShowPanel(cardMenuPanel);
-    }
-
-    public void OpenCreditsPanel()
-    {
-        ShowPanel(creditsPanel);
-    }
-
-    public void StartButton()
-    {
-        OpenDeckSelectionScreen();
-    }
-
     public void QuitGame()
     {
         Application.Quit();
@@ -163,12 +154,5 @@ public class MainMenu : MonoBehaviour
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
     }
-
-    public void LoadSettings(int currentResolutionIndex)
-    {
-        if (resolutionDropdown != null)
-        {
-            resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex;
-        }
-    }
+    public void LoadSettings(int currentResolutionIndex) { if (resolutionDropdown != null) { resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex; } }
 }

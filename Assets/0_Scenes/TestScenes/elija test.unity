@@ -7468,12 +7468,12 @@ MonoBehaviour:
   optionsPanel: {fileID: 2051205026}
   cardMenuPanel: {fileID: 1246495634}
   creditsPanel: {fileID: 742701775}
-  deckSelectionPanel: {fileID: 386787570}
+  deckSelectionPanel: {fileID: 0}
   resolutionDropdown: {fileID: 1006733357}
   targetFPS: 60
   selectedFPS: {fileID: 433580951}
   cardMenuManager: {fileID: 1889312453}
-  deckSelectionContainer: {fileID: 985729142}
+  deckSelectionContainer: {fileID: 386787571}
   playGameButton: {fileID: 105561144}
 --- !u!114 &1889312453
 MonoBehaviour:
@@ -7498,8 +7498,6 @@ MonoBehaviour:
   decksDisplayContainer: {fileID: 934719616}
   deckDisplayPrefab: {fileID: 2013489522614463475, guid: 2a1a47a38225589408a7e5e586ef8e48,
     type: 3}
-  editDeckButton: {fileID: 661233944}
-  deleteDeckButton: {fileID: 0}
   cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
 --- !u!1 &1897934736
 GameObject:
