@@ -1,12 +1,14 @@
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using System.Globalization; 
+using System.Globalization;
 
 public class ItemCSVImporter
 {
     private const string CSV_PATH_KEY = "ItemCSVImporter_Path";
-    private const string DEFAULT_ASSET_FOLDER = "Assets/GameData/Items"; 
+    private const string ITEM_DATA_FOLDER = "Assets/GameData/Items";
+    private const string PREFAB_FOLDER = "Assets/1_Prefabs/Items";
+    private const string SPRITE_FOLDER = "Assets/Art Complete/ItemSprites"; 
 
     [MenuItem("Tools/Import Items from CSV")]
     public static void ImportItems()
@@ -16,10 +18,10 @@ public class ItemCSVImporter
 
         if (string.IsNullOrEmpty(path))
         {
-            return; 
+            return;
         }
 
-        EditorPrefs.SetString(CSV_PATH_KEY, Path.GetDirectoryName(path)); 
+        EditorPrefs.SetString(CSV_PATH_KEY, Path.GetDirectoryName(path));
 
         string[] lines = File.ReadAllLines(path);
 
@@ -29,25 +31,25 @@ public class ItemCSVImporter
             return;
         }
 
-        if (!Directory.Exists(DEFAULT_ASSET_FOLDER))
-        {
-            Directory.CreateDirectory(DEFAULT_ASSET_FOLDER);
-        }
+        if (!Directory.Exists(ITEM_DATA_FOLDER)) Directory.CreateDirectory(ITEM_DATA_FOLDER);
+        if (!Directory.Exists(PREFAB_FOLDER)) Directory.CreateDirectory(PREFAB_FOLDER);
+        if (!Directory.Exists(SPRITE_FOLDER)) Directory.CreateDirectory(SPRITE_FOLDER);
 
         int itemsCreated = 0;
         int itemsUpdated = 0;
+        int prefabsCreated = 0;
+        int prefabsUpdated = 0;
 
         for (int i = 1; i < lines.Length; i++)
         {
             string line = lines[i].Trim();
-            if (string.IsNullOrEmpty(line) || line.StartsWith(";;;;")) 
+            if (string.IsNullOrEmpty(line) || line.StartsWith(";;;;"))
             {
                 continue;
             }
 
             string[] values = line.Split(';');
 
-            // ID;Klasse;Name;Tier;Rüstungsart;Dmg Bonus ;Ms Bonus;Def Bonus;Heal Bonus;Max HP;Max AP;Range;1 Class Bonus;1 Bonus Amount;2 Class Bonus;2 Bonus Amount;Total
             if (values.Length < 17)
             {
                 Debug.LogWarning($"Skipping line {i + 1}: Not enough columns (found {values.Length}, expected 17). Line content: '{line}'");
@@ -56,22 +58,23 @@ public class ItemCSVImporter
 
             try
             {
-                ItemData item = null;
-                string itemName = SanitizeFileName(values[2]); 
+                ItemData itemData = null;
+                string itemName = SanitizeFileName(values[2]);
                 if (string.IsNullOrEmpty(itemName))
                 {
-                    itemName = $"Item_ID_{values[0]}"; 
+                    itemName = $"Item_ID_{values[0]}";
                 }
-                
+
                 string assetFileName = $"{values[0]}_{itemName}.asset";
-                string assetPath = Path.Combine(DEFAULT_ASSET_FOLDER, assetFileName);
+                string assetPath = Path.Combine(ITEM_DATA_FOLDER, assetFileName);
 
-                item = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
+                itemData = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
+                bool isNewItem = itemData == null;
 
-                if (item == null)
+                if (isNewItem)
                 {
-                    item = ScriptableObject.CreateInstance<ItemData>();
-                    AssetDatabase.CreateAsset(item, assetPath);
+                    itemData = ScriptableObject.CreateInstance<ItemData>();
+                    AssetDatabase.CreateAsset(itemData, assetPath);
                     itemsCreated++;
                 }
                 else
@@ -79,29 +82,85 @@ public class ItemCSVImporter
                     itemsUpdated++;
                 }
 
-                // Populate data
-                item.id = ParseInt(values[0]);
-                item.itemClass = ParseItemClassType(values[1]);
-                item.name = values[2];
-                item.tier = ParseInt(values[3]);
-                item.itemSlot = ParseItemSlot(values[4]);
+                itemData.id = ParseInt(values[0]);
+                itemData.itemClass = ParseItemClassType(values[1]);
+                itemData.name = values[2];
+                itemData.tier = ParseInt(values[3]);
+                itemData.itemSlot = ParseItemSlot(values[4]);
+                itemData.damageBonus = ParseInt(values[5]);
+                itemData.movementSpeedBonus = ParseInt(values[6]);
+                itemData.defenseBonus = ParseInt(values[7]);
+                itemData.healBonus = ParseInt(values[8]);
+                itemData.maxHpBonus = ParseInt(values[9]);
+                itemData.maxApBonus = ParseInt(values[10]);
+                itemData.range = ParseInt(values[11]);
+                itemData.classBonus1Type = ParseStatBonusType(values[12]);
+                itemData.classBonus1Amount = ParseInt(values[13]);
+                itemData.classBonus2Type = ParseStatBonusType(values[14]);
+                itemData.classBonus2Amount = ParseInt(values[15]);
+                itemData.totalValue = ParseInt(values[16]);
+                
+                string[] spriteGuids = AssetDatabase.FindAssets($"t:Sprite {itemData.id}", new[] { SPRITE_FOLDER });
+                if (spriteGuids.Length > 0)
+                {
+                    string spritePath = AssetDatabase.GUIDToAssetPath(spriteGuids[0]);
+                    itemData.itemIcon = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+                    if (spriteGuids.Length > 1)
+                    {
+                        Debug.LogWarning($"Found multiple sprites for ID {itemData.id} in {SPRITE_FOLDER}. Using the first one: {spritePath}");
+                    }
+                }
+                else if (isNewItem) 
+                {
+                    Debug.LogWarning($"No sprite found for item ID {itemData.id} in {SPRITE_FOLDER}. Expected a file named '{itemData.id}.png' (or .jpg, etc).");
+                }
 
-                item.damageBonus = ParseInt(values[5]);
-                item.movementSpeedBonus = ParseInt(values[6]);
-                item.defenseBonus = ParseInt(values[7]);
-                item.healBonus = ParseInt(values[8]);
-                item.maxHpBonus = ParseInt(values[9]);
-                item.maxApBonus = ParseInt(values[10]);
-                item.range = ParseInt(values[11]);
+                EditorUtility.SetDirty(itemData);
 
-                item.classBonus1Type = ParseStatBonusType(values[12]);
-                item.classBonus1Amount = ParseInt(values[13]);
-                item.classBonus2Type = ParseStatBonusType(values[14]);
-                item.classBonus2Amount = ParseInt(values[15]);
+                string prefabFileName = $"{values[0]}_{itemName}.prefab";
+                string prefabPath = Path.Combine(PREFAB_FOLDER, prefabFileName);
 
-                item.totalValue = ParseInt(values[16]);
+                GameObject existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                
+                if (existingPrefab == null)
+                {
+                    GameObject newPrefabRoot = new GameObject(itemData.name);
+                    ItemPickup pickupComponent = newPrefabRoot.AddComponent<ItemPickup>();
+                    
+                    SpriteRenderer spriteRenderer = newPrefabRoot.AddComponent<SpriteRenderer>();
+                    spriteRenderer.sprite = itemData.itemIcon; 
 
-                EditorUtility.SetDirty(item); 
+                    SerializedObject so = new SerializedObject(pickupComponent);
+                    so.FindProperty("itemData").objectReferenceValue = itemData;
+                    so.ApplyModifiedProperties();
+                    
+                    PrefabUtility.SaveAsPrefabAsset(newPrefabRoot, prefabPath);
+                    GameObject.DestroyImmediate(newPrefabRoot);
+                    prefabsCreated++;
+                }
+                else
+                {
+                    GameObject prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(existingPrefab);
+                    ItemPickup pickupComponent = prefabInstance.GetComponent<ItemPickup>();
+                    if(pickupComponent == null) pickupComponent = prefabInstance.AddComponent<ItemPickup>();
+
+                    SpriteRenderer spriteRenderer = prefabInstance.GetComponent<SpriteRenderer>();
+                    if (spriteRenderer == null) spriteRenderer = prefabInstance.AddComponent<SpriteRenderer>();
+                    spriteRenderer.sprite = itemData.itemIcon; 
+
+                    SerializedObject so = new SerializedObject(pickupComponent);
+                    so.FindProperty("itemData").objectReferenceValue = itemData;
+                    so.ApplyModifiedProperties();
+
+                    if (prefabInstance.name != itemData.name)
+                    {
+                        prefabInstance.name = itemData.name;
+                    }
+
+                    PrefabUtility.SaveAsPrefabAsset(prefabInstance, prefabPath);
+                    GameObject.DestroyImmediate(prefabInstance);
+                    prefabsUpdated++;
+                }
             }
             catch (System.Exception ex)
             {
@@ -113,10 +172,13 @@ public class ItemCSVImporter
         AssetDatabase.Refresh();
 
         EditorUtility.DisplayDialog("Import Complete",
-            $"{itemsCreated} items created.\n{itemsUpdated} items updated.", "OK");
-        Debug.Log($"Item import complete. Created: {itemsCreated}, Updated: {itemsUpdated}. Assets saved in {DEFAULT_ASSET_FOLDER}");
+            $"{itemsCreated} items created, {prefabsCreated} prefabs created.\n" +
+            $"{itemsUpdated} items updated, {prefabsUpdated} prefabs updated.", "OK");
+        Debug.Log($"Item import complete. Assets saved in {ITEM_DATA_FOLDER} and {PREFAB_FOLDER}");
     }
-    
+
+    // --- (No changes to the helper methods below this line) ---
+
     private static int ParseInt(string value, int defaultValue = 0)
     {
         if (string.IsNullOrWhiteSpace(value)) return defaultValue;
@@ -158,9 +220,9 @@ public class ItemCSVImporter
 
     private static StatBonusType ParseStatBonusType(string value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return StatBonusType.None; 
-        string normalizedValue = value.Replace(" ", ""); 
-        
+        if (string.IsNullOrWhiteSpace(value)) return StatBonusType.None;
+        string normalizedValue = value.Replace(" ", "");
+
         try
         {
             return (StatBonusType)System.Enum.Parse(typeof(StatBonusType), normalizedValue, true);
