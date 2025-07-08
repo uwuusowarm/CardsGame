@@ -1,4 +1,4 @@
-
+using System; 
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +6,10 @@ public class EquipmentManager : MonoBehaviour
 {
     public static EquipmentManager Instance { get; private set; }
 
+    public event Action<ItemSlot> OnEquipmentChanged;
+
     private Dictionary<ItemSlot, ItemData> equippedItems = new Dictionary<ItemSlot, ItemData>();
-    public ItemClassType playerClass = ItemClassType.Warrior; // Set this based on player's class
+    public ItemClassType playerClass = ItemClassType.Warrior; 
 
     private void Awake()
     {
@@ -41,12 +43,26 @@ public class EquipmentManager : MonoBehaviour
             return;
         }
 
+        if (equippedItems[item.itemSlot] != null)
+        {
+            Debug.Log($"Replaced '{equippedItems[item.itemSlot].name}' with '{item.name}' in slot {item.itemSlot}.");
+        }
+
         equippedItems[item.itemSlot] = item;
+        Debug.Log($"Equipped '{item.name}'.");
+
+        OnEquipmentChanged?.Invoke(item.itemSlot);
     }
 
     public void UnequipItem(ItemSlot slot)
     {
-        equippedItems[slot] = null;
+        if (equippedItems.ContainsKey(slot) && equippedItems[slot] != null)
+        {
+            Debug.Log($"Unequipped {equippedItems[slot].name} from slot {slot}.");
+            equippedItems[slot] = null;
+            
+            OnEquipmentChanged?.Invoke(slot);
+        }
     }
 
     public int GetTotalDamageBonus()
