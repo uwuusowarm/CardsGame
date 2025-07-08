@@ -19,8 +19,6 @@ public class CardMenuManager : MonoBehaviour
     [Header("Card Menu Referenzen")]
     [SerializeField] private Transform decksDisplayContainer;
     public GameObject deckDisplayPrefab;
-    [SerializeField] private Button editDeckButton;
-    [SerializeField] private Button deleteDeckButton;
 
     [Header("Zentrale Datenbank")]
     [SerializeField] private CardDatabaseSO cardDatabase;
@@ -29,14 +27,11 @@ public class CardMenuManager : MonoBehaviour
     private List<CardData> currentlySelectedCards = new List<CardData>();
     private Deck currentlyEditingDeck;
     private DeckUI currentlySelectedDeckUI;
-
     private List<CardSelectorUI> spawnedCardUIs = new List<CardSelectorUI>();
 
     void Start()
     {
         allPlayerDecks = SaveSystem.LoadDecks();
-        if (editDeckButton != null) editDeckButton.gameObject.SetActive(false);
-        if (deleteDeckButton != null) deleteDeckButton.gameObject.SetActive(false);
     }
 
     public List<Deck> GetPlayerDecks()
@@ -50,9 +45,7 @@ public class CardMenuManager : MonoBehaviour
         {
             currentlySelectedDeckUI.HideActions();
         }
-
         currentlySelectedDeckUI = selectedUI;
-
         if (currentlySelectedDeckUI != null)
         {
             currentlyEditingDeck = currentlySelectedDeckUI.GetAssignedDeck();
@@ -63,7 +56,6 @@ public class CardMenuManager : MonoBehaviour
     public void OpenEditDeckEditor()
     {
         if (currentlyEditingDeck == null) return;
-
         currentlySelectedCards = new List<CardData>(currentlyEditingDeck.Cards);
         if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
         PopulateAllCardsList();
@@ -73,10 +65,8 @@ public class CardMenuManager : MonoBehaviour
     public void DeleteSelectedDeck()
     {
         if (currentlyEditingDeck == null) return;
-
         allPlayerDecks.Remove(currentlyEditingDeck);
         SaveSystem.SaveDecks(allPlayerDecks);
-
         currentlyEditingDeck = null;
         currentlySelectedDeckUI = null;
         PopulateDeckDisplay();
@@ -95,9 +85,7 @@ public class CardMenuManager : MonoBehaviour
             newDeck.Cards = new List<CardData>(currentlySelectedCards);
             allPlayerDecks.Add(newDeck);
         }
-
         SaveSystem.SaveDecks(allPlayerDecks);
-
         if (deckEditorSlideout != null) deckEditorSlideout.SetActive(false);
         PopulateDeckDisplay();
     }
@@ -106,7 +94,6 @@ public class CardMenuManager : MonoBehaviour
     {
         foreach (Transform child in allCardsContainer) Destroy(child.gameObject);
         spawnedCardUIs.Clear();
-
         if (cardDatabase.allCards == null) return;
 
         GridLayoutGroup gridLayout = allCardsContainer.GetComponent<GridLayoutGroup>();
@@ -130,14 +117,8 @@ public class CardMenuManager : MonoBehaviour
 
     public void ToggleCardSelection(CardData card)
     {
-        if (currentlySelectedCards.Contains(card))
-        {
-            currentlySelectedCards.Remove(card);
-        }
-        else
-        {
-            currentlySelectedCards.Add(card);
-        }
+        if (currentlySelectedCards.Contains(card)) currentlySelectedCards.Remove(card);
+        else currentlySelectedCards.Add(card);
         UpdateSaveButtonState();
         UpdateAllCardHighlights();
     }
@@ -171,12 +152,8 @@ public class CardMenuManager : MonoBehaviour
     public void PopulateDeckDisplay()
     {
         if (decksDisplayContainer == null) return;
-
         currentlySelectedDeckUI = null;
         currentlyEditingDeck = null;
-
-        if (editDeckButton != null) editDeckButton.gameObject.SetActive(false);
-        if (deleteDeckButton != null) deleteDeckButton.gameObject.SetActive(false);
 
         foreach (Transform child in decksDisplayContainer) Destroy(child.gameObject);
         foreach (Deck deck in allPlayerDecks)
