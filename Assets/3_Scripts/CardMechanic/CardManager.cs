@@ -141,6 +141,7 @@ public class CardManager : MonoBehaviour
                 rightZone.Add(card);
                 break;
             case DropType.Discard:
+                Sound_Manager.instance.Play("Discard");
                 discardPile.Add(card);
                 break;
             default: 
