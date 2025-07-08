@@ -134,8 +134,7 @@ public class GameManager : MonoBehaviour
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
         }
-<<<<<<< HEAD
-=======
+
 
     }
 
@@ -150,7 +149,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Drawing new cards based on exhaustion level.");
         CardManager.Instance.DrawCards(CardManager.Instance.drawCount);
         Sound_Manager.instance.Play("Draw_Card_V2");
->>>>>>> 857421fa43217ce6648a67edc30cb1765b78c3e3
+
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
