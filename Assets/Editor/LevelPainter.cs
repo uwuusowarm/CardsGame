@@ -1,3 +1,5 @@
+// --- START OF FILE LevelPainter.cs ---
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -11,17 +13,7 @@ public class HexPrefabMapping
     public bool isDefault;
 }
 
-[System.Serializable]
-public class PlaceableObject
-{
-    public string name;
-    public GameObject prefab;
-    public bool isDoor; 
-    
-    [Tooltip("The local Y-position offset when this object is placed on a hex.")]
-    public float yOffset = 1.421f;
-}
-
+// The 'PlaceableObject' class has been REMOVED from this file and moved to LevelPainterSettings.cs
 
 public class LevelPainter : EditorWindow
 {
@@ -152,7 +144,7 @@ public class LevelPainter : EditorWindow
         EditorGUILayout.EndScrollView();
 
         serializedWindowObject.ApplyModifiedProperties();
-        serializedSettingsObject.ApplyModifiedProperties();
+        if (serializedSettingsObject != null) serializedSettingsObject.ApplyModifiedProperties(); // This line saves the changes
     }
     
     private void LoadSettings()
@@ -172,9 +164,12 @@ public class LevelPainter : EditorWindow
             settings = AssetDatabase.LoadAssetAtPath<LevelPainterSettings>(path);
         }
 
-        serializedSettingsObject = new SerializedObject(settings);
-        serializedPrefabs = serializedSettingsObject.FindProperty("hexPrefabs");
-        serializedPlaceableObjects = serializedSettingsObject.FindProperty("placeableObjects");
+        if (settings != null)
+        {
+            serializedSettingsObject = new SerializedObject(settings);
+            serializedPrefabs = serializedSettingsObject.FindProperty("hexPrefabs");
+            serializedPlaceableObjects = serializedSettingsObject.FindProperty("placeableObjects");
+        }
     }
 
     #region Scene GUI & Interaction
@@ -206,85 +201,86 @@ public class LevelPainter : EditorWindow
     }
     
     private void HandleTool(Event e, Vector3Int hexCoords, HexGrid grid)
-{
-    var worldPositionOnGrid = CoordsToWorldPosition(hexCoords, grid);
-
-    switch (currentTool)
     {
-        case ToolMode.Paint:
-            if (selectedBrushType == BrushType.Hex)
-            {
-                Handles.color = Color.green;
-                Handles.DrawWireDisc(worldPositionOnGrid, Vector3.up, grid.hexWidth / 2f);
-            }
-            else 
-            {
-                var targetHexObject = FindHexAt(hexCoords, grid);
-                if (targetHexObject != null)
-                {
-                    var targetHexPosition = targetHexObject.transform.position;
-                    Handles.color = Color.green;
-                    Handles.DrawWireDisc(targetHexPosition, Vector3.up, grid.hexWidth / 2f);
+        var worldPositionOnGrid = CoordsToWorldPosition(hexCoords, grid);
 
-                    var objectToPlace = settings.placeableObjects[selectedBrushIndex];
-                    var finalObjectPosition = targetHexPosition + new Vector3(0, objectToPlace.yOffset, 0);
-                    Handles.DrawWireCube(finalObjectPosition, Vector3.one * 0.5f); 
-                    Handles.DrawLine(targetHexPosition, finalObjectPosition); 
-                }
-                else
+        switch (currentTool)
+        {
+            case ToolMode.Paint:
+                if (selectedBrushType == BrushType.Hex)
                 {
-                    Handles.color = Color.red;
+                    Handles.color = Color.green;
                     Handles.DrawWireDisc(worldPositionOnGrid, Vector3.up, grid.hexWidth / 2f);
                 }
-            }
-            break;
+                else 
+                {
+                    var targetHexObject = FindHexAt(hexCoords, grid);
+                    if (targetHexObject != null)
+                    {
+                        var targetHexPosition = targetHexObject.transform.position;
+                        Handles.color = Color.green;
+                        Handles.DrawWireDisc(targetHexPosition, Vector3.up, grid.hexWidth / 2f);
 
-        case ToolMode.Erase:
-            Handles.color = Color.red;
-            Handles.DrawWireDisc(worldPositionOnGrid, Vector3.up, grid.hexWidth / 2f);
-            break;
+                        // This now reads the yOffset directly from the settings object
+                        var objectToPlace = settings.placeableObjects[selectedBrushIndex];
+                        var finalObjectPosition = targetHexPosition + new Vector3(0, objectToPlace.yOffset, 0);
+                        Handles.DrawWireCube(finalObjectPosition, Vector3.one * 0.5f); 
+                        Handles.DrawLine(targetHexPosition, finalObjectPosition); 
+                    }
+                    else
+                    {
+                        Handles.color = Color.red;
+                        Handles.DrawWireDisc(worldPositionOnGrid, Vector3.up, grid.hexWidth / 2f);
+                    }
+                }
+                break;
 
-        case ToolMode.Pick:
-            Handles.color = Color.cyan;
-            Handles.DrawWireDisc(worldPositionOnGrid, Vector3.up, grid.hexWidth / 2f);
-            break;
+            case ToolMode.Erase:
+                Handles.color = Color.red;
+                Handles.DrawWireDisc(worldPositionOnGrid, Vector3.up, grid.hexWidth / 2f);
+                break;
 
-        case ToolMode.Select:
-            var potentialHex = FindHexAt(hexCoords, grid);
-            if(potentialHex != null)
-            {
-                Handles.color = Color.yellow;
-                Handles.DrawWireDisc(potentialHex.transform.position, Vector3.up, grid.hexWidth / 2f);
-            }
-            break;
+            case ToolMode.Pick:
+                Handles.color = Color.cyan;
+                Handles.DrawWireDisc(worldPositionOnGrid, Vector3.up, grid.hexWidth / 2f);
+                break;
+
+            case ToolMode.Select:
+                var potentialHex = FindHexAt(hexCoords, grid);
+                if(potentialHex != null)
+                {
+                    Handles.color = Color.yellow;
+                    Handles.DrawWireDisc(potentialHex.transform.position, Vector3.up, grid.hexWidth / 2f);
+                }
+                break;
+        }
+
+        if (e.type != EventType.MouseDown || e.button != 0) return;
+        e.Use();
+        switch (currentTool)
+        {
+            case ToolMode.Paint:
+                switch (selectedBrushType)
+                {
+                    case BrushType.Hex:
+                        PaintHex(hexCoords, worldPositionOnGrid);
+                        break;
+                    case BrushType.PlaceableObject:
+                        PaintObject(hexCoords, grid);
+                        break;
+                }
+                break;
+            case ToolMode.Erase:
+                EraseHex(hexCoords, grid);
+                break;
+            case ToolMode.Pick:
+                PickHex(hexCoords, grid);
+                break;
+            case ToolMode.Select:
+                SelectHex(hexCoords, grid);
+                break;
+        }
     }
-
-    if (e.type != EventType.MouseDown || e.button != 0) return;
-    e.Use();
-    switch (currentTool)
-    {
-        case ToolMode.Paint:
-            switch (selectedBrushType)
-            {
-                case BrushType.Hex:
-                    PaintHex(hexCoords, worldPositionOnGrid);
-                    break;
-                case BrushType.PlaceableObject:
-                    PaintObject(hexCoords, grid);
-                    break;
-            }
-            break;
-        case ToolMode.Erase:
-            EraseHex(hexCoords, grid);
-            break;
-        case ToolMode.Pick:
-            PickHex(hexCoords, grid);
-            break;
-        case ToolMode.Select:
-            SelectHex(hexCoords, grid);
-            break;
-    }
-}
     private void SelectHex(Vector3Int coords, HexGrid grid)
     {
         selectedHex = FindHexAt(coords, grid);
@@ -334,6 +330,12 @@ public class LevelPainter : EditorWindow
         if (hexComponent.PlacedObject != null)
         {
              EditorGUILayout.HelpBox($"Object '{hexComponent.PlacedObject.name}' is on this hex.", MessageType.Info);
+             EditorGUILayout.LabelField("Adjust Placed Object", EditorStyles.boldLabel);
+             EditorGUILayout.BeginHorizontal();
+             if (GUILayout.Button("Height +1")) ChangePlacedObjectHeight(heightStep);
+             if (GUILayout.Button("Height -1")) ChangePlacedObjectHeight(-heightStep);
+             EditorGUILayout.EndHorizontal();
+             EditorGUILayout.Space();
         }
         
         foreach (var obj in settings.placeableObjects)
@@ -355,9 +357,25 @@ public class LevelPainter : EditorWindow
         Undo.RecordObject(selectedHex.transform, "Change Hex Height");
         selectedHex.transform.position += new Vector3(0, amount, 0);
     }
+    
+    private void ChangePlacedObjectHeight(float amount)
+    {
+        if (selectedHex == null) return;
+        var hexComponent = selectedHex.GetComponent<Hex>();
+        if (hexComponent == null || hexComponent.PlacedObject == null) return;
+
+        Undo.RecordObject(hexComponent.PlacedObject.transform, "Change Placed Object Height");
+        hexComponent.PlacedObject.transform.position += new Vector3(0, amount, 0);
+    }
+
 
     private void PlaceObjectOnHex(Hex hexComponent, PlaceableObject objectToPlace)
     {
+        if (hexComponent.PlacedObject != null)
+        {
+            ClearObjectFromHex(hexComponent);
+        }
+        
         GameObject hex = hexComponent.gameObject;
     
         Transform propsContainer = hex.transform.Find("Props");
@@ -369,13 +387,17 @@ public class LevelPainter : EditorWindow
         }
 
         GameObject placedObject = PrefabUtility.InstantiatePrefab(objectToPlace.prefab) as GameObject;
+        // This now reads the yOffset directly from the settings object
         placedObject.transform.position = hex.transform.position + Vector3.up * objectToPlace.yOffset;
         placedObject.transform.SetParent(propsContainer, true);
     
         hexComponent.SetPlacedObject(placedObject);
     
         Undo.RegisterCreatedObjectUndo(placedObject, "Place Object");
-        Undo.RegisterCreatedObjectUndo(propsContainer.gameObject, "Create Props Container");
+        if (propsContainer.gameObject.hideFlags == HideFlags.None) // Only register undo if it's a new object
+        {
+            Undo.RegisterCreatedObjectUndo(propsContainer.gameObject, "Create Props Container");
+        }
     }
 
 
@@ -437,66 +459,67 @@ public class LevelPainter : EditorWindow
     }
 
     private void DrawBrushSelectionUI()
-{
-    EditorGUILayout.LabelField("Hex Brushes", EditorStyles.boldLabel);
-    var gridCols = Mathf.FloorToInt(position.width / 110);
-    if (gridCols < 1) gridCols = 1;
-
-    EditorGUILayout.BeginHorizontal();
-    var current_col = 0;
-    for (var i = 0; i < settings.hexPrefabs.Count; i++)
     {
-        if (settings.hexPrefabs[i]?.prefab == null) continue;
+        EditorGUILayout.LabelField("Hex Brushes", EditorStyles.boldLabel);
+        var gridCols = Mathf.FloorToInt(position.width / 110);
+        if (gridCols < 1) gridCols = 1;
 
-        var isSelected = selectedBrushType == BrushType.Hex && selectedBrushIndex == i;
-        GUI.backgroundColor = (isSelected && currentTool == ToolMode.Paint) ? Color.cyan : Color.white;
-        
-        if (GUILayout.Button(settings.hexPrefabs[i].prefab.name, GUILayout.Width(100), GUILayout.Height(40)))
-        {
-            currentTool = ToolMode.Paint;
-            selectedBrushType = BrushType.Hex;
-            selectedBrushIndex = i;
-        }
-        
-        current_col++;
-        if (current_col < gridCols) continue;
-        EditorGUILayout.EndHorizontal();
         EditorGUILayout.BeginHorizontal();
-        current_col = 0;
-    }
-    EditorGUILayout.EndHorizontal();
-    GUI.backgroundColor = Color.white;
-    
-    EditorGUILayout.Space();
-
-    EditorGUILayout.LabelField("Object Brushes", EditorStyles.boldLabel);
-    EditorGUILayout.BeginHorizontal();
-    current_col = 0;
-    for (var i = 0; i < settings.placeableObjects.Count; i++)
-    {
-        if (settings.placeableObjects[i]?.prefab == null) continue;
-        
-        var isSelected = selectedBrushType == BrushType.PlaceableObject && selectedBrushIndex == i;
-        GUI.backgroundColor = (isSelected && currentTool == ToolMode.Paint) ? Color.cyan : Color.white;
-
-        if (GUILayout.Button(settings.placeableObjects[i].name, GUILayout.Width(100), GUILayout.Height(40)))
+        var current_col = 0;
+        for (var i = 0; i < settings.hexPrefabs.Count; i++)
         {
-            currentTool = ToolMode.Paint;
-            selectedBrushType = BrushType.PlaceableObject;
-            selectedBrushIndex = i;
-        }
+            if (settings.hexPrefabs[i]?.prefab == null) continue;
 
-        current_col++;
-        if (current_col >= gridCols)
-        {
+            var isSelected = selectedBrushType == BrushType.Hex && selectedBrushIndex == i;
+            GUI.backgroundColor = (isSelected && currentTool == ToolMode.Paint) ? Color.cyan : Color.white;
+            
+            if (GUILayout.Button(settings.hexPrefabs[i].prefab.name, GUILayout.Width(100), GUILayout.Height(40)))
+            {
+                currentTool = ToolMode.Paint;
+                selectedBrushType = BrushType.Hex;
+                selectedBrushIndex = i;
+            }
+            
+            current_col++;
+            if (current_col < gridCols) continue;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
             current_col = 0;
         }
+        EditorGUILayout.EndHorizontal();
+        GUI.backgroundColor = Color.white;
+        
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField("Object Brushes", EditorStyles.boldLabel);
+        EditorGUILayout.BeginHorizontal();
+        current_col = 0;
+        for (var i = 0; i < settings.placeableObjects.Count; i++)
+        {
+            if (settings.placeableObjects[i]?.prefab == null) continue;
+            
+            var isSelected = selectedBrushType == BrushType.PlaceableObject && selectedBrushIndex == i;
+            GUI.backgroundColor = (isSelected && currentTool == ToolMode.Paint) ? Color.cyan : Color.white;
+
+            if (GUILayout.Button(settings.placeableObjects[i].name, GUILayout.Width(100), GUILayout.Height(40)))
+            {
+                currentTool = ToolMode.Paint;
+                selectedBrushType = BrushType.PlaceableObject;
+                selectedBrushIndex = i;
+            }
+
+            current_col++;
+            if (current_col >= gridCols)
+            {
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                current_col = 0;
+            }
+        }
+        EditorGUILayout.EndHorizontal();
+        GUI.backgroundColor = Color.white;
     }
-    EditorGUILayout.EndHorizontal();
-    GUI.backgroundColor = Color.white;
-}
+    
     private void PaintObject(Vector3Int coords, HexGrid grid)
     {
         var hexGameObject = FindHexAt(coords, grid);
