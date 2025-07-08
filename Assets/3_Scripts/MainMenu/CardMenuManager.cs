@@ -13,56 +13,110 @@ public class CardMenuManager : MonoBehaviour
 
     [Header("Deck Editor Referenzen")]
     [SerializeField] private Transform allCardsContainer;
-    [SerializeField] private GameObject cardInListPrefab; // Hier kommt das Wrapper-Prefab rein
+    [SerializeField] private GameObject cardInListPrefab;
     [SerializeField] private Button saveDeckButton;
 
     [Header("Card Menu Referenzen")]
     [SerializeField] private Transform decksDisplayContainer;
-    [SerializeField] private GameObject deckDisplayPrefab;
+    public GameObject deckDisplayPrefab;
     [SerializeField] private Button editDeckButton;
+    [SerializeField] private Button deleteDeckButton;
 
     [Header("Zentrale Datenbank")]
     [SerializeField] private CardDatabaseSO cardDatabase;
 
-    private List<CardData> allAvailableCards;
     private List<Deck> allPlayerDecks = new List<Deck>();
     private List<CardData> currentlySelectedCards = new List<CardData>();
     private Deck currentlyEditingDeck;
+    private DeckUI currentlySelectedDeckUI;
 
     private List<CardSelectorUI> spawnedCardUIs = new List<CardSelectorUI>();
 
     void Start()
     {
-        if (cardDatabase != null) allAvailableCards = cardDatabase.allCards;
+        allPlayerDecks = SaveSystem.LoadDecks();
+        if (editDeckButton != null) editDeckButton.gameObject.SetActive(false);
+        if (deleteDeckButton != null) deleteDeckButton.gameObject.SetActive(false);
+    }
 
-        mainMenuPanel.SetActive(true);
-        cardMenuPanel.SetActive(false);
-        deckEditorSlideout.SetActive(false);
-        boostersSlideout.SetActive(false);
-        editDeckButton.gameObject.SetActive(false);
+    public List<Deck> GetPlayerDecks()
+    {
+        return allPlayerDecks;
+    }
+
+    public void SelectDeckForEditing(DeckUI selectedUI)
+    {
+        if (currentlySelectedDeckUI != null && currentlySelectedDeckUI != selectedUI)
+        {
+            currentlySelectedDeckUI.HideActions();
+        }
+
+        currentlySelectedDeckUI = selectedUI;
+
+        if (currentlySelectedDeckUI != null)
+        {
+            currentlyEditingDeck = currentlySelectedDeckUI.GetAssignedDeck();
+            currentlySelectedDeckUI.ShowActions();
+        }
+    }
+
+    public void OpenEditDeckEditor()
+    {
+        if (currentlyEditingDeck == null) return;
+
+        currentlySelectedCards = new List<CardData>(currentlyEditingDeck.Cards);
+        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
+        PopulateAllCardsList();
+        UpdateSaveButtonState();
+    }
+
+    public void DeleteSelectedDeck()
+    {
+        if (currentlyEditingDeck == null) return;
+
+        allPlayerDecks.Remove(currentlyEditingDeck);
+        SaveSystem.SaveDecks(allPlayerDecks);
+
+        currentlyEditingDeck = null;
+        currentlySelectedDeckUI = null;
+        PopulateDeckDisplay();
+    }
+
+    public void SaveDeckAndCloseEditor()
+    {
+        if (currentlyEditingDeck != null)
+        {
+            currentlyEditingDeck.Cards = new List<CardData>(currentlySelectedCards);
+        }
+        else
+        {
+            Deck newDeck = new Deck();
+            newDeck.DeckName = "Neues Deck " + (allPlayerDecks.Count + 1);
+            newDeck.Cards = new List<CardData>(currentlySelectedCards);
+            allPlayerDecks.Add(newDeck);
+        }
+
+        SaveSystem.SaveDecks(allPlayerDecks);
+
+        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(false);
+        PopulateDeckDisplay();
     }
 
     private void PopulateAllCardsList()
     {
-        foreach (Transform child in allCardsContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        foreach (Transform child in allCardsContainer) Destroy(child.gameObject);
         spawnedCardUIs.Clear();
 
-        if (allAvailableCards == null) return;
+        if (cardDatabase.allCards == null) return;
 
         GridLayoutGroup gridLayout = allCardsContainer.GetComponent<GridLayoutGroup>();
+        Vector2 targetCellSize = (gridLayout != null) ? gridLayout.cellSize : new Vector2(100, 150);
 
-        Vector2 targetCellSize = gridLayout.cellSize;
-
-        foreach (var cardData in allAvailableCards)
+        foreach (var cardData in cardDatabase.allCards)
         {
             if (cardData.cardPrefab == null) continue;
-
             GameObject wrapperGO = Instantiate(cardInListPrefab, allCardsContainer);
             wrapperGO.name = "Wrapper_" + cardData.cardName;
-
             CardSelectorUI cardUI = wrapperGO.GetComponent<CardSelectorUI>();
             if (cardUI != null)
             {
@@ -100,83 +154,38 @@ public class CardMenuManager : MonoBehaviour
         }
     }
 
-    #region Restliche Methoden
-    public void OpenCardMenu() 
-    { 
-        mainMenuPanel.SetActive(false); 
-        cardMenuPanel.SetActive(true); 
-        PopulateDeckDisplay(); 
+    public void OpenNewDeckEditor()
+    {
+        currentlyEditingDeck = null;
+        currentlySelectedCards.Clear();
+        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
+        PopulateAllCardsList();
+        UpdateSaveButtonState();
     }
-    public void OpenNewDeckEditor() 
-    { 
-        currentlyEditingDeck = null; 
-        currentlySelectedCards.Clear(); 
-        deckEditorSlideout.SetActive(true); 
-        PopulateAllCardsList(); 
-        UpdateSaveButtonState(); 
-    }
-    public void OpenEditDeckEditor() 
-    { 
-        if (currentlyEditingDeck == null) 
-            return; 
 
-        currentlySelectedCards = new List<CardData>(currentlyEditingDeck.Cards); 
-        deckEditorSlideout.SetActive(true); 
-        PopulateAllCardsList(); 
-        UpdateSaveButtonState(); 
+    private void UpdateSaveButtonState()
+    {
+        if (saveDeckButton != null) saveDeckButton.interactable = currentlySelectedCards.Count >= 15;
     }
-    public void OpenBoostersMenu() 
-    { 
-        cardMenuPanel.SetActive(false); 
-        boostersSlideout.SetActive(true); 
+
+    public void PopulateDeckDisplay()
+    {
+        if (decksDisplayContainer == null) return;
+
+        currentlySelectedDeckUI = null;
+        currentlyEditingDeck = null;
+
+        if (editDeckButton != null) editDeckButton.gameObject.SetActive(false);
+        if (deleteDeckButton != null) deleteDeckButton.gameObject.SetActive(false);
+
+        foreach (Transform child in decksDisplayContainer) Destroy(child.gameObject);
+        foreach (Deck deck in allPlayerDecks)
+        {
+            GameObject deckGO = Instantiate(deckDisplayPrefab, decksDisplayContainer);
+            if (deckGO.TryGetComponent<DeckUI>(out var deckUI))
+            {
+                deckUI.Initialize(deck, this);
+            }
+        }
     }
-    public void SaveDeckAndCloseEditor() 
-    { 
-        if (currentlyEditingDeck != null) 
-        { currentlyEditingDeck.Cards = new List<CardData>(currentlySelectedCards); 
-        } 
-        else 
-        { 
-            Deck newDeck = new Deck(); 
-            newDeck.DeckName = "Neues Deck " + (allPlayerDecks.Count + 1); 
-            newDeck.Cards = new List<CardData>(currentlySelectedCards); 
-            allPlayerDecks.Add(newDeck); 
-        } 
-        deckEditorSlideout.SetActive(false); 
-        PopulateDeckDisplay(); }
-    public void BackToMainMenu() 
-    { 
-        cardMenuPanel.SetActive(false); 
-        boostersSlideout.SetActive(false); 
-        mainMenuPanel.SetActive(true); 
-    }
-    public void SelectDeckForEditing(Deck deck) 
-    { 
-        currentlyEditingDeck = deck; 
-        editDeckButton.gameObject.SetActive(true); 
-    }
-    private void UpdateSaveButtonState() 
-    { 
-        if (saveDeckButton != null) 
-        { 
-            saveDeckButton.interactable = currentlySelectedCards.Count >= 15; 
-        } 
-    }
-    private void PopulateDeckDisplay() 
-    { 
-        foreach (Transform child in decksDisplayContainer) 
-        { 
-            Destroy(child.gameObject); 
-        } 
-        foreach (Deck deck in allPlayerDecks) 
-        { 
-            GameObject deckGO = Instantiate(deckDisplayPrefab, 
-                decksDisplayContainer); 
-            if (deckGO.TryGetComponent<DeckUI>(out var deckUI)) 
-            { 
-                deckUI.Initialize(deck, this); 
-            } 
-        } 
-    }
-    #endregion
 }

@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         Debug.Log("Drawing new cards based on exhaustion level.");
-        CardManager.Instance.DrawCards(CardManager.Instance.drawCount);
+        CardManager.Instance.DrawCards(CardManager.Instance.DrawCount);
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)

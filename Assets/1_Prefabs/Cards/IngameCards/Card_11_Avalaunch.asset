@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96a61ce38373274c97e49ef39b7eb27, type: 3}
+  m_Name: Card_11_Avalaunch
+  m_EditorClassIdentifier: 
+  cardName: Avalaunch
+  manaCost: 0
+  cardArt: {fileID: 0}
+  cardClass: 1
+  backgroundSprite: {fileID: 0}
+  rarity: 1
+  borderSprite: {fileID: 0}
+  leftEffects:
+  - effectType: 1
+    value: 4
+    isTemporary: 0
+    duration: 0
+    range: 0
+  rightEffects:
+  - effectType: 0
+    value: 1
+    isTemporary: 0
+    duration: 0
+    range: 0
+  alwaysEffects:
+  - effectType: 7
+    value: 0
+    isTemporary: 0
+    duration: 0
+    range: 0
+  leftEffectIcon: {fileID: 0}
+  rightEffectIcon: {fileID: 0}
+  cardPrefab: {fileID: 726607358467613445, guid: 4fd59f8f1cc5cd645b7d9f9924822c6f,
+    type: 3}
+  description: 
