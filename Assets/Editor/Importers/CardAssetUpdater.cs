@@ -5,7 +5,7 @@ using System.IO;
 
 public static class CardAssetUpdater
 {
-    private const string CARD_ART_FOLDER_PATH = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Card Images/";
+    private const string CARD_ART_FOLDER_PATH = "Assets/Art Complete/UI/2D_Card_Art/Cards_Image_2D/Card Images/";
 
     public static Sprite FindCardArtSprite(string cardName)
     {
@@ -33,7 +33,7 @@ public static class CardAssetUpdater
     {
         if (cardData == null) return;
 
-        string bgPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Card Layouts";
+        string bgPath = "Assets/Art Complete/UI/2D_Card_Art/Cards_Image_2D/Card Layouts";
         var classBackgrounds = new Dictionary<string, Sprite>()
         {
             { "Wizard", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Wizard_v1_NC.png") },
@@ -48,7 +48,7 @@ public static class CardAssetUpdater
             cardData.backgroundSprite = bgSprite;
         }
 
-        string rarityPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Rarity Layer";
+        string rarityPath = "Assets/Art Complete/UI/2D_Card_Art/Cards_Image_2D/Rarity Layer";
         var rarityBorders = new Dictionary<CardRarity, Sprite>()
         {
             { CardRarity.Common, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Common_v1_NC.png") },
@@ -62,7 +62,7 @@ public static class CardAssetUpdater
             cardData.borderSprite = border;
         }
         
-        string iconsPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Card Icons";
+        string iconsPath = "Assets/Art Complete/UI/2D_Card_Art/Cards_Image_2D/Card Icons";
         var effectIcons = new Dictionary<CardEffect.EffectType, Sprite>()
         {
             { CardEffect.EffectType.Attack, AssetDatabase.LoadAssetAtPath<Sprite>($"{iconsPath}/Card_Icon_Core_Attack_v1_NC.png") },
