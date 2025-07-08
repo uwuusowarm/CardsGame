@@ -13,18 +13,18 @@ public class MovementSystem : MonoBehaviour
     public Animator animator;
     private Vector3Int lastUnitHex;
 
-    public void Initialize(Unit unit, HexGrid grid)
+    public void Initialize(Unit unit, HexGrid grid, int movementPointsFromCache)
     {
         selectedUnit = unit;
         hexGrid = grid;
-        remainingMovementPoints = unit.MovementPoints;
+        remainingMovementPoints = movementPointsFromCache; 
         lastUnitHex = hexGrid.GetClosestHex(selectedUnit.transform.position);
         CalculateRange();
     }
 
     private void CalculateRange()
     {
-        movementRange = GraphSearch.BFSGetRange(hexGrid, lastUnitHex, 1);
+        movementRange = GraphSearch.BFSGetRange(hexGrid, lastUnitHex, remainingMovementPoints);
         Debug.Log("Range: " + string.Join(", ", movementRange.GetRangePositions()));
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
@@ -56,16 +56,24 @@ public class MovementSystem : MonoBehaviour
         }
 
         int moveCost = selectedHex.GetCost();
+        
+        int movementUsed = moveCost > 0 ? moveCost : 1;
+        
         Debug.Log($"MoveCost: {moveCost}, Remaining: {remainingMovementPoints}");
+        
+        
         if (moveCost > remainingMovementPoints)
         {
             Debug.Log("Nicht genug Bewegungspunkte!");
             return;
         }
 
+        PlayedCardEffectCache.Instance.UseMovement(movementUsed);
+    
         currentPath.Clear();
         currentPath.Add(selectedHexPosition);
-        remainingMovementPoints -= moveCost;
+
+        remainingMovementPoints = PlayedCardEffectCache.Instance.PendingMovement; 
         selectedHex.HighLightPath();
 
         Debug.Log("ConfirmPath wird aufgerufen");
@@ -108,11 +116,11 @@ public class MovementSystem : MonoBehaviour
         selectedUnit.SetIntendedEndPosition(endWorldPos);
         selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
         lastUnitHex = endHexPos;
+    
+        selectedUnit.movementPoints = remainingMovementPoints;
+        PlayerStatsUI.Instance.UpdateMovementPoints(remainingMovementPoints);
+    
         ClearPath();
-        if (remainingMovementPoints > 0)
-        {
-            CalculateRange();
-        }
     }
 
     public void ClearPath()
