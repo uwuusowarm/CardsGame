@@ -20,8 +20,6 @@ public class Hex : MonoBehaviour
     [Tooltip("A non-unit object placed on this hex (e.g., door, chest, obstacle).")]
     public GameObject PlacedObject { get; private set; }
 
-    private ChestController chestOnTile;
-    
     public int GetCost()
         => hexType switch
         {
@@ -120,20 +118,11 @@ public class Hex : MonoBehaviour
     {
         return EnemyUnitOnHex != null;
     }
-    
-    public void SetChest(ChestController chest)
-    {
-        chestOnTile = chest;
-    }
 
-    public void ClearChest()
+    public HexType HexType
     {
-        chestOnTile = null;
-    }
-    
-    public ChestController GetChest()
-    {
-        return chestOnTile;
+        get => hexType;
+        set => hexType = value;
     }
 }
 
