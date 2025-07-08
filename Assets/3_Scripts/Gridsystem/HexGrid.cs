@@ -12,7 +12,6 @@ public class HexGrid : MonoBehaviour
     [Tooltip("The full height of a single hex tile (flat side to flat side). Can be auto-calculated in the Level Painter.")]
     public float hexHeight = 2f;
 
-    // A getter for the vertical spacing based on height.
     public float ZSpacing => hexHeight * 0.75f;
 
     public static HexGrid Instance { get; private set; }
@@ -43,17 +42,29 @@ public class HexGrid : MonoBehaviour
         }
         Debug.Log($"Grid initialized with {hexTileDict.Count} hexes");
     }
+    public int GetDistance(Hex hexA, Hex hexB)
+    {
+        Vector3Int cubeA = OffsetToCube(hexA.hexCoords);
+        Vector3Int cubeB = OffsetToCube(hexB.hexCoords);
 
+        return (Mathf.Abs(cubeA.x - cubeB.x) + Mathf.Abs(cubeA.y - cubeB.y) + Mathf.Abs(cubeA.z - cubeB.z)) / 2;
+    }
+    
+    private Vector3Int OffsetToCube(Vector3Int offset)
+    {
+        var q = offset.x - (offset.z - (offset.z & 1)) / 2;
+        var r = offset.z;
+        var s = -q - r;
+        
+        return new Vector3Int(q, s, r);
+    }
     public Vector3Int GetClosestHex(Vector3 worldPosition)
     {
-        // Convert world position to axial coordinates first for accuracy
         float q_axial = (worldPosition.x * Mathf.Sqrt(3) / 3f - worldPosition.z / 3f) / (hexHeight / 2f);
         float r_axial = (worldPosition.z * 2f / 3f) / (hexHeight / 2f);
 
-        // Convert axial to cube coordinates
         Vector3 cube = new Vector3(q_axial, -q_axial - r_axial, r_axial);
         
-        // Round cube coordinates to nearest integer
         int rx = Mathf.RoundToInt(cube.x);
         int ry = Mathf.RoundToInt(cube.y);
         int rz = Mathf.RoundToInt(cube.z);
@@ -69,13 +80,8 @@ public class HexGrid : MonoBehaviour
         else
             rz = -rx - ry;
 
-        // Convert final cube coordinates back to offset (odd-q)
         int col = rx;
         int row = rz + (rx - (rx & 1)) / 2;
-        
-        // The Y coordinate in the Vector3Int is unused for grid positioning, so we return it as the original world Y.
-        // Let's stick to the simpler offset math which is what the rest of the system uses.
-        // It's less accurate at the seams but easier to reason about.
 
         int z = Mathf.RoundToInt(worldPosition.z / ZSpacing);
         float xOffset = (z % 2 != 0) ? hexWidth / 2f : 0;
@@ -89,7 +95,6 @@ public class HexGrid : MonoBehaviour
         float x = hexCoordinates.x * hexWidth;
         float z = hexCoordinates.z * ZSpacing;
 
-        // Stagger odd rows (this is "odd-r" or "odd-row" layout)
         if (hexCoordinates.z % 2 != 0)
         {
             x += hexWidth / 2f;
@@ -123,16 +128,13 @@ public class HexGrid : MonoBehaviour
         return hexTileNeighboursDict[hexCoordinates];
     }
     
-    // Unchanged methods...
-    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range = 1) { /* ... */ return new List<Vector3Int>(); }
-    public void AddMovementPoints(int points) { /* ... */ }
+    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range = 1) { return new List<Vector3Int>(); }
+    public void AddMovementPoints(int points) {  }
 }
 
 
 public static class Direction
 {
-    // --- REVISED DIRECTION VECTORS for pointy-topped "odd-r" layout ---
-    // odd rows are shifted to the right
     public static List<Vector3Int> directionsOffsetOdd = new List<Vector3Int>
     {
         new Vector3Int(1, 0, 0),    // E
@@ -143,7 +145,6 @@ public static class Direction
         new Vector3Int(0, 0, 1)     // SE
     };
 
-    // even rows are not shifted
     public static List<Vector3Int> directionsOffsetEven = new List<Vector3Int>
     {
         new Vector3Int(1, 0, 0),    // E

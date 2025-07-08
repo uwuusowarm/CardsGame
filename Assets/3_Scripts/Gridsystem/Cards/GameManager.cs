@@ -12,7 +12,9 @@ public class GameManager : MonoBehaviour
     public bool IsPlayerTurn { get; private set; } = false;
     private bool isWaitingForPlayerActionResolution = false;
 
-    private Unit playerUnit; 
+    private Unit playerUnit;
+
+    public Unit PlayerUnit => playerUnit;
     
     int carryOverActionPoints = 0;
 
