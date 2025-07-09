@@ -1400,11 +1400,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1499648058}
     m_Modifications:
-    - target: {fileID: -7511558181221131132, guid: b3dbb89751212e14fa32e5ed90fbb2d1,
-        type: 3}
-      propertyPath: m_Materials.Array.data[3]
-      value: 
-      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
     - target: {fileID: -8679921383154817045, guid: eeedf1db4aacae24598772dab2d83d16,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -1480,6 +1475,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Treppe_001
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: b3dbb89751212e14fa32e5ed90fbb2d1,
+        type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: 2100000, guid: 40dcd6a352876a4449e0a4326370a96e, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
