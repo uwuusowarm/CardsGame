@@ -70,7 +70,12 @@ public class Unit : MonoBehaviour
     {
         movementPoints += points /*+= (points*10)*/;
     }
-    
+
+    public void SetMovementPoints(int points)
+    {
+        movementPoints = points;
+    }
+
     public void ResetMovementPoints()
     {
         movementPoints = 0;
