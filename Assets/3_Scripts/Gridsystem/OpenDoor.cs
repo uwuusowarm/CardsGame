@@ -10,10 +10,26 @@ public class OpenDoor : MonoBehaviour
 
     private void Awake()
     {
-        myHex = GetComponent<Hex>();
-        rend = GetComponentInChildren<Renderer>();
+        myHex = GetHexBelow();
         if (myHex == null)
-            Debug.LogError("OpenDoor: No hex!");
+        {
+            Debug.LogError("OpenDoor: No Hex found below the door!");
+            enabled = false;
+            return;
+        }
+        roomID = myHex.RoomID; 
+        rend = GetComponentInChildren<Renderer>();
+    }
+
+    private Hex GetHexBelow()
+    {
+        if (transform.parent != null)
+            return transform.parent.GetComponent<Hex>();
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 2f))
+            return hit.collider.GetComponent<Hex>();
+
+        return null;
     }
 
     private void Start()
@@ -51,14 +67,13 @@ public class OpenDoor : MonoBehaviour
 
     private void SetClosed()
     {
-        myHex.SetPlacedObject(gameObject);
         myHex.HexType = HexType.Obstacle;
-        if (rend != null) rend.material.color = Color.red; 
+        if (rend != null) rend.material.color = Color.red;
     }
 
     private void SetOpen()
     {
         myHex.HexType = HexType.Default;
-        if (rend != null) rend.material.color = Color.green; 
+        if (rend != null) rend.material.color = Color.green;
     }
 }
