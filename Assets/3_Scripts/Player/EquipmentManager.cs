@@ -1,6 +1,9 @@
 using System; 
+using System.Collections; 
 using System.Collections.Generic;
+using System.Text; 
 using UnityEngine;
+using TMPro; 
 
 public class EquipmentManager : MonoBehaviour
 {
@@ -8,8 +11,14 @@ public class EquipmentManager : MonoBehaviour
 
     public event Action<ItemSlot> OnEquipmentChanged;
 
+    [Header("UI Feedback")]
+    [SerializeField] private TextMeshProUGUI itemStatsDisplay;
+    [SerializeField] private float statsDisplayDuration = 4.0f;
+
     private Dictionary<ItemSlot, ItemData> equippedItems = new Dictionary<ItemSlot, ItemData>();
     public ItemClassType playerClass = ItemClassType.Warrior; 
+
+    private Coroutine displayCoroutine; 
 
     private void Awake()
     {
@@ -23,6 +32,11 @@ public class EquipmentManager : MonoBehaviour
         }
 
         InitializeEquipmentSlots();
+        
+        if (itemStatsDisplay != null)
+        {
+            itemStatsDisplay.gameObject.SetActive(false);
+        }
     }
 
     private void InitializeEquipmentSlots()
@@ -44,8 +58,67 @@ public class EquipmentManager : MonoBehaviour
 
         equippedItems[item.itemSlot] = item;
         Debug.Log($"Equipped '{item.name}'.");
+        
+        ShowStatsTemporarily(item);
 
         OnEquipmentChanged?.Invoke(item.itemSlot);
+    }
+
+    private void ShowStatsTemporarily(ItemData item)
+    {
+        if (itemStatsDisplay == null)
+        {
+            Debug.LogWarning("Item Stats Display is not assigned in the EquipmentManager.");
+            return;
+        }
+
+        if (displayCoroutine != null)
+        {
+            StopCoroutine(displayCoroutine);
+        }
+        
+        displayCoroutine = StartCoroutine(DisplayStatsCoroutine(item));
+    }
+
+    private IEnumerator DisplayStatsCoroutine(ItemData item)
+    {
+        itemStatsDisplay.text = FormatItemStats(item);
+        
+        itemStatsDisplay.gameObject.SetActive(true);
+        
+        yield return new WaitForSeconds(statsDisplayDuration);
+        
+        itemStatsDisplay.gameObject.SetActive(false);
+        displayCoroutine = null; 
+    }
+
+    private string FormatItemStats(ItemData item)
+    {
+        if (item == null) return "";
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.AppendLine($"<b><color=#FFD700>{item.name}</color></b>"); 
+        sb.AppendLine($"<size=80%><i>{item.itemSlot}</i></size>\n");
+
+        if (item.damageBonus > 0) sb.AppendLine($"+{item.damageBonus} Damage");
+        if (item.defenseBonus > 0) sb.AppendLine($"+{item.defenseBonus} Defense");
+        if (item.healBonus > 0) sb.AppendLine($"+{item.healBonus} Healing");
+        if (item.movementSpeedBonus > 0) sb.AppendLine($"+{item.movementSpeedBonus} Move Speed");
+        if (item.maxHpBonus > 0) sb.AppendLine($"+{item.maxHpBonus} Max HP");
+        if (item.maxApBonus > 0) sb.AppendLine($"+{item.maxApBonus} Max AP");
+        if (item.range > 0 && item.itemSlot == ItemSlot.Weapon) sb.AppendLine($"Range: {item.range}");
+
+        bool hasClassBonus = (item.classBonus1Amount > 0 || item.classBonus2Amount > 0);
+        if (hasClassBonus)
+        {
+            string classColor = (playerClass == item.itemClass) ? "#88FF88" : "#FF8888";
+            sb.AppendLine($"\n<color={classColor}><b>{item.itemClass} Bonus:</b></color>");
+            if (item.classBonus1Amount > 0) sb.AppendLine($"+{item.classBonus1Amount} {item.classBonus1Type}");
+            if (item.classBonus2Amount > 0) sb.AppendLine($"+{item.classBonus2Amount} {item.classBonus2Type}");
+        }
+
+        return sb.ToString();
     }
 
     public void UnequipItem(ItemSlot slot)
@@ -69,7 +142,7 @@ public class EquipmentManager : MonoBehaviour
         Debug.Log("All items unequipped.");
     }
 
-     public int GetTotalDamageBonus()
+    public int GetTotalDamageBonus()
     {
         int bonus = 0;
         foreach (var item in equippedItems.Values)
