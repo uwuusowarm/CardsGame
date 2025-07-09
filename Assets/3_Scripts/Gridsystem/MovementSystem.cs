@@ -40,30 +40,16 @@ public class MovementSystem : MonoBehaviour
 
     public void AddToPath(Vector3Int selectedHexPosition)
     {
-        if (isMoving) return;
-
+        if (isMoving || !IsHexInRange(selectedHexPosition)) 
+        {
+            Debug.Log($"Cannot move to hex: Moving={isMoving}, InRange={IsHexInRange(selectedHexPosition)}");
+            return;
+        }
+        
         ClearHighlights();
         
         Hex selectedHex = hexGrid.GetTileAt(selectedHexPosition);
-        if (selectedHex == null || selectedHex.IsOccupied())
-        {
-            Debug.Log("Selected hex is null or occupied");
-            return;
-        }
-
-        List<Vector3Int> neighbors = hexGrid.GetNeighborsFor(currentUnitHex);
-        if (!neighbors.Contains(selectedHexPosition))
-        {
-            Debug.Log("Selected hex is not a neighbor");
-            return;
-        }
-
         int moveCost = selectedHex.GetCost();
-        if (moveCost > remainingMovementPoints)
-        {
-            Debug.Log("Not enough movement points");
-            return;
-        }
 
         isMoving = true;
 
@@ -79,6 +65,11 @@ public class MovementSystem : MonoBehaviour
         }
         selectedHex.SetUnit(selectedUnit);
 
+        if (selectedUnit.TryGetComponent<HexCoordinates>(out var hexCoordinates))
+        {
+            hexCoordinates.UpdateHexCoords(selectedHexPosition);
+        }
+
         remainingMovementPoints -= moveCost;
         currentUnitHex = selectedHexPosition;
 
@@ -88,7 +79,10 @@ public class MovementSystem : MonoBehaviour
         }
 
         selectedUnit.SetMovementPoints(remainingMovementPoints);
+    
+        Debug.Log($"Moving to {selectedHexPosition}, Cost: {moveCost}, Remaining Points: {remainingMovementPoints}");
     }
+
 
     private void OnMovementFinished(Unit unit)
     {
