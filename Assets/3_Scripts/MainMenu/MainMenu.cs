@@ -38,6 +38,7 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
+        
         ReturnToMainMenu();
         if (resolutionDropdown != null)
         {

@@ -84,6 +84,7 @@ public class CardManager : MonoBehaviour
 
     private void Shuffle(List<CardData> list)
     {
+        Sound_Manager.instance.Play("Deck_Shuffel");
         for (int i = 0; i < list.Count; i++)
         {
             int r = Random.Range(i, list.Count);
@@ -127,6 +128,7 @@ public class CardManager : MonoBehaviour
     public void OnDeckClicked()
     {
         DrawCards(drawCount);
+        Sound_Manager.instance.Play("Deck_Shuffel");
     }
 
     public void MoveToZone(CardData card, DropType type)
@@ -154,6 +156,7 @@ public class CardManager : MonoBehaviour
                 break;
             case DropType.Discard:
                 discardPile.Add(card);
+                Sound_Manager.instance.Play("Discard");
                 break;
             default: // Hand
                 hand.Add(card);
@@ -187,6 +190,7 @@ public class CardManager : MonoBehaviour
         }
         discardPile.Add(card);
         UpdateAllUI();
+        Sound_Manager.instance.Play("Discard");
     }
 
     public void UpdateAllUI()
