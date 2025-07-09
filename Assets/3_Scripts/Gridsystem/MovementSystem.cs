@@ -1,117 +1,102 @@
-using System.Collections;
+
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class MovementSystem : MonoBehaviour
 {
-    private BFSResult movementRange = new BFSResult(new Dictionary<Vector3Int, Vector3Int?>());
     private List<Vector3Int> currentPath = new List<Vector3Int>();
     private int remainingMovementPoints;
     private Unit selectedUnit;
     private HexGrid hexGrid;
     public Animator animator;
-    private Vector3Int lastUnitHex;
+    private Vector3Int currentUnitHex;
+    private bool isMoving = false;
 
     public void Initialize(Unit unit, HexGrid grid)
     {
         selectedUnit = unit;
         hexGrid = grid;
         remainingMovementPoints = unit.MovementPoints;
-        lastUnitHex = hexGrid.GetClosestHex(selectedUnit.transform.position);
-        CalculateRange();
+        currentUnitHex = hexGrid.GetClosestHex(selectedUnit.transform.position);
+        ShowAvailableHexes();
     }
 
-    private void CalculateRange()
+    private void ShowAvailableHexes()
     {
-        movementRange = GraphSearch.BFSGetRange(hexGrid, lastUnitHex, 1);
-        Debug.Log("Range: " + string.Join(", ", movementRange.GetRangePositions()));
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        ClearHighlights();
+
+        if (remainingMovementPoints <= 0) return;
+
+        List<Vector3Int> neighbors = hexGrid.GetNeighborsFor(currentUnitHex);
+        foreach (Vector3Int hexPosition in neighbors)
         {
-            if (hexPosition != lastUnitHex)
-                hexGrid.GetTileAt(hexPosition).EnableHighlight();
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            if (hex != null && !hex.IsOccupied() && hex.GetCost() <= remainingMovementPoints)
+            {
+                hex.EnableHighlight();
+            }
         }
     }
 
     public void AddToPath(Vector3Int selectedHexPosition)
     {
-        Debug.Log("AddToPath: " + selectedHexPosition);
-
-        if (!IsHexInRange(selectedHexPosition))
+        if (isMoving || !IsHexInRange(selectedHexPosition)) 
         {
-            Debug.Log("Nicht in Range!");
+            Debug.Log($"Cannot move to hex: Moving={isMoving}, InRange={IsHexInRange(selectedHexPosition)}");
             return;
         }
-
+        
+        ClearHighlights();
+        
         Hex selectedHex = hexGrid.GetTileAt(selectedHexPosition);
-        if (selectedHex == null)
-        {
-            Debug.Log("SelectedHex ist null!");
-            return;
-        }
-        if (selectedHex.IsOccupied())
-        {
-            Debug.Log("SelectedHex ist besetzt!");
-            return;
-        }
-
         int moveCost = selectedHex.GetCost();
-        Debug.Log($"MoveCost: {moveCost}, Remaining: {remainingMovementPoints}");
-        if (moveCost > remainingMovementPoints)
-        {
-            Debug.Log("Nicht genug Bewegungspunkte!");
-            return;
-        }
 
-        currentPath.Clear();
-        currentPath.Add(selectedHexPosition);
-        remainingMovementPoints -= moveCost;
-        selectedHex.HighLightPath();
+        isMoving = true;
 
-        Debug.Log("ConfirmPath wird aufgerufen");
-        ConfirmPath();
-    }
-
-    private void UpdateMovementRange()
-    {
-        foreach (Vector3Int pos in movementRange.GetRangePositions())
-        {
-            hexGrid.GetTileAt(pos).DisableHighlight();
-        }
-
-        Vector3Int startPoint = currentPath.Count > 0 ?
-            currentPath[currentPath.Count - 1] :
-            hexGrid.GetClosestHex(selectedUnit.transform.position);
-
-        movementRange = GraphSearch.BFSGetRange(hexGrid, startPoint, remainingMovementPoints);
-        foreach (Vector3Int pos in movementRange.GetRangePositions())
-        {
-            if (!currentPath.Contains(pos))
-                hexGrid.GetTileAt(pos).EnableHighlight();
-        }
-    }
-
-    public void ConfirmPath()
-    {
-        if (currentPath.Count == 0) return;
-
-        Vector3Int endHexPos = currentPath[0];
-        Hex endHex = hexGrid.GetTileAt(endHexPos);
-        if (endHex == null || endHex.IsOccupied())
-        {
-            Debug.LogWarning("Error MovementSystem: End hex is null or occupied!");
-            ClearPath();
-            return;
-        }
-
-        Vector3 endWorldPos = endHex.transform.position;
+        Vector3 endWorldPos = selectedHex.transform.position;
         selectedUnit.SetIntendedEndPosition(endWorldPos);
+        selectedUnit.MovementFinished += OnMovementFinished;
         selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
-        lastUnitHex = endHexPos;
-        ClearPath();
+
+        Hex currentHex = hexGrid.GetTileAt(currentUnitHex);
+        if (currentHex != null)
+        {
+            currentHex.ClearUnit();
+        }
+        selectedHex.SetUnit(selectedUnit);
+
+        if (selectedUnit.TryGetComponent<HexCoordinates>(out var hexCoordinates))
+        {
+            hexCoordinates.UpdateHexCoords(selectedHexPosition);
+        }
+
+        remainingMovementPoints -= moveCost;
+        currentUnitHex = selectedHexPosition;
+
+        if (PlayerStatusUI.Instance != null)
+        {
+            PlayerStatusUI.Instance.UpdateMovementPoints(remainingMovementPoints);
+        }
+
+        selectedUnit.SetMovementPoints(remainingMovementPoints);
+    
+        Debug.Log($"Moving to {selectedHexPosition}, Cost: {moveCost}, Remaining Points: {remainingMovementPoints}");
+    }
+
+
+    private void OnMovementFinished(Unit unit)
+    {
+        unit.MovementFinished -= OnMovementFinished;
+        isMoving = false;
+
         if (remainingMovementPoints > 0)
         {
-            CalculateRange();
+            ClearHighlights();
+            ShowAvailableHexes();
+        }
+        else
+        {
+            ClearHighlights();
         }
     }
 
@@ -122,27 +107,15 @@ public class MovementSystem : MonoBehaviour
             hexGrid.GetTileAt(pos).ResetHighlight();
         }
         currentPath.Clear();
-        foreach (Vector3Int pos in movementRange.GetRangePositions())
-        {
-            hexGrid.GetTileAt(pos).DisableHighlight();
-        }
+        ClearHighlights();
     }
 
-    public bool IsHexInRange(Vector3Int hexPosition)
-    {
-        return movementRange.IsHexPositionInRange(hexPosition);
-    }
-
-    public bool IsPositionInPath(Vector3Int position)
-    {
-        return currentPath.Contains(position);
-    }
-
-    public void HideRange()
+    private void ClearHighlights()
     {
         if (hexGrid == null) return;
 
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        List<Vector3Int> neighbors = hexGrid.GetNeighborsFor(currentUnitHex);
+        foreach (Vector3Int hexPosition in neighbors)
         {
             Hex hex = hexGrid.GetTileAt(hexPosition);
             if (hex != null)
@@ -152,28 +125,21 @@ public class MovementSystem : MonoBehaviour
         }
     }
 
-    public void ShowPath(Vector3Int selectedHexPosition)
+    public void HideRange()
     {
-        if (movementRange.GetRangePositions().Contains(selectedHexPosition))
-        {
-            foreach (Vector3Int hexPosition in currentPath)
-            {
-                hexGrid.GetTileAt(hexPosition).ResetHighlight();
-            }
-
-            currentPath = movementRange.GetPathTo(selectedHexPosition);
-            foreach (Vector3Int hexPosition in currentPath)
-            {
-                hexGrid.GetTileAt(hexPosition).HighLightPath();
-            }
-        }
+        ClearHighlights();
     }
 
-    public void MoveUnit()
+    public bool IsHexInRange(Vector3Int hexPosition)
     {
-        if (currentPath.Count == 0) return;
-        selectedUnit.MoveTroughPath(currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList());
-        ClearPath();
+        if (remainingMovementPoints <= 0) return false;
+
+        List<Vector3Int> neighbors = hexGrid.GetNeighborsFor(currentUnitHex);
+        if (!neighbors.Contains(hexPosition))
+            return false;
+
+        Hex hex = hexGrid.GetTileAt(hexPosition);
+        return hex != null && !hex.IsOccupied() && hex.GetCost() <= remainingMovementPoints;
     }
 
     private void Update()
@@ -183,8 +149,8 @@ public class MovementSystem : MonoBehaviour
             if (selectedUnit != null)
             {
                 remainingMovementPoints = 4;
-                CalculateRange();
-                Debug.Log("Test: Movement aktiviert mit 4 Schritten!");
+                ShowAvailableHexes();
+                Debug.Log("Test: Movement activated with 4 steps!");
             }
         }
     }

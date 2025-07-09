@@ -28,4 +28,10 @@ public class HexCoordinates : MonoBehaviour
         int z = Mathf.RoundToInt(position.z / zOffset);
         return new Vector3Int(x, y, z);
     }
+    
+    public void UpdateHexCoords(Vector3Int newCoords)
+    {
+        offsetCoordinates = newCoords;
+    }
+
 }

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
-public enum DropType { Hand, Left, Right, Discard }
+using static UnityEditor.MaterialProperty;
 
 public class CardManager : MonoBehaviour
 {
@@ -14,8 +13,8 @@ public class CardManager : MonoBehaviour
     [SerializeField] private CardDatabaseSO cardDatabase;
 
     [Header("Einstellungen")]
-    [SerializeField, Min(1)]
-    public int drawCount = 4;
+    [SerializeField, Min(1)] private int drawCount = 4;
+    public int DrawCount => drawCount;
 
     [Header("UI-Referenzen (Nur für Spiel-Szene)")]
     [Tooltip("Die UI-Elemente, die als Zonen für die Karten im Spiel dienen.")]
@@ -23,7 +22,7 @@ public class CardManager : MonoBehaviour
     [SerializeField] private Transform leftGrid;
     [SerializeField] private Transform rightGrid;
     [SerializeField] private Transform discardGrid;
-    [SerializeField] private GameObject cardPrefab; 
+    [SerializeField] private GameObject cardPrefab;
 
     [Header("Gameplay")]
     [SerializeField] private float playCooldown = 0.5f;
@@ -43,31 +42,45 @@ public class CardManager : MonoBehaviour
     private bool isPlaying = false;
     private bool hasDrawnStartHand = false;
 
-    public void DrawCard() => DrawCards(1);
-    public void DrawCard(int count) => DrawCards(count);
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
-        else Instance = this;
+        }
+        else
+        {
+            Instance = this;
+        }
     }
 
     private void Start()
     {
-        if (cardDatabase == null)
+        if (GameDataManager.Instance != null && GameDataManager.Instance.selectedDeck != null)
         {
-            Debug.LogError("FATAL: CardDatabaseSO wurde nicht im CardManager zugewiesen! Das Spiel kann nicht starten.");
-            return;
+            Debug.Log("Lade ausgewähltes Deck: " + GameDataManager.Instance.selectedDeck.DeckName);
+            deck.Clear();
+            deck.AddRange(GameDataManager.Instance.selectedDeck.Cards);
+        }
+        else
+        {
+            Debug.LogWarning("Kein Deck ausgewählt. Lade alle Karten aus der Datenbank als Fallback.");
+            if (cardDatabase == null)
+            {
+                Debug.LogError("FATAL: CardDatabaseSO wurde nicht im CardManager zugewiesen!");
+                return;
+            }
+            deck.Clear();
+            deck.AddRange(cardDatabase.allCards);
         }
 
-        deck.Clear();
-        deck.AddRange(cardDatabase.allCards);
         Shuffle(deck);
-
         DrawInitialCards();
         UpdateAllUI();
     }
+
+    public void DrawCard() => DrawCards(1);
+    public void DrawCard(int count) => DrawCards(count);
 
     private void Shuffle(List<CardData> list)
     {
@@ -82,16 +95,14 @@ public class CardManager : MonoBehaviour
 
     public void DrawInitialCards()
     {
-        if (hasDrawnStartHand)
-            return;
+        if (hasDrawnStartHand) return;
         hasDrawnStartHand = true;
         DrawCards(drawCount);
     }
 
     public void DrawCards(int count)
     {
-        if (hand.Count > 0)
-            return;
+        if (hand.Count > 0) return;
 
         if (deck.Count == 0 && discardPile.Count > 0)
         {
@@ -104,8 +115,11 @@ public class CardManager : MonoBehaviour
 
         for (int i = 0; i < toDraw; i++)
         {
-            hand.Add(deck[0]);
-            deck.RemoveAt(0);
+            if (deck.Count > 0)
+            {
+                hand.Add(deck[0]);
+                deck.RemoveAt(0);
+            }
         }
         UpdateAllUI();
     }
@@ -120,8 +134,6 @@ public class CardManager : MonoBehaviour
         if ((type == DropType.Left && leftZone.Contains(card)) ||
             (type == DropType.Right && rightZone.Contains(card)))
         {
-            Debug.Log($"[CardManager] Karte '{card.name}' wurde bereits in Zone '{type}' gelegt.");
-            Sound_Manager.instance.Play("Draw_Card_V2");
             UpdateAllUI();
             return;
         }
@@ -141,10 +153,9 @@ public class CardManager : MonoBehaviour
                 rightZone.Add(card);
                 break;
             case DropType.Discard:
-                Sound_Manager.instance.Play("Discard");
                 discardPile.Add(card);
                 break;
-            default: 
+            default: // Hand
                 hand.Add(card);
                 break;
         }
@@ -174,7 +185,6 @@ public class CardManager : MonoBehaviour
                 rightZone.Remove(card);
                 break;
         }
-        Sound_Manager.instance.Play("Discard");
         discardPile.Add(card);
         UpdateAllUI();
     }
@@ -194,16 +204,29 @@ public class CardManager : MonoBehaviour
 
         foreach (var cardData in list)
         {
-            var cardObject = Instantiate(cardPrefab, parent);
-
+            GameObject cardObject = null;
+            if (cardData.cardPrefab != null)
+            {
+                cardObject = Instantiate(cardData.cardPrefab, parent);
+            }
+            else if (cardPrefab != null)
+            {
+                cardObject = Instantiate(cardPrefab, parent);
+            }
+            else
+            {
+                continue;
+            }
+            
+            if (parent == discardGrid)
+            {
+                cardObject.transform.localScale *= 0.5f;
+            }
+            
             var cardUI = cardObject.GetComponent<CardUI>();
             if (cardUI != null)
             {
                 cardUI.Initialize(cardData);
-            }
-            else
-            {
-                Debug.LogError($"CardUI component missing on card prefab! Card: {cardData.name}");
             }
 
             if (draggable)
@@ -220,6 +243,4 @@ public class CardManager : MonoBehaviour
             cardObject.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
         }
     }
-
-
 }
