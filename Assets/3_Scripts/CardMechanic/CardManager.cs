@@ -217,12 +217,7 @@ public class CardManager : MonoBehaviour
             {
                 continue;
             }
-            
-            if (parent == discardGrid)
-            {
-                cardObject.transform.localScale *= 0.5f;
-            }
-            
+
             var cardUI = cardObject.GetComponent<CardUI>();
             if (cardUI != null)
             {

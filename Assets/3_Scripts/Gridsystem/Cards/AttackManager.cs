@@ -16,14 +16,6 @@ public class AttackManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public void TryPrepareAttack()
-    {
-        if (GameManager.Instance != null && GameManager.Instance.IsAttackAvailable())
-        {
-            HighlightEnemiesInRange();
-        }
-    }
-
     public void PrepareAttack(int damage, int range)
     {
         if (UnitManager.Instance == null)
@@ -158,14 +150,10 @@ public class AttackManager : MonoBehaviour
         }
         return result;
     }
-    
+
+
     public void HandleEnemyClick(EnemyUnit enemy)
     {
-        if (!GameManager.Instance.IsAttackAvailable())
-        {
-            return;
-        }
-
         if (highlightedEnemies.Contains(enemy))
         {
             enemy.TakeDamage(currentAttackDamage);

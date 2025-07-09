@@ -32,6 +32,11 @@ public class UnitManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        
+    }
+
     public void HandleUnitSelected(GameObject unit)
     {
         if (!PlayersTurn)
@@ -87,10 +92,6 @@ public class UnitManager : MonoBehaviour
         selectedUnit?.Deselect();
         movementSystem.HideRange();
         selectedUnit = null;
-        if (PlayerStatusUI.Instance != null)
-        {
-            PlayerStatusUI.Instance.ClearAttackInfo();
-        }
         AttackManager.Instance?.ClearHighlights();
     }
 

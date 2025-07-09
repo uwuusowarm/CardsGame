@@ -24,7 +24,7 @@ public class MovementSystem : MonoBehaviour
 
     private void CalculateRange()
     {
-        movementRange = GraphSearch.BFSGetRange(hexGrid, lastUnitHex, remainingMovementPoints);
+        movementRange = GraphSearch.BFSGetRange(hexGrid, lastUnitHex, 1);
         Debug.Log("Range: " + string.Join(", ", movementRange.GetRangePositions()));
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
@@ -107,13 +107,6 @@ public class MovementSystem : MonoBehaviour
         Vector3 endWorldPos = endHex.transform.position;
         selectedUnit.SetIntendedEndPosition(endWorldPos);
         selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
-        
-        selectedUnit.SetMovementPoints(remainingMovementPoints);
-        if (PlayerStatusUI.Instance != null)
-        {
-            PlayerStatusUI.Instance.UpdateMovementPoints(remainingMovementPoints);
-        }
-
         lastUnitHex = endHexPos;
         ClearPath();
         if (remainingMovementPoints > 0)

@@ -1,3 +1,5 @@
+// --- START OF FILE LevelPainter.cs ---
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -11,24 +13,31 @@ public class HexPrefabMapping
     public bool isDefault;
 }
 
+// The 'PlaceableObject' class has been REMOVED from this file and moved to LevelPainterSettings.cs
+
 public class LevelPainter : EditorWindow
 {
-    [SerializeField] private LevelPainterSettings settings;
+    [SerializeField] private LevelPainterSettings settings; 
+
     [SerializeField] private Transform gridParent;
-    [SerializeField] private HexGrid hexGridComponent;
-    
+
     private int gridWidth = 20;
     private int gridHeight = 20;
     private float heightStep = 0.5f;
+
     private int currentRoomID = 1;
+
     private enum BrushType { Hex, PlaceableObject }
     private BrushType selectedBrushType = BrushType.Hex;
     private int selectedBrushIndex = 0;
+    
     private ToolMode currentTool = ToolMode.Paint;
     private enum ToolMode { Paint, Erase, Pick, Select }
     private string[] toolNames = { "Paint", "Erase", "Pick", "Select" };
+    
     private GameObject selectedHex;
     private Vector2 scrollPos;
+    
     private SerializedObject serializedWindowObject;
     private SerializedObject serializedSettingsObject;
     private SerializedProperty serializedGridParent;
@@ -36,17 +45,25 @@ public class LevelPainter : EditorWindow
     private SerializedProperty serializedPlaceableObjects;
 
     [MenuItem("Tools/Level Painter")]
-    public static void ShowWindow() => GetWindow<LevelPainter>("Level Painter");
+    public static void ShowWindow()
+    {
+        GetWindow<LevelPainter>("Level Painter");
+    }
 
     private void OnEnable()
     {
         serializedWindowObject = new SerializedObject(this);
         serializedGridParent = serializedWindowObject.FindProperty("gridParent");
+        
         LoadSettings();
+        
         SceneView.duringSceneGui += OnSceneGUI;
     }
 
-    private void OnDisable() => SceneView.duringSceneGui -= OnSceneGUI;
+    private void OnDisable()
+    {
+        SceneView.duringSceneGui -= OnSceneGUI;
+    }
 
     private void OnGUI()
     {
@@ -54,15 +71,16 @@ public class LevelPainter : EditorWindow
         if (serializedSettingsObject != null) serializedSettingsObject.Update();
 
         EditorGUILayout.LabelField("Level Painter", EditorStyles.boldLabel);
-        settings = (LevelPainterSettings)EditorGUILayout.ObjectField("Settings Asset", settings, typeof(LevelPainterSettings), false);
-        EditorGUILayout.PropertyField(serializedGridParent, new GUIContent("Ground Object (Hex Parent)"));
-        hexGridComponent = (HexGrid)EditorGUILayout.ObjectField("HexGrid Component", hexGridComponent, typeof(HexGrid), true);
 
+        settings = (LevelPainterSettings)EditorGUILayout.ObjectField("Settings Asset", settings, typeof(LevelPainterSettings), false);
+        
         if (settings == null)
         {
             EditorGUILayout.HelpBox("Keine Level Painter Settings gefunden. Eine neue Datei wird unter 'Assets/Editor/LevelPainterSettings.asset' erstellt, sobald Sie Prefabs hinzufügen.", MessageType.Info);
             LoadSettings(); 
         }
+        
+        EditorGUILayout.PropertyField(serializedGridParent);
 
         if (settings == null || serializedSettingsObject == null)
         {
@@ -75,7 +93,7 @@ public class LevelPainter : EditorWindow
         EditorGUILayout.PropertyField(serializedPlaceableObjects, true);
         
         EditorGUILayout.Space();
-        if (hexGridComponent != null)
+        if (gridParent != null && gridParent.GetComponent<HexGrid>() != null)
         {
             if (GUILayout.Button("Calculate Size From Default Prefab"))
             {
@@ -126,7 +144,7 @@ public class LevelPainter : EditorWindow
         EditorGUILayout.EndScrollView();
 
         serializedWindowObject.ApplyModifiedProperties();
-        if (serializedSettingsObject != null) serializedSettingsObject.ApplyModifiedProperties();
+        if (serializedSettingsObject != null) serializedSettingsObject.ApplyModifiedProperties(); // This line saves the changes
     }
     
     private void LoadSettings()
@@ -153,20 +171,24 @@ public class LevelPainter : EditorWindow
             serializedPlaceableObjects = serializedSettingsObject.FindProperty("placeableObjects");
         }
     }
+
+    #region Scene GUI & Interaction
     
     private void OnSceneGUI(SceneView sceneView)
     {
         if (!CheckPrerequisites()) return;
 
+        var grid = gridParent.GetComponent<HexGrid>();
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+
         var ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
         var groundPlane = new Plane(Vector3.up, gridParent.position);
 
         if (groundPlane.Raycast(ray, out var enter))
         {
             var worldPosition = ray.GetPoint(enter);
-            var hexCoords = WorldPositionToCoords(worldPosition, hexGridComponent);
-            HandleTool(Event.current, hexCoords, hexGridComponent);
+            var hexCoords = WorldPositionToCoords(worldPosition, grid);
+            HandleTool(Event.current, hexCoords, grid);
         }
         
         if (selectedHex != null)
@@ -198,6 +220,8 @@ public class LevelPainter : EditorWindow
                         var targetHexPosition = targetHexObject.transform.position;
                         Handles.color = Color.green;
                         Handles.DrawWireDisc(targetHexPosition, Vector3.up, grid.hexWidth / 2f);
+
+                        // This now reads the yOffset directly from the settings object
                         var objectToPlace = settings.placeableObjects[selectedBrushIndex];
                         var finalObjectPosition = targetHexPosition + new Vector3(0, objectToPlace.yOffset, 0);
                         Handles.DrawWireCube(finalObjectPosition, Vector3.one * 0.5f); 
@@ -257,7 +281,6 @@ public class LevelPainter : EditorWindow
                 break;
         }
     }
-
     private void SelectHex(Vector3Int coords, HexGrid grid)
     {
         selectedHex = FindHexAt(coords, grid);
@@ -345,6 +368,7 @@ public class LevelPainter : EditorWindow
         hexComponent.PlacedObject.transform.position += new Vector3(0, amount, 0);
     }
 
+
     private void PlaceObjectOnHex(Hex hexComponent, PlaceableObject objectToPlace)
     {
         if (hexComponent.PlacedObject != null)
@@ -363,17 +387,20 @@ public class LevelPainter : EditorWindow
         }
 
         GameObject placedObject = PrefabUtility.InstantiatePrefab(objectToPlace.prefab) as GameObject;
+        // This now reads the yOffset directly from the settings object
         placedObject.transform.position = hex.transform.position + Vector3.up * objectToPlace.yOffset;
         placedObject.transform.SetParent(propsContainer, true);
     
         hexComponent.SetPlacedObject(placedObject);
     
         Undo.RegisterCreatedObjectUndo(placedObject, "Place Object");
-        if (propsContainer.gameObject.hideFlags == HideFlags.None)
+        if (propsContainer.gameObject.hideFlags == HideFlags.None) // Only register undo if it's a new object
         {
             Undo.RegisterCreatedObjectUndo(propsContainer.gameObject, "Create Props Container");
         }
     }
+
+
 
     private void ClearObjectFromHex(Hex hex)
     {
@@ -383,9 +410,14 @@ public class LevelPainter : EditorWindow
         EditorUtility.SetDirty(hex);
     }
 
+    #endregion
+
+    #region Grid & Painting Logic (using settings)
+
     private void PaintHex(Vector3Int coords, Vector3 paintPosition)
     {
-        EraseHex(coords, hexGridComponent, false);
+        var grid = gridParent.GetComponent<HexGrid>();
+        EraseHex(coords, grid, false);
         if (selectedBrushIndex >= settings.hexPrefabs.Count) return;
 
         var prefabToInstantiate = settings.hexPrefabs[selectedBrushIndex].prefab;
@@ -408,12 +440,13 @@ public class LevelPainter : EditorWindow
         var defaultPrefab = settings.hexPrefabs.FirstOrDefault(p => p is { isDefault: true })?.prefab;
         if (defaultPrefab == null) { Debug.LogError("Please mark one prefab as 'isDefault' in your Settings Asset."); return; }
         
+        var grid = gridParent.GetComponent<HexGrid>();
         for (var z = 0; z < gridHeight; z++)
         {
             for (var x = 0; x < gridWidth; x++)
             {
                  var hexCoords = new Vector3Int(x, 0, z);
-                 var placementPosition = CoordsToWorldPosition(hexCoords, hexGridComponent);
+                 var placementPosition = CoordsToWorldPosition(hexCoords, grid);
                  var newHexObj = (GameObject)PrefabUtility.InstantiatePrefab(defaultPrefab, gridParent);
                  newHexObj.transform.position = placementPosition;
                  newHexObj.name = $"Hex_{hexCoords.x}_{hexCoords.z}";
@@ -525,10 +558,11 @@ public class LevelPainter : EditorWindow
             return;
         }
         var size = renderer.bounds.size;
-        hexGridComponent.hexWidth = size.x;
-        hexGridComponent.hexHeight = size.z;
-        EditorUtility.SetDirty(hexGridComponent);
-        Debug.Log($"Hex dimensions calculated and set on HexGrid: Width={hexGridComponent.hexWidth}, Height={hexGridComponent.hexHeight}");
+        var grid = gridParent.GetComponent<HexGrid>();
+        grid.hexWidth = size.x;
+        grid.hexHeight = size.z;
+        EditorUtility.SetDirty(grid);
+        Debug.Log($"Hex dimensions calculated and set on HexGrid: Width={grid.hexWidth}, Height={grid.hexHeight}");
     }
 
     private void PickHex(Vector3Int coords, HexGrid grid)
@@ -547,6 +581,10 @@ public class LevelPainter : EditorWindow
             return;
         }
     }
+    
+    #endregion
+
+    #region Utility Functions
     
     private Vector3 CoordsToWorldPosition(Vector3Int coords, HexGrid grid)
     {
@@ -578,9 +616,8 @@ public class LevelPainter : EditorWindow
     {
         if (gridParent == null) return null;
         var targetWorldPos = CoordsToWorldPosition(coords, grid);
-        return (from Transform hexTransform in gridParent 
-            where Vector3.Distance(hexTransform.position, targetWorldPos) < 0.01f 
-            select hexTransform.gameObject).FirstOrDefault();
+
+        return (from Transform hexTransform in gridParent where Vector3.Distance(hexTransform.position, targetWorldPos) < 0.01f select hexTransform.gameObject).FirstOrDefault();
     }
 
     private void ClearGrid()
@@ -596,13 +633,14 @@ public class LevelPainter : EditorWindow
     private bool CheckPrerequisites()
     {
         if (gridParent == null) return false;
-        if (hexGridComponent == null)
+        if (gridParent.GetComponent<HexGrid>() == null)
         {
-            if(Event.current.type == EventType.Repaint)
-                EditorGUILayout.HelpBox("Please assign a HexGrid component reference.", MessageType.Error);
+            if(Event.current.type == EventType.Repaint) EditorGUILayout.HelpBox("The 'Grid Parent' must have a HexGrid component attached.", MessageType.Error);
             return false;
         }
         if (settings == null || settings.hexPrefabs.Count == 0 || settings.hexPrefabs.All(p => p == null || p.prefab == null)) return false;
         return true;
     }
+    
+    #endregion
 }
