@@ -125,22 +125,6 @@ public class GameManager : MonoBehaviour
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
         }
-
-
-    }
-
-    private void DrawPlayerCards()
-    {
-        
-        if (CardManager.Instance == null)
-        {
-            Debug.LogError("CardManager.Instance is null for card draw.");
-            return;
-        }
-        Debug.Log("Drawing new cards based on exhaustion level.");
-        CardManager.Instance.DrawCards(CardManager.Instance.drawCount);
-        Sound_Manager.instance.Play("Draw_Card_V2");
-
     }
 
     private void DrawPlayerCards()
