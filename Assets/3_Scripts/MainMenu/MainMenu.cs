@@ -90,7 +90,8 @@ public class MainMenu : MonoBehaviour
     public void OpenDeckSelectionScreen()
     {
         ShowPanel(deckSelectionPanel);
-        if (playGameButton != null) playGameButton.gameObject.SetActive(false);
+        if (playGameButton != null) 
+            playGameButton.gameObject.SetActive(false);
         currentlySelectedDeckForPlay = null;
         if (currentlySelectedDeckUIForPlay != null)
         {
@@ -98,7 +99,8 @@ public class MainMenu : MonoBehaviour
             currentlySelectedDeckUIForPlay = null;
         }
 
-        foreach (Transform child in deckSelectionContainer) Destroy(child.gameObject);
+        foreach (Transform child in deckSelectionContainer) 
+            Destroy(child.gameObject);
 
         List<Deck> playerDecks = cardMenuManager.GetPlayerDecks();
         GameObject deckDisplayPrefab = cardMenuManager.deckDisplayPrefab;
@@ -109,7 +111,8 @@ public class MainMenu : MonoBehaviour
             DeckUI deckUI = deckGO.GetComponent<DeckUI>();
             if (deckUI != null)
             {
-                deckUI.Initialize(deck, (selectedUI) => {
+                deckUI.Initialize(deck, (selectedUI) => 
+                {
                     SelectDeckForPlay(selectedUI);
                 });
             }
@@ -123,7 +126,8 @@ public class MainMenu : MonoBehaviour
             selectedUI.SetHighlight(false);
             currentlySelectedDeckUIForPlay = null;
             currentlySelectedDeckForPlay = null;
-            if (playGameButton != null) playGameButton.gameObject.SetActive(false);
+            if (playGameButton != null) 
+                playGameButton.gameObject.SetActive(false);
         }
         else
         {
@@ -136,7 +140,8 @@ public class MainMenu : MonoBehaviour
             currentlySelectedDeckForPlay = selectedUI.GetAssignedDeck();
             currentlySelectedDeckUIForPlay.SetHighlight(true);
 
-            if (playGameButton != null) playGameButton.gameObject.SetActive(true);
+            if (playGameButton != null) 
+                playGameButton.gameObject.SetActive(true);
         }
     }
 
