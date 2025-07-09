@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
                                          ExhaustionSystem.Instance != null &&
                                          ActionPointSystem.Instance != null &&
                                          EquipmentManager.Instance != null &&
-                                         playerUnit != null);
+                                         PlayerDataManager.Instance.IsDataLoaded);
         StartGame();
     }
 
@@ -354,6 +354,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         
+        PlayerDataManager.Instance.SavePlayerState();
         if (attackAvailable)
         {
             attackAvailable = false;
