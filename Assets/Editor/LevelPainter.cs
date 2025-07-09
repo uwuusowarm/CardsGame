@@ -48,86 +48,91 @@ public class LevelPainter : EditorWindow
 
     private void OnDisable() => SceneView.duringSceneGui -= OnSceneGUI;
 
+    
     private void OnGUI()
+{
+    serializedWindowObject.Update();
+    if (serializedSettingsObject != null) serializedSettingsObject.Update();
+
+    scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+
+    EditorGUILayout.LabelField("Level Painter", EditorStyles.boldLabel);
+    settings = (LevelPainterSettings)EditorGUILayout.ObjectField("Settings Asset", settings, typeof(LevelPainterSettings), false);
+    EditorGUILayout.PropertyField(serializedGridParent, new GUIContent("Ground Object (Hex Parent)"));
+    hexGridComponent = (HexGrid)EditorGUILayout.ObjectField("HexGrid Component", hexGridComponent, typeof(HexGrid), true);
+
+    if (settings == null)
     {
-        serializedWindowObject.Update();
-        if (serializedSettingsObject != null) serializedSettingsObject.Update();
-
-        EditorGUILayout.LabelField("Level Painter", EditorStyles.boldLabel);
-        settings = (LevelPainterSettings)EditorGUILayout.ObjectField("Settings Asset", settings, typeof(LevelPainterSettings), false);
-        EditorGUILayout.PropertyField(serializedGridParent, new GUIContent("Ground Object (Hex Parent)"));
-        hexGridComponent = (HexGrid)EditorGUILayout.ObjectField("HexGrid Component", hexGridComponent, typeof(HexGrid), true);
-
-        if (settings == null)
-        {
-            EditorGUILayout.HelpBox("Keine Level Painter Settings gefunden. Eine neue Datei wird unter 'Assets/Editor/LevelPainterSettings.asset' erstellt, sobald Sie Prefabs hinzufügen.", MessageType.Info);
-            LoadSettings(); 
-        }
-
-        if (settings == null || serializedSettingsObject == null)
-        {
-            serializedWindowObject.ApplyModifiedProperties();
-            return;
-        }
-
-        EditorGUILayout.PropertyField(serializedPrefabs, true);
-        EditorGUILayout.Space();
-        EditorGUILayout.PropertyField(serializedPlaceableObjects, true);
-        
-        EditorGUILayout.Space();
-        if (hexGridComponent != null)
-        {
-            if (GUILayout.Button("Calculate Size From Default Prefab"))
-            {
-                CalculateAndSetHexSize();
-            }
-        }
-        
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Base Grid Generation", EditorStyles.boldLabel);
-        gridWidth = EditorGUILayout.IntField("Grid Width", gridWidth);
-        gridHeight = EditorGUILayout.IntField("Grid Height", gridHeight);
-
-        if (GUILayout.Button("Generate Base Grid"))
-        {
-            if (CheckPrerequisites()) GenerateGrid();
-        }
-
-        if (GUILayout.Button("Clear Entire Grid"))
-        {
-            if (CheckPrerequisites() && EditorUtility.DisplayDialog("Clear Grid?", "Are you sure you want to delete all child objects of the grid parent?", "Yes", "No"))
-            {
-                ClearGrid();
-            }
-        }
-
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Room Tagging", EditorStyles.boldLabel);
-        EditorGUILayout.LabelField("Next Room ID to be assigned: " + currentRoomID);
-        if (GUILayout.Button("Reset Room Counter to 1"))
-        {
-            currentRoomID = 1;
-        }
-        
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Painting Tools", EditorStyles.boldLabel);
-        
-        EditorGUI.BeginChangeCheck();
-        currentTool = (ToolMode)GUILayout.Toolbar((int)currentTool, toolNames);
-        if (EditorGUI.EndChangeCheck() && currentTool != ToolMode.Select)
-        {
-            selectedHex = null;
-        }
-        
-        EditorGUILayout.Space();
-        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-        EditorGUILayout.LabelField("Brushes", EditorStyles.boldLabel);
-        DrawBrushSelectionUI();
-        EditorGUILayout.EndScrollView();
-
-        serializedWindowObject.ApplyModifiedProperties();
-        if (serializedSettingsObject != null) serializedSettingsObject.ApplyModifiedProperties();
+        EditorGUILayout.HelpBox("Keine Level Painter Settings gefunden. Eine neue Datei wird unter 'Assets/Editor/LevelPainterSettings.asset' erstellt, sobald Sie Prefabs hinzufügen.", MessageType.Info);
+        LoadSettings(); 
     }
+
+    if (settings == null || serializedSettingsObject == null)
+    {
+        EditorGUILayout.EndScrollView(); 
+        serializedWindowObject.ApplyModifiedProperties();
+        return;
+    }
+
+    EditorGUILayout.PropertyField(serializedPrefabs, true);
+    EditorGUILayout.Space();
+    EditorGUILayout.PropertyField(serializedPlaceableObjects, true);
+    
+    EditorGUILayout.Space();
+    if (hexGridComponent != null)
+    {
+        if (GUILayout.Button("Calculate Size From Default Prefab"))
+        {
+            CalculateAndSetHexSize();
+        }
+    }
+    
+    EditorGUILayout.Space();
+    EditorGUILayout.LabelField("Base Grid Generation", EditorStyles.boldLabel);
+    gridWidth = EditorGUILayout.IntField("Grid Width", gridWidth);
+    gridHeight = EditorGUILayout.IntField("Grid Height", gridHeight);
+
+    if (GUILayout.Button("Generate Base Grid"))
+    {
+        if (CheckPrerequisites()) GenerateGrid();
+    }
+
+    if (GUILayout.Button("Clear Entire Grid"))
+    {
+        if (CheckPrerequisites() && EditorUtility.DisplayDialog("Clear Grid?", "Are you sure you want to delete all child objects of the grid parent?", "Yes", "No"))
+        {
+            ClearGrid();
+        }
+    }
+
+    EditorGUILayout.Space();
+    EditorGUILayout.LabelField("Room Tagging", EditorStyles.boldLabel);
+    EditorGUILayout.LabelField("Next Room ID to be assigned: " + currentRoomID);
+    if (GUILayout.Button("Reset Room Counter to 1"))
+    {
+        currentRoomID = 1;
+    }
+    
+    EditorGUILayout.Space();
+    EditorGUILayout.LabelField("Painting Tools", EditorStyles.boldLabel);
+    
+    EditorGUI.BeginChangeCheck();
+    currentTool = (ToolMode)GUILayout.Toolbar((int)currentTool, toolNames);
+    if (EditorGUI.EndChangeCheck() && currentTool != ToolMode.Select)
+    {
+        selectedHex = null;
+    }
+    
+    EditorGUILayout.Space();
+    EditorGUILayout.LabelField("Brushes", EditorStyles.boldLabel);
+    DrawBrushSelectionUI();
+
+    EditorGUILayout.EndScrollView();
+
+    serializedWindowObject.ApplyModifiedProperties();
+    if (serializedSettingsObject != null) serializedSettingsObject.ApplyModifiedProperties();
+}
+
     
     private void LoadSettings()
     {
