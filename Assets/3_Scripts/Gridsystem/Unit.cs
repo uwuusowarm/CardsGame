@@ -15,8 +15,6 @@ public class Unit : MonoBehaviour
     public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
     
-    public static Unit Instance { get; private set; }
-
     [SerializeField] private float movementDuration = 1, rotationDuration = 0.3f;
     private GlowHighlight glowHighlight;
     private Queue<Vector3> pathPositions = new Queue<Vector3>();
@@ -28,15 +26,6 @@ public class Unit : MonoBehaviour
         if (glowHighlight == null)
         {
             Debug.LogError("GlowHighlight component missing on Unit!", gameObject);
-        }
-        
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
         }
     }
     private void Start()
@@ -81,7 +70,12 @@ public class Unit : MonoBehaviour
     {
         movementPoints += points /*+= (points*10)*/;
     }
-    
+
+    public void SetMovementPoints(int points)
+    {
+        movementPoints = points;
+    }
+
     public void ResetMovementPoints()
     {
         movementPoints = 0;

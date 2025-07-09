@@ -8,6 +8,10 @@ public class ChestController : MonoBehaviour
     [Tooltip("Reference to the ItemDatabase asset that holds all possible loot.")]
     [SerializeField] private ItemDatabase itemDatabase;
 
+    [Header("Testing")]
+    [SerializeField, Tooltip("If true, this chest will open on click regardless of player position, turn, or AP cost.")]
+    private bool testMode = false;
+    
     private Hex currentHex;
     private bool isOpen = false;
 
@@ -45,6 +49,14 @@ public class ChestController : MonoBehaviour
     private void OnMouseDown()
     {
         if (isOpen) return;
+        
+        if (testMode)
+        {
+            Debug.LogWarning("CHEST IN TEST MODE: Bypassing all checks and opening immediately.");
+            OpenChestAndGiveLoot();
+            return; 
+        }
+        
         if (!GameManager.Instance.IsPlayerTurn)
         {
             Debug.Log("Cannot open chest, it is not the player's turn.");

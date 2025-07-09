@@ -9,6 +9,7 @@ public class ItemCSVImporter
     private const string ITEM_DATA_FOLDER = "Assets/GameData/Items";
     private const string PREFAB_FOLDER = "Assets/1_Prefabs/Items";
     private const string SPRITE_FOLDER = "Assets/Art Complete/ItemSprites"; 
+    private const string ITEM_DATABASE_PATH = "Assets/GameData/ItemDatabase.asset";
 
     [MenuItem("Tools/Import Items from CSV")]
     public static void ImportItems()
@@ -31,6 +32,7 @@ public class ItemCSVImporter
             return;
         }
 
+        if (!Directory.Exists("Assets/GameData")) Directory.CreateDirectory("Assets/GameData");
         if (!Directory.Exists(ITEM_DATA_FOLDER)) Directory.CreateDirectory(ITEM_DATA_FOLDER);
         if (!Directory.Exists(PREFAB_FOLDER)) Directory.CreateDirectory(PREFAB_FOLDER);
         if (!Directory.Exists(SPRITE_FOLDER)) Directory.CreateDirectory(SPRITE_FOLDER);
@@ -39,6 +41,7 @@ public class ItemCSVImporter
         int itemsUpdated = 0;
         int prefabsCreated = 0;
         int prefabsUpdated = 0;
+
 
         for (int i = 1; i < lines.Length; i++)
         {
@@ -177,9 +180,7 @@ public class ItemCSVImporter
             $"{itemsUpdated} items updated, {prefabsUpdated} prefabs updated.", "OK");
         Debug.Log($"Item import complete. Assets saved in {ITEM_DATA_FOLDER} and {PREFAB_FOLDER}");
     }
-
-    // --- (No changes to the helper methods below this line) ---
-
+    
     private static int ParseInt(string value, int defaultValue = 0)
     {
         if (string.IsNullOrWhiteSpace(value)) return defaultValue;
@@ -244,23 +245,17 @@ public class ItemCSVImporter
     }
     private static void PopulateItemDatabase()
     {
-        Debug.Log("Attempting to populate ItemDatabase...");
+        Debug.Log("Attempting to find or create ItemDatabase...");
+        ItemDatabase database = AssetDatabase.LoadAssetAtPath<ItemDatabase>(ITEM_DATABASE_PATH);
 
-        string[] dbGuids = AssetDatabase.FindAssets("t:ItemDatabase");
-        if (dbGuids.Length == 0)
+        if (database == null)
         {
-            Debug.LogError("Could not find an ItemDatabase asset in the project. Please create one via Assets > Create > Game > Item Database.");
-            return;
-        }
-        if (dbGuids.Length > 1)
-        {
-            Debug.LogWarning("Multiple ItemDatabase assets found. Using the first one.");
+            Debug.LogWarning($"ItemDatabase not found at '{ITEM_DATABASE_PATH}'. Creating a new one.");
+            database = ScriptableObject.CreateInstance<ItemDatabase>();
+            AssetDatabase.CreateAsset(database, ITEM_DATABASE_PATH);
         }
 
-        string dbPath = AssetDatabase.GUIDToAssetPath(dbGuids[0]);
-        ItemDatabase database = AssetDatabase.LoadAssetAtPath<ItemDatabase>(dbPath);
-
-        string[] itemGuids = AssetDatabase.FindAssets("t:ItemData");
+        string[] itemGuids = AssetDatabase.FindAssets("t:ItemData", new[] { ITEM_DATA_FOLDER });
         
         database.allItems.Clear(); 
 
