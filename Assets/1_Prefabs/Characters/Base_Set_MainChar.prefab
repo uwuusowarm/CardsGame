@@ -31,7 +31,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 0f6e5071537d5c74b816871c7566933c,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.45
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0f6e5071537d5c74b816871c7566933c,
         type: 3}
@@ -179,6 +179,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9198328c13b276643a3fcb5ccdb30656, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemStatsDisplay: {fileID: 0}
+  statsDisplayDuration: 4
   playerClass: 2
 --- !u!114 &-4127796247774531127
 MonoBehaviour:
