@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
@@ -12,6 +12,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject cardMenuPanel;
     [SerializeField] private GameObject creditsPanel;
     [SerializeField] private GameObject deckSelectionPanel;
+    [SerializeField] private GameObject deckEditorSlideout;
+    [SerializeField] private GameObject boostersSlideout;
 
     [Header("Resolution")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
@@ -39,8 +41,8 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
-        
         ReturnToMainMenu();
+
         if (resolutionDropdown != null)
         {
             resolutionDropdown.ClearOptions();
@@ -82,6 +84,9 @@ public class MainMenu : MonoBehaviour
         if (cardMenuPanel != null) cardMenuPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(false);
         if (deckSelectionPanel != null) deckSelectionPanel.SetActive(false);
+        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(false);
+        if (boostersSlideout != null) boostersSlideout.SetActive(false);
+
         if (panelToShow != null)
         {
             panelToShow.SetActive(true);
@@ -91,8 +96,7 @@ public class MainMenu : MonoBehaviour
     public void OpenDeckSelectionScreen()
     {
         ShowPanel(deckSelectionPanel);
-        if (playGameButton != null) 
-            playGameButton.gameObject.SetActive(false);
+        if (playGameButton != null) playGameButton.gameObject.SetActive(false);
         currentlySelectedDeckForPlay = null;
         if (currentlySelectedDeckUIForPlay != null)
         {
@@ -100,8 +104,7 @@ public class MainMenu : MonoBehaviour
             currentlySelectedDeckUIForPlay = null;
         }
 
-        foreach (Transform child in deckSelectionContainer) 
-            Destroy(child.gameObject);
+        foreach (Transform child in deckSelectionContainer) Destroy(child.gameObject);
 
         List<Deck> playerDecks = cardMenuManager.GetPlayerDecks();
         GameObject deckDisplayPrefab = cardMenuManager.deckDisplayPrefab;
@@ -112,8 +115,7 @@ public class MainMenu : MonoBehaviour
             DeckUI deckUI = deckGO.GetComponent<DeckUI>();
             if (deckUI != null)
             {
-                deckUI.Initialize(deck, (selectedUI) => 
-                {
+                deckUI.Initialize(deck, (selectedUI) => {
                     SelectDeckForPlay(selectedUI);
                 });
             }
@@ -127,8 +129,7 @@ public class MainMenu : MonoBehaviour
             selectedUI.SetHighlight(false);
             currentlySelectedDeckUIForPlay = null;
             currentlySelectedDeckForPlay = null;
-            if (playGameButton != null) 
-                playGameButton.gameObject.SetActive(false);
+            if (playGameButton != null) playGameButton.gameObject.SetActive(false);
         }
         else
         {
@@ -136,13 +137,10 @@ public class MainMenu : MonoBehaviour
             {
                 currentlySelectedDeckUIForPlay.SetHighlight(false);
             }
-
             currentlySelectedDeckUIForPlay = selectedUI;
             currentlySelectedDeckForPlay = selectedUI.GetAssignedDeck();
             currentlySelectedDeckUIForPlay.SetHighlight(true);
-
-            if (playGameButton != null) 
-                playGameButton.gameObject.SetActive(true);
+            if (playGameButton != null) playGameButton.gameObject.SetActive(true);
         }
     }
 
@@ -151,7 +149,7 @@ public class MainMenu : MonoBehaviour
         if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
         {
             GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
-            SceneManager.LoadScene(2);
+            SceneManager.LoadScene(1);
         }
         else
         {
@@ -159,48 +157,44 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    public void ReturnToMainMenu() 
-    { 
-        ShowPanel(mainPanel); 
+    public void ReturnToMainMenu()
+    {
+        ShowPanel(mainPanel);
     }
-    public void OpenOptionsPanel() 
-    { 
-        ShowPanel(optionsPanel); 
+
+    public void OpenOptionsPanel()
+    {
+        ShowPanel(optionsPanel);
     }
+
     public void OpenCardMenuPanel()
     {
         ShowPanel(cardMenuPanel);
-        if (cardMenuManager != null)
-        {
-            cardMenuManager.PopulateDeckDisplay();
-        }
     }
-    public void OpenCreditsPanel() 
-    { 
-        ShowPanel(creditsPanel); 
-    }
-    public void StartButton() 
-    { 
-        OpenDeckSelectionScreen(); 
-    }
-    public void QuitGame()
 
+    public void OpenCreditsPanel()
     {
+        ShowPanel(creditsPanel);
+    }
 
+    public void StartButton()
+    {
+        OpenDeckSelectionScreen();
+    }
+
+    public void QuitGame()
+    {
         Application.Quit();
-
 #if UNITY_EDITOR
-
-        UnityEditor.EditorApplication.isPlaying = false;
-
+        UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
 
-    }
-    public void LoadSettings(int currentResolutionIndex) 
-    { 
-        if (resolutionDropdown != null) 
-        { 
-            resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex; 
-        } 
+    public void LoadSettings(int currentResolutionIndex)
+    {
+        if (resolutionDropdown != null)
+        {
+            resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex;
+        }
     }
 }
