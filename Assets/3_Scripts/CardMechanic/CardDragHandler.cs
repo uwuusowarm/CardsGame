@@ -53,8 +53,8 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnDrag(PointerEventData e)
     {
         if (isInMenu) return;
-
         rt.position = e.position;
+        
     }
 
     public void OnEndDrag(PointerEventData e)

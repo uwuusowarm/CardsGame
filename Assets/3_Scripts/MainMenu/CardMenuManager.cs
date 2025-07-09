@@ -40,7 +40,10 @@ public class CardMenuManager : MonoBehaviour
         deckEditorSlideout.SetActive(false);
         boostersSlideout.SetActive(false);
         editDeckButton.gameObject.SetActive(false);
+
+        Sound_Manager.instance.Play("Level_Music");
     }
+
 
     private void PopulateAllCardsList()
     {

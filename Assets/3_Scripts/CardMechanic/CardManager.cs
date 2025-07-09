@@ -78,6 +78,7 @@ public class CardManager : MonoBehaviour
             list[i] = list[r];
             list[r] = tmp;
         }
+        Sound_Manager.instance.Play("Deck_Shuffel");
     }
 
     public void DrawInitialCards()
@@ -112,6 +113,7 @@ public class CardManager : MonoBehaviour
 
     public void OnDeckClicked()
     {
+        Sound_Manager.instance.Play("Deck_Shuffel");
         DrawCards(drawCount);
     }
 

@@ -83,6 +83,7 @@ public class ChestController : MonoBehaviour
     {
         if (isOpen) return;
         isOpen = true;
+        Sound_Manager.instance.Play("Chest_Open");
 
         ItemData randomItem = itemDatabase.GetRandomItem();
         if (randomItem != null && EquipmentManager.Instance != null)

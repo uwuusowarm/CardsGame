@@ -739,7 +739,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 34.70874, y: -19.7146}
+  m_AnchoredPosition: {x: 34.70874, y: -19.71463}
   m_SizeDelta: {x: -1920, y: -1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &251232017
@@ -4622,7 +4622,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 34.70874, y: -19.7146}
+  m_AnchoredPosition: {x: 34.70874, y: -19.71463}
   m_SizeDelta: {x: -1920, y: -1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1246495636
@@ -7017,7 +7017,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 34.70874, y: -19.7146}
+  m_AnchoredPosition: {x: 34.70874, y: -19.71463}
   m_SizeDelta: {x: -1920, y: -1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2025819424
@@ -7441,6 +7441,79 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2104511988}
   m_CullTransparentMesh: 1
+--- !u!1001 &2131380644
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1549458550830430638, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: sounds.Array.data[28].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7356424615175957051, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_Name
+      value: Sound_Manager
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 116.262054
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 128.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 185.5924
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223688728168766120, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 59f832ea27e436145b66e1640f9a9536, type: 3}
 --- !u!1 &2143568972
 GameObject:
   m_ObjectHideFlags: 0
@@ -7529,3 +7602,4 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 1889312450}
   - {fileID: 397014122}
+  - {fileID: 2131380644}
