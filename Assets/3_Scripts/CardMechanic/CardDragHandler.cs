@@ -39,6 +39,9 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         if (isInMenu) return;
 
+        Sound_Manager.instance.PlayRandomFromGroup("Draw_Card");
+
+
         startParent = transform.parent;
         startPos = rt.anchoredPosition;
 

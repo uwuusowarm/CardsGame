@@ -134,6 +134,8 @@ public class CardManager : MonoBehaviour
         if ((type == DropType.Left && leftZone.Contains(card)) ||
             (type == DropType.Right && rightZone.Contains(card)))
         {
+            Debug.Log($"[CardManager] Karte '{card.name}' wurde bereits in Zone '{type}' gelegt.");
+            Sound_Manager.instance.Play("Draw_Card_V2");
             UpdateAllUI();
             return;
         }
@@ -153,6 +155,7 @@ public class CardManager : MonoBehaviour
                 rightZone.Add(card);
                 break;
             case DropType.Discard:
+                Sound_Manager.instance.Play("Discard");
                 discardPile.Add(card);
                 break;
             default: // Hand
@@ -185,6 +188,7 @@ public class CardManager : MonoBehaviour
                 rightZone.Remove(card);
                 break;
         }
+        Sound_Manager.instance.Play("Discard");
         discardPile.Add(card);
         UpdateAllUI();
     }
