@@ -7,11 +7,14 @@ public class GameManager : MonoBehaviour
 
     [Header("Game Settings")]
     [SerializeField] private float enemyTurnDelay = 1f;
-    private PlayerInput playerInput;
 
     private bool isFirstTurn = true;
     public bool IsPlayerTurn { get; private set; } = false;
     private bool isWaitingForPlayerActionResolution = false;
+    
+    private bool attackAvailable = false;
+    private int pendingAttackDamage = 0;
+    private int pendingAttackRange = 0;
 
     private Unit playerUnit;
 
@@ -21,34 +24,30 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else if (Instance != this) Destroy(this);
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(this);
+        }
+
     }
 
     private void Start()
     {
-        playerInput = FindObjectOfType<PlayerInput>();
-        if (playerInput != null)
-        {
-            playerInput.PointerRightClick.AddListener(HandleCancelAction);
-        }
-        else
-        {
-            Debug.LogError("PlayerInput script not found in the scene!");
-        }
-
         GameObject playerGameObject = GameObject.FindGameObjectWithTag("Player");
         if (playerGameObject != null)
         {
             playerUnit = playerGameObject.GetComponent<Unit>();
-            if (playerUnit != null)
+            if (playerUnit == null)
             {
-                Debug.Log("Player Unit found and assigned: " + playerUnit.name);
-                playerUnit.MovementFinished += OnPlayerMovementFinished;
+                Debug.LogError("GameObject with tag 'Player' does not have a Unit component!");
             }
             else
             {
-                Debug.LogError("GameObject with tag 'Player' does not have a Unit component!");
+                Debug.Log("Player Unit found and assigned: " + playerUnit.name);
             }
         }
         else
@@ -59,24 +58,6 @@ public class GameManager : MonoBehaviour
         StartCoroutine(WaitForManagersAndStartGame());
     }
 
-    private void OnDestroy()
-    {
-        if (playerInput != null)
-        {
-            playerInput.PointerRightClick.RemoveListener(HandleCancelAction);
-        }
-        if (playerUnit != null)
-        {
-            playerUnit.MovementFinished -= OnPlayerMovementFinished;
-        }
-    }
-    
-    private void OnPlayerMovementFinished(Unit unit)
-    {
-        Debug.Log("Player has finished moving. Re-evaluating actions.");
-        UpdatePlayerStateFromCache();
-    }
-
     private IEnumerator WaitForManagersAndStartGame()
     {
         yield return new WaitUntil(() => CardManager.Instance != null &&
@@ -84,9 +65,10 @@ public class GameManager : MonoBehaviour
                                          HexGrid.Instance != null &&
                                          AttackManager.Instance != null &&
                                          PlayedCardEffectCache.Instance != null &&
+                                         ExhaustionSystem.Instance != null &&
                                          ActionPointSystem.Instance != null &&
-                                         playerUnit != null &&
-                                         PlayerStatsUI.Instance != null);
+                                         EquipmentManager.Instance != null &&
+                                         playerUnit != null);
         StartGame();
     }
 
@@ -103,28 +85,37 @@ public class GameManager : MonoBehaviour
         IsPlayerTurn = true;
         isWaitingForPlayerActionResolution = false;
         playerUnit.shieldPoints = 0;
+        playerUnit.ResetMovementPoints();
         
-        playerUnit.ResetMovementPoints(); 
-        
-        PlayerStatsUI.Instance.UpdateMovementPoints(0); 
-        PlayerStatsUI.Instance.ClearAttackInfo();
+        attackAvailable = false;
+        pendingAttackDamage = 0;
+        pendingAttackRange = 0;
+
+        if (PlayerStatusUI.Instance != null)
+        {
+            PlayerStatusUI.Instance.UpdateMovementPoints(playerUnit.MovementPoints);
+            PlayerStatusUI.Instance.ClearAttackInfo();
+        }
 
         if (ActionPointSystem.Instance != null)
         {
             if (isFirstTurn)
             {
-                ActionPointSystem.Instance.InitializeActionPoints(2);
+                int startingAP = 2 + EquipmentManager.Instance.GetTotalAPBonus();
+                ActionPointSystem.Instance.InitializeActionPoints(startingAP);
             }
             else
             {
                 ActionPointSystem.Instance.ResetActionPoints();
-                ActionPointSystem.Instance.AddActionPoints(2);
+                int turnAP = 2 + EquipmentManager.Instance.GetTotalAPBonus();
+                ActionPointSystem.Instance.AddActionPoints(turnAP);
             }
 
             if (carryOverActionPoints > 0)
             {
                 ActionPointSystem.Instance.AddActionPoints(1);
                 carryOverActionPoints = 0;
+                Debug.Log("Added 1 carried over action point");
             }
         }
     
@@ -152,102 +143,253 @@ public class GameManager : MonoBehaviour
 
     }
 
+    private void DrawPlayerCards()
+    {
+        if (CardManager.Instance == null)
+        {
+            Debug.LogError("CardManager.Instance is null for card draw.");
+            return;
+        }
+        Debug.Log("Drawing new cards based on exhaustion level.");
+        CardManager.Instance.DrawCards(CardManager.Instance.DrawCount);
+    }
+
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
     {
-        if (ActionPointSystem.Instance.GetCurrentActionPoints() <= 0) return;
-        if (!IsPlayerTurn || isWaitingForPlayerActionResolution) return;
+        int AP = ActionPointSystem.Instance.GetCurrentActionPoints();
+        
+        if (AP <= 0)
+        {
+            Debug.LogWarning("Cannot process card. No action points left.");
+            return;    
+        }
+        
+        if (!IsPlayerTurn || isWaitingForPlayerActionResolution)
+        {
+            Debug.LogWarning("Cannot process card. Not player's turn or waiting for action resolution.");
+            return;
+        }
+        if (cardData == null)
+        {
+            Debug.LogError("cardData is null in ProcessPlayedCard.");
+            return;
+        }
 
-        UnitManager.Instance.HandleUnitSelected(playerUnit.gameObject);
-
+        if (PlayedCardEffectCache.Instance == null)
+        {
+            Debug.LogError("PlayedCardEffectCache.Instance is null.");
+            return;
+        }
         PlayedCardEffectCache.Instance.CacheCardEffect(cardData, isLeftEffectChosen);
 
-        ApplyAndConsumeNonTargetedEffects();
+        if (playerUnit != null && UnitManager.Instance != null)
+        {
+            UnitManager.Instance.HandleUnitSelected(playerUnit.gameObject);
+        }
+       
+        if (cardData.alwaysEffects != null)
+        {
+            foreach (var effect in cardData.alwaysEffects)
+            {
+                ApplyImmediateEffect(effect, playerUnit); 
+            }
+        }
 
-        UpdatePlayerStateFromCache();
+        ApplyCachedEffects();
 
-        CardManager.Instance.MoveToZone(cardData, DropType.Discard);
+        if (CardManager.Instance != null)
+        {
+            CardManager.Instance.MoveToZone(cardData, DropType.Discard);
+            UnitManager.Instance.ReduceActionPoints(playerUnit, 1);
+        }
+        else
+        {
+            Debug.LogError("CardManager.Instance is null. Cannot move card to discard.");
+        }
+
+        if (PlayedCardEffectCache.Instance.PendingDamage > 0)
+        {
+            attackAvailable = true;
+            pendingAttackDamage = PlayedCardEffectCache.Instance.PendingDamage;
+            pendingAttackRange = PlayedCardEffectCache.Instance.PendingRange;
+            
+            if(AttackManager.Instance != null)
+            {
+                AttackManager.Instance.PrepareAttack(pendingAttackDamage, pendingAttackRange);
+            }
+        }
+
+        if(PlayedCardEffectCache.Instance != null)
+        {
+            PlayedCardEffectCache.Instance.ClearCache();
+        }
+        
         ActionPointSystem.Instance.UseActionPoints(1);
-        UnitManager.Instance.ReduceActionPoints(playerUnit, 1);
     }
-    
-    private void ApplyAndConsumeNonTargetedEffects()
-    {
-        var cache = PlayedCardEffectCache.Instance;
-        Unit target = playerUnit;
 
-        if (cache.PendingBlock > 0)
+    public bool IsAttackAvailable()
+    {
+        return attackAvailable;
+    }
+
+    private void ApplyCachedEffects()
+    {
+        if (PlayedCardEffectCache.Instance == null || !PlayedCardEffectCache.Instance.HasPendingEffects) return;
+
+        Unit targetForSelfEffects = playerUnit; 
+
+        if (PlayedCardEffectCache.Instance.PendingBlock > 0 && targetForSelfEffects != null)
         {
-            target.AddBlock(cache.PendingBlock);
-            Debug.Log($"Player gained {cache.PendingBlock} Block");
-            cache.ConsumeBlock();
+            int blockAmount = PlayedCardEffectCache.Instance.PendingBlock;
+            int defenseBonus = EquipmentManager.Instance.GetTotalDefenseBonus();
+            int totalBlock = blockAmount + defenseBonus;
+            
+            targetForSelfEffects.AddBlock(totalBlock);
+            Debug.Log($"Player gained {totalBlock} Block (Base: {blockAmount}, Equipment: {defenseBonus})");
         }
-        if (cache.PendingHealing > 0)
+
+        if (PlayedCardEffectCache.Instance.PendingHealing > 0 && targetForSelfEffects != null)
         {
-            target.Heal(cache.PendingHealing);
-            Debug.Log($"Player healed for {cache.PendingHealing}");
-            cache.ConsumeHealing();
+            int healAmount = PlayedCardEffectCache.Instance.PendingHealing;
+            int healBonus = EquipmentManager.Instance.GetTotalHealBonus();
+            int totalHeal = healAmount + healBonus;
+            
+            targetForSelfEffects.Heal(totalHeal);
+            Debug.Log($"Player healed for {totalHeal} (Base: {healAmount}, Equipment: {healBonus})");
+        }
+
+        if (PlayedCardEffectCache.Instance.PendingMovement > 0 && targetForSelfEffects != null)
+        {
+            int moveAmount = PlayedCardEffectCache.Instance.PendingMovement;
+            int moveBonus = EquipmentManager.Instance.GetTotalMovementSpeedBonus();
+            int totalMove = moveAmount + moveBonus;
+            
+            targetForSelfEffects.AddMovementPoints(totalMove);
+            Debug.Log($"Player gained {totalMove} Movement Points (Base: {moveAmount}, Equipment: {moveBonus})");
+            if (PlayerStatusUI.Instance != null)
+            {
+                PlayerStatusUI.Instance.UpdateMovementPoints(targetForSelfEffects.MovementPoints);
+            }
+            UnitManager.Instance.HandleUnitSelected(targetForSelfEffects.gameObject);
+        }
+
+        if (PlayedCardEffectCache.Instance.PendingDamage > 0)
+        {
+            Unit attacker = UnitManager.Instance.SelectedUnit;
+            if (attacker == null) attacker = playerUnit;
+
+            if (AttackManager.Instance != null && attacker != null)
+            {
+                int damageAmount = PlayedCardEffectCache.Instance.PendingDamage;
+                int damageBonus = EquipmentManager.Instance.GetTotalDamageBonus();
+                int totalDamage = damageAmount + damageBonus;
+                
+                int baseRange = PlayedCardEffectCache.Instance.PendingRange;
+                int weaponRange = EquipmentManager.Instance.GetWeaponRange() - 1; // -1 because weapon range is absolute
+                int totalRange = baseRange + weaponRange;
+
+                Debug.Log($"Preparing attack from {attacker.name} with {totalDamage} damage (Base: {damageAmount}, Equipment: {damageBonus}) " +
+                         $"and range {totalRange} (Base: {baseRange}, Weapon: {weaponRange + 1})");
+                
+                AttackManager.Instance.PrepareAttack(totalDamage, totalRange);
+                if (PlayerStatusUI.Instance != null)
+                {
+                    PlayerStatusUI.Instance.UpdateAttackInfo(totalDamage, totalRange);
+                }
+            }
+            else Debug.LogError("AttackManager or Attacker (SelectedUnit/PlayerUnit) is null. Cannot prepare attack.");
         }
     }
-    
-    public void UpdatePlayerStateFromCache()
+
+    private void ApplyImmediateEffect(CardEffect effect, Unit defaultTarget)
     {
-        var cache = PlayedCardEffectCache.Instance;
+        if (effect == null) return;
 
-        if (cache.HasPendingMovement)
-        {
-            Debug.Log("Updating movement range from cache.");
-            UnitManager.Instance.PrepareUnitForMovement(playerUnit);
-        }
-        else
-        {
-            FindObjectOfType<MovementSystem>().HideRange();
-        }
-        PlayerStatsUI.Instance.UpdateMovementPoints(cache.PendingMovement);
+        Unit effectiveTarget = defaultTarget;
 
-        if (cache.HasPendingAttack)
+        if (effectiveTarget == null)
         {
-            Debug.Log("Updating attack range from cache.");
-            isWaitingForPlayerActionResolution = true;
-            int totalDamage = cache.PendingDamage;
-            int totalRange = cache.PendingRange;
-            AttackManager.Instance.PrepareAttack(totalDamage, totalRange);
-            PlayerStatsUI.Instance.UpdateAttackInfo(totalDamage, totalRange);
+            Debug.LogWarning($"No effective target found for immediate effect {effect.effectType}. Tried default: {defaultTarget?.name}");
+            return;
         }
-        else
+
+        switch (effect.effectType)
         {
-            AttackManager.Instance.ClearHighlights();
-            PlayerStatsUI.Instance.ClearAttackInfo();
-            isWaitingForPlayerActionResolution = false;
+            case CardEffect.EffectType.Attack:
+                int totalDamage = effect.value + EquipmentManager.Instance.GetTotalDamageBonus();
+                Debug.Log($"Applying direct Attack {totalDamage} (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalDamageBonus()}) from {effectiveTarget.name}.");
+                break;
+                
+            case CardEffect.EffectType.Move:
+                int totalMove = effect.value + EquipmentManager.Instance.GetTotalMovementSpeedBonus();
+                effectiveTarget.AddMovementPoints(totalMove);
+                Debug.Log($"Added {totalMove} movement points (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalMovementSpeedBonus()}) to {effectiveTarget.name}.");
+                break;
+                
+            case CardEffect.EffectType.Heal:
+                int totalHeal = effect.value + EquipmentManager.Instance.GetTotalHealBonus();
+                effectiveTarget.Heal(totalHeal);
+                Debug.Log($"Healed {effectiveTarget.name} for {totalHeal} (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalHealBonus()}).");
+                break;
+                
+            case CardEffect.EffectType.Block:
+                int totalBlock = effect.value + EquipmentManager.Instance.GetTotalDefenseBonus();
+                effectiveTarget.AddBlock(totalBlock);
+                Debug.Log($"{effectiveTarget.name} gained {totalBlock} Block (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalDefenseBonus()}).");
+                break;
         }
+    }
+
+    private bool IsAttackPending()
+    {
+        if(PlayedCardEffectCache.Instance == null) return false;
+        return PlayedCardEffectCache.Instance.PendingDamage > 0 && isWaitingForPlayerActionResolution;
     }
 
     public void PlayerActionResolved(bool actionWasCompleted)
     {
-        Debug.Log($"Player attack action resolved. Completed: {actionWasCompleted}");
-    
-        if (actionWasCompleted)
-        {
-            PlayedCardEffectCache.Instance.ConsumeAttack();
-        }
+        Debug.Log($"Player action resolved. Completed: {actionWasCompleted}");
+        if(PlayerStatusUI.Instance != null) PlayerStatusUI.Instance.ClearAttackInfo();
         
-        UpdatePlayerStateFromCache();
+        attackAvailable = false;
+        pendingAttackDamage = 0;
+        pendingAttackRange = 0;
+        
+        if(AttackManager.Instance != null)
+        {
+            AttackManager.Instance.ClearHighlights();
+        }
     }
-    
-    public void HandleCancelAction()
-    {
-        if (!IsPlayerTurn || !isWaitingForPlayerActionResolution) return;
 
-        Debug.Log("Player cancelled target selection. Hiding highlights, attack remains armed.");
-        AttackManager.Instance.ClearHighlights();
-    }
 
     public void PlayerEndsTurn()
     {
-        if (!IsPlayerTurn) return;
+        if (!IsPlayerTurn)
+        {
+            Debug.LogWarning("PlayerEndsTurn called, but it's not the player's turn.");
+            return;
+        }
         
-        PlayedCardEffectCache.Instance.ClearCacheForNewTurn();
-        FindObjectOfType<MovementSystem>().HideRange();
-        AttackManager.Instance.ClearHighlights();
+        if (attackAvailable)
+        {
+            attackAvailable = false;
+            pendingAttackDamage = 0;
+            pendingAttackRange = 0;
+            if(AttackManager.Instance != null)
+            {
+                AttackManager.Instance.ClearHighlights();
+            }
+        }
+
+        if (isWaitingForPlayerActionResolution)
+        {
+            Debug.LogWarning("Cannot end turn while waiting for action resolution.");
+            if (PlayerStatusUI.Instance != null) PlayerStatusUI.Instance.ClearAttackInfo();
+            AttackManager.Instance?.ClearHighlights();
+            isWaitingForPlayerActionResolution = false;
+            if(PlayedCardEffectCache.Instance != null) PlayedCardEffectCache.Instance.ClearCache();
+            return;
+        }
         
         int currentAP = ActionPointSystem.Instance.GetCurrentActionPoints();
         carryOverActionPoints = Mathf.Min(currentAP, 1);
@@ -263,8 +405,10 @@ public class GameManager : MonoBehaviour
 
         foreach (var enemy in UnitManager.Instance.GetEnemyUnits())
         {
+            Debug.Log($"Enemy {enemy.name} is taking its turn.");
             if (enemy != null)
             {
+                Debug.Log($"Starting turn for enemy: {enemy.name}");
                 yield return StartCoroutine(enemy.EnemyTurnRoutine());
                 yield return new WaitForSeconds(enemyTurnDelay);
             }

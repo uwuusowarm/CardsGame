@@ -31,7 +31,7 @@ public class UnitManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
     public void HandleUnitSelected(GameObject unit)
     {
         if (!PlayersTurn)
@@ -78,9 +78,7 @@ public class UnitManager : MonoBehaviour
 
         selectedUnit = unitReference;
         selectedUnit.Select();
-
-        int currentMovement = PlayedCardEffectCache.Instance.PendingMovement;
-        movementSystem.Initialize(selectedUnit, hexGrid, currentMovement);
+        movementSystem.Initialize(selectedUnit, hexGrid);
     }
 
     public void ClearOldSelection()
@@ -89,6 +87,10 @@ public class UnitManager : MonoBehaviour
         selectedUnit?.Deselect();
         movementSystem.HideRange();
         selectedUnit = null;
+        if (PlayerStatusUI.Instance != null)
+        {
+            PlayerStatusUI.Instance.ClearAttackInfo();
+        }
         AttackManager.Instance?.ClearHighlights();
     }
 
@@ -101,6 +103,8 @@ public class UnitManager : MonoBehaviour
     {
         unit.MovementFinished -= OnMovementFinished;
         animator.SetBool("IsWalking", false);
+
+        
     }
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)

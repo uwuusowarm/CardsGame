@@ -13,11 +13,11 @@ public class MovementSystem : MonoBehaviour
     public Animator animator;
     private Vector3Int lastUnitHex;
 
-    public void Initialize(Unit unit, HexGrid grid, int movementPointsFromCache)
+    public void Initialize(Unit unit, HexGrid grid)
     {
         selectedUnit = unit;
         hexGrid = grid;
-        remainingMovementPoints = movementPointsFromCache; 
+        remainingMovementPoints = unit.MovementPoints;
         lastUnitHex = hexGrid.GetClosestHex(selectedUnit.transform.position);
         CalculateRange();
     }
@@ -56,24 +56,16 @@ public class MovementSystem : MonoBehaviour
         }
 
         int moveCost = selectedHex.GetCost();
-        
-        int movementUsed = moveCost > 0 ? moveCost : 1;
-        
         Debug.Log($"MoveCost: {moveCost}, Remaining: {remainingMovementPoints}");
-        
-        
         if (moveCost > remainingMovementPoints)
         {
             Debug.Log("Nicht genug Bewegungspunkte!");
             return;
         }
 
-        PlayedCardEffectCache.Instance.UseMovement(movementUsed);
-    
         currentPath.Clear();
         currentPath.Add(selectedHexPosition);
-
-        remainingMovementPoints = PlayedCardEffectCache.Instance.PendingMovement; 
+        remainingMovementPoints -= moveCost;
         selectedHex.HighLightPath();
 
         Debug.Log("ConfirmPath wird aufgerufen");
@@ -115,12 +107,19 @@ public class MovementSystem : MonoBehaviour
         Vector3 endWorldPos = endHex.transform.position;
         selectedUnit.SetIntendedEndPosition(endWorldPos);
         selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
+        
+        selectedUnit.SetMovementPoints(remainingMovementPoints);
+        if (PlayerStatusUI.Instance != null)
+        {
+            PlayerStatusUI.Instance.UpdateMovementPoints(remainingMovementPoints);
+        }
+
         lastUnitHex = endHexPos;
-    
-        selectedUnit.movementPoints = remainingMovementPoints;
-        PlayerStatsUI.Instance.UpdateMovementPoints(remainingMovementPoints);
-    
         ClearPath();
+        if (remainingMovementPoints > 0)
+        {
+            CalculateRange();
+        }
     }
 
     public void ClearPath()

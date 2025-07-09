@@ -250,67 +250,69 @@ public class EnemyUnit : MonoBehaviour
 
     private void PlayCard(CardData card, bool isLeft)
     {
-        var effectsToUse = isLeft ? card.leftEffects : card.rightEffects;
+        var effects = new List<CardEffect>();
+        if (card.leftEffects != null) effects.AddRange(card.leftEffects);
+        // if (card.bottomEffects != null) effects.AddRange(card.bottomEffects);
+        if (card.rightEffects != null) effects.AddRange(card.rightEffects);
 
-        if (card.alwaysEffects != null)
-        {
-            effectsToUse.AddRange(card.alwaysEffects);
-        }
-    
-        Debug.Log($"{name} is playing card '{card.cardName}'. Using " + (isLeft ? "Left" : "Right") + " effects.");
-
-        foreach (var effect in effectsToUse)
+        foreach (var effect in effects)
         {
             switch (effect.effectType)
             {
                 case CardEffect.EffectType.Move:
                     bool moved = MoveTowardsPlayer(effect.value);
                     if (moved)
-                        Debug.Log($"{name} moves up to {effect.value} hexes towards the player.");
+                        Debug.Log($"{name} move by {effect.value} to player.");
                     else
-                        Debug.Log($"{name} could not find a better position to move to.");
+                        Debug.Log($"{name} cant move.");
                     break;
-
                 case CardEffect.EffectType.Attack:
-                    if (IsPlayerInRange(1)) 
+                    if (IsPlayerInRange(2))
                     {
                         AttackPlayer(effect.value);
-                        Debug.Log($"{name} attacks player for {effect.value} damage.");
+                        Debug.Log($"{name} attack player by {effect.value} damage.");
                     }
                     else
                     {
-                        Debug.Log($"{name} wants to attack but player is out of range.");
+                        Debug.Log($"{name} cant attack because of range.");
                     }
                     break;
-
                 case CardEffect.EffectType.Block:
-                    // Placeholder for block logic
-                    Debug.Log($"{name} gained {effect.value} block.");
                     break;
             }
         }
-    
-        hand.Remove(card);
-        Debug.Log($"{name} discarded '{card.cardName}'.");
+        Debug.Log($"{name} behält die Karte '{card.cardName}' in der Hand");
     }
-
-
     
     private bool MoveTowardsPlayer(int steps)
 {
-    var player = GameObject.FindGameObjectWithTag("Player");
-    if (player == null) return false;
-
-    Hex playerHexObject = HexGrid.Instance.GetTileAt(HexGrid.Instance.GetClosestHex(player.transform.position));
-    if (playerHexObject == null)
-    {
-        Debug.LogWarning("Player is not on a valid hex. Cannot move towards them.");
+    var playerGO = GameObject.FindGameObjectWithTag("Player");
+    if (playerGO == null) {
+        Debug.LogError("AI Error: Player object with tag 'Player' not found.");
+        return false;
+    }
+    var playerUnit = playerGO.GetComponent<Unit>();
+    if (playerUnit == null) {
+        Debug.LogError("AI Error: Player object does not have a Unit component.");
         return false;
     }
 
-    Vector3Int myHex = HexGrid.Instance.GetClosestHex(transform.position);
+    Hex playerHexObject = playerUnit.GetCurrentHex();
+    if (playerHexObject == null)
+    {
+        Debug.LogWarning("Player is not on a valid hex (playerUnit.GetCurrentHex() is null). Cannot move towards them.");
+        return false;
+    }
 
-    var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHex, steps);
+    if (this.currentHex == null)
+    {
+        Debug.LogWarning($"{name} is not on a valid hex (this.currentHex is null). Cannot calculate movement path.");
+        return false;
+    }
+    
+    Vector3Int myHexCoords = this.currentHex.hexCoords;
+
+    var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHexCoords, steps);
     var availablePositions = bfsResult.GetRangePositions().ToList();
 
     if (availablePositions.Count <= 1)
@@ -319,11 +321,13 @@ public class EnemyUnit : MonoBehaviour
         return false;
     }
 
-    Vector3Int bestPosition = myHex;
-    int shortestDistance = int.MaxValue;
+    Vector3Int bestPosition = myHexCoords;
+    int shortestDistance = HexGrid.Instance.GetDistance(this.currentHex, playerHexObject);
 
     foreach (var pos in availablePositions)
     {
+        if (pos == myHexCoords) continue;
+
         var hex = HexGrid.Instance.GetTileAt(pos);
         if (hex != null && !hex.IsObstacle() && (!hex.HasEnemyUnit() || hex.EnemyUnitOnHex == this))
         {
@@ -336,16 +340,16 @@ public class EnemyUnit : MonoBehaviour
         }
     }
 
-    if (bestPosition == myHex)
+    if (bestPosition == myHexCoords)
     {
-        Debug.Log($"{name} is already at the best possible position within range.");
+        Debug.Log($"{name} is already at the best possible position or cannot get closer.");
         return false;
     }
 
     var targetHex = HexGrid.Instance.GetTileAt(bestPosition);
+    
+    currentHex?.ClearEnemyUnit();
     StartCoroutine(MoveToHexSmooth(targetHex));
-
-    currentHex?.SetEnemyUnit(null);
     currentHex = targetHex;
     currentHex.SetEnemyUnit(this);
 
