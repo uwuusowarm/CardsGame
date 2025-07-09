@@ -58,6 +58,16 @@ public class EquipmentManager : MonoBehaviour
             OnEquipmentChanged?.Invoke(slot);
         }
     }
+    
+    public void UnequipAll()
+    {
+        List<ItemSlot> slotsToUnequip = new List<ItemSlot>(equippedItems.Keys);
+        foreach(var slot in slotsToUnequip)
+        {
+            UnequipItem(slot);
+        }
+        Debug.Log("All items unequipped.");
+    }
 
      public int GetTotalDamageBonus()
     {
