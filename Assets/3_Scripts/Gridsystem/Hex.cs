@@ -19,6 +19,8 @@ public class Hex : MonoBehaviour
 
     [Tooltip("A non-unit object placed on this hex (e.g., door, chest, obstacle).")]
     public GameObject PlacedObject { get; private set; }
+    
+    private ChestController chestOnTile;
 
     public int GetCost()
         => hexType switch
@@ -117,6 +119,27 @@ public class Hex : MonoBehaviour
     public bool HasEnemyUnit()
     {
         return EnemyUnitOnHex != null;
+    }
+
+    public void SetChest(ChestController chest)
+    {
+        chestOnTile = chest;
+    }
+
+    public void ClearChest()
+    {
+        chestOnTile = null;
+    }
+    
+    public ChestController GetChest()
+    {
+        return chestOnTile;
+    }
+    
+    public HexType HexType
+    {
+        get => hexType;
+        set => hexType = value;
     }
 }
 

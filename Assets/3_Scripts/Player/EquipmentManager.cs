@@ -1,4 +1,4 @@
-
+using System; 
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +6,10 @@ public class EquipmentManager : MonoBehaviour
 {
     public static EquipmentManager Instance { get; private set; }
 
+    public event Action<ItemSlot> OnEquipmentChanged;
+
     private Dictionary<ItemSlot, ItemData> equippedItems = new Dictionary<ItemSlot, ItemData>();
-    public ItemClassType playerClass = ItemClassType.Warrior; // Set this based on player's class
+    public ItemClassType playerClass = ItemClassType.Warrior; 
 
     private void Awake()
     {
@@ -34,34 +36,42 @@ public class EquipmentManager : MonoBehaviour
     public void EquipItem(ItemData item)
     {
         if (item == null) return;
-        
-        if (item.itemClass != ItemClassType.Any && item.itemClass != playerClass)
+
+        if (equippedItems[item.itemSlot] != null)
         {
-            Debug.Log($"Cannot equip {item.name}: wrong class type!");
-            return;
+            Debug.Log($"Replaced '{equippedItems[item.itemSlot].name}' with '{item.name}' in slot {item.itemSlot}.");
         }
 
         equippedItems[item.itemSlot] = item;
+        Debug.Log($"Equipped '{item.name}'.");
+
+        OnEquipmentChanged?.Invoke(item.itemSlot);
     }
 
     public void UnequipItem(ItemSlot slot)
     {
-        equippedItems[slot] = null;
+        if (equippedItems.ContainsKey(slot) && equippedItems[slot] != null)
+        {
+            Debug.Log($"Unequipped {equippedItems[slot].name} from slot {slot}.");
+            equippedItems[slot] = null;
+            
+            OnEquipmentChanged?.Invoke(slot);
+        }
     }
 
-    public int GetTotalDamageBonus()
+     public int GetTotalDamageBonus()
     {
         int bonus = 0;
         foreach (var item in equippedItems.Values)
         {
             if (item == null) continue;
-            
             bonus += item.damageBonus;
             
-            if (item.classBonus1Type == StatBonusType.Dmg)
-                bonus += item.classBonus1Amount;
-            if (item.classBonus2Type == StatBonusType.Dmg)
-                bonus += item.classBonus2Amount;
+            if (playerClass == item.itemClass)
+            {
+                if (item.classBonus1Type == StatBonusType.Dmg) bonus += item.classBonus1Amount;
+                if (item.classBonus2Type == StatBonusType.Dmg) bonus += item.classBonus2Amount;
+            }
         }
         return bonus;
     }
@@ -72,13 +82,13 @@ public class EquipmentManager : MonoBehaviour
         foreach (var item in equippedItems.Values)
         {
             if (item == null) continue;
-            
             bonus += item.defenseBonus;
             
-            if (item.classBonus1Type == StatBonusType.Def)
-                bonus += item.classBonus1Amount;
-            if (item.classBonus2Type == StatBonusType.Def)
-                bonus += item.classBonus2Amount;
+            if (playerClass == item.itemClass)
+            {
+                if (item.classBonus1Type == StatBonusType.Def) bonus += item.classBonus1Amount;
+                if (item.classBonus2Type == StatBonusType.Def) bonus += item.classBonus2Amount;
+            }
         }
         return bonus;
     }
@@ -89,13 +99,13 @@ public class EquipmentManager : MonoBehaviour
         foreach (var item in equippedItems.Values)
         {
             if (item == null) continue;
-            
             bonus += item.healBonus;
             
-            if (item.classBonus1Type == StatBonusType.Heal)
-                bonus += item.classBonus1Amount;
-            if (item.classBonus2Type == StatBonusType.Heal)
-                bonus += item.classBonus2Amount;
+            if (playerClass == item.itemClass)
+            {
+                if (item.classBonus1Type == StatBonusType.Heal) bonus += item.classBonus1Amount;
+                if (item.classBonus2Type == StatBonusType.Heal) bonus += item.classBonus2Amount;
+            }
         }
         return bonus;
     }
@@ -106,13 +116,13 @@ public class EquipmentManager : MonoBehaviour
         foreach (var item in equippedItems.Values)
         {
             if (item == null) continue;
-            
             bonus += item.movementSpeedBonus;
             
-            if (item.classBonus1Type == StatBonusType.MS)
-                bonus += item.classBonus1Amount;
-            if (item.classBonus2Type == StatBonusType.MS)
-                bonus += item.classBonus2Amount;
+            if (playerClass == item.itemClass)
+            {
+                if (item.classBonus1Type == StatBonusType.MS) bonus += item.classBonus1Amount;
+                if (item.classBonus2Type == StatBonusType.MS) bonus += item.classBonus2Amount;
+            }
         }
         return bonus;
     }
@@ -123,13 +133,13 @@ public class EquipmentManager : MonoBehaviour
         foreach (var item in equippedItems.Values)
         {
             if (item == null) continue;
-            
             bonus += item.maxHpBonus;
             
-            if (item.classBonus1Type == StatBonusType.MaxHP)
-                bonus += item.classBonus1Amount;
-            if (item.classBonus2Type == StatBonusType.MaxHP)
-                bonus += item.classBonus2Amount;
+            if (playerClass == item.itemClass)
+            {
+                if (item.classBonus1Type == StatBonusType.MaxHP) bonus += item.classBonus1Amount;
+                if (item.classBonus2Type == StatBonusType.MaxHP) bonus += item.classBonus2Amount;
+            }
         }
         return bonus;
     }
@@ -140,13 +150,13 @@ public class EquipmentManager : MonoBehaviour
         foreach (var item in equippedItems.Values)
         {
             if (item == null) continue;
-            
             bonus += item.maxApBonus;
             
-            if (item.classBonus1Type == StatBonusType.AP)
-                bonus += item.classBonus1Amount;
-            if (item.classBonus2Type == StatBonusType.AP)
-                bonus += item.classBonus2Amount;
+            if (playerClass == item.itemClass)
+            {
+                if (item.classBonus1Type == StatBonusType.AP) bonus += item.classBonus1Amount;
+                if (item.classBonus2Type == StatBonusType.AP) bonus += item.classBonus2Amount;
+            }
         }
         return bonus;
     }
