@@ -18,5 +18,6 @@ public class HoverImageHandler : MonoBehaviour, IPointerEnterHandler, IPointerEx
     {
         if (hoverImage != null)
             hoverImage.SetActive(false);
+       
     }
 }

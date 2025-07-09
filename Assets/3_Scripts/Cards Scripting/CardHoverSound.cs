@@ -16,7 +16,7 @@ public class CardHoverSound : MonoBehaviour, IPointerEnterHandler
     {
         if (hoverSound != null)
         {
-            audioSource.PlayOneShot(hoverSound);
+            Sound_Manager.instance.Play("Hover_V1");
         }
         else
         {
