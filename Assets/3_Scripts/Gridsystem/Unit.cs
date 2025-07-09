@@ -180,29 +180,17 @@ public class Unit : MonoBehaviour
             }
             intendedEndPosition = null; 
         }
-
-        Vector3Int newHexCoords = hexGrid.GetClosestHex(endPosition);
-        currentHex = hexGrid.GetTileAt(newHexCoords);
+        Vector3Int fallbackHexCoords = FindNearestExistingHex(hexGrid, transform.position);
+        currentHex = hexGrid.GetTileAt(fallbackHexCoords);
         if (currentHex != null)
         {
+            Vector3 hexPos = currentHex.transform.position;
+            transform.position = new Vector3(hexPos.x, transform.position.y, hexPos.z);
             currentHex.SetUnit(this);
         }
         else
         {
-            Debug.LogWarning($"[Unit] No hex... new hex {newHexCoords}!");
-            Vector3Int fallbackHexCoords = FindNearestExistingHex(hexGrid, endPosition);
-            currentHex = hexGrid.GetTileAt(fallbackHexCoords);
-            if (currentHex != null)
-            {
-                Debug.Log($"[Unit] fallback on hex {fallbackHexCoords}");
-                Vector3 hexPos = currentHex.transform.position;
-                transform.position = new Vector3(hexPos.x, transform.position.y, hexPos.z);
-                currentHex.SetUnit(this);
-            }
-            else
-            {
-                Debug.LogError("[Unit] Error no Hex found.");
-            }
+            Debug.LogError("[Unit] Error no Hex found!");
         }
 
         if (pathPositions.Count > 0)
@@ -213,7 +201,6 @@ public class Unit : MonoBehaviour
         else
         {
             Debug.Log("Movement finished!");
-            //movementPoints = 0;
             MovementFinished?.Invoke(this);
         }
     }
