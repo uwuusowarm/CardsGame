@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitForManagersAndStartGame()
     {
-        yield return new WaitUntil(() => CardManager.Instance != null &&
+        /*yield return new WaitUntil(() => CardManager.Instance != null &&
                                          UnitManager.Instance != null &&
                                          HexGrid.Instance != null &&
                                          AttackManager.Instance != null &&
@@ -68,7 +68,8 @@ public class GameManager : MonoBehaviour
                                          ExhaustionSystem.Instance != null &&
                                          ActionPointSystem.Instance != null &&
                                          EquipmentManager.Instance != null &&
-                                         playerUnit != null);
+                                         PlayerDataManager.Instance.IsDataLoaded);*/
+        yield return new WaitForSeconds(0.1f);
         StartGame();
     }
 
@@ -354,6 +355,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         
+        PlayerDataManager.Instance.SavePlayerState();
         if (attackAvailable)
         {
             attackAvailable = false;
