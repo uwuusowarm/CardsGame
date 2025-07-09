@@ -1,9 +1,9 @@
 using UnityEngine;
 using TMPro;
 
-public class PlayerStatsUI : MonoBehaviour
+public class PlayerStatusUI : MonoBehaviour
 {
-    public static PlayerStatsUI Instance { get; private set; }
+    public static PlayerStatusUI Instance { get; private set; }
 
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI movementPointsText;
