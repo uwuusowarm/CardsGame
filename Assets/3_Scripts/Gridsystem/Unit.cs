@@ -11,7 +11,7 @@ public class Unit : MonoBehaviour
     [SerializeField] public int movementPoints = 0;
     [SerializeField] public int actionPoints = 4;
     public int shieldPoints = 0;
-    protected Hex currentHex;
+    public Hex currentHex;
     public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
     
@@ -180,16 +180,17 @@ public class Unit : MonoBehaviour
             }
             intendedEndPosition = null; 
         }
-
-        Vector3Int newHexCoords = hexGrid.GetClosestHex(endPosition);
-        currentHex = hexGrid.GetTileAt(newHexCoords);
+        Vector3Int fallbackHexCoords = FindNearestExistingHex(hexGrid, transform.position);
+        currentHex = hexGrid.GetTileAt(fallbackHexCoords);
         if (currentHex != null)
         {
+            Vector3 hexPos = currentHex.transform.position;
+            transform.position = new Vector3(hexPos.x, transform.position.y, hexPos.z);
             currentHex.SetUnit(this);
         }
         else
         {
-            Debug.Log("Error");
+            Debug.LogError("[Unit] Error no Hex found!");
         }
 
         if (pathPositions.Count > 0)
@@ -200,10 +201,27 @@ public class Unit : MonoBehaviour
         else
         {
             Debug.Log("Movement finished!");
-            //movementPoints = 0;
             MovementFinished?.Invoke(this);
         }
     }
+
+    private Vector3Int FindNearestExistingHex(HexGrid hexGrid, Vector3 position)
+{
+    Vector3Int center = hexGrid.GetClosestHex(position);
+    int searchRadius = 1;
+    while (searchRadius < 5) 
+    {
+        foreach (var kvp in hexGrid.GetAllHexes())
+        {
+            if (Vector3.Distance(kvp.Value.transform.position, position) < searchRadius * 2f)
+            {
+                return kvp.Key;
+            }
+        }
+        searchRadius++;
+    }
+    return center;
+}
 
     private Vector3? intendedEndPosition = null;
 

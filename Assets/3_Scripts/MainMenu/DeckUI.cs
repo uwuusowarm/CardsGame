@@ -8,26 +8,27 @@ public class DeckUI : MonoBehaviour
 {
     [Header("UI-Elemente im Prefab")]
     [SerializeField] private TextMeshProUGUI deckNameText;
+    [SerializeField] private GameObject editButtonObject;
+    [SerializeField] private GameObject deleteButtonObject;
+    [SerializeField] private GameObject highlightOverlay;
+
     [SerializeField] private Button editButton;
     [SerializeField] private Button deleteButton;
 
     private Deck assignedDeck;
     private CardMenuManager manager;
+    private Action<DeckUI> onDeckSelectedCallback_Play;
 
     public void Initialize(Deck deck, CardMenuManager menuManager)
     {
-        this.assignedDeck = deck;
         this.manager = menuManager;
+        InternalSetup(deck);
 
-        if (deckNameText != null && assignedDeck != null)
-        {
-            deckNameText.text = assignedDeck.DeckName;
-        }
+        GetComponent<Button>().onClick.RemoveAllListeners();
+        editButton?.onClick.RemoveAllListeners();
+        deleteButton?.onClick.RemoveAllListeners();
 
-        HideActions();
-
-        GetComponent<Button>().onClick.AddListener(OnDeckSelected);
-
+        GetComponent<Button>().onClick.AddListener(OnDeckSelectedForEdit);
         if (editButton != null)
         {
             editButton.onClick.AddListener(OnEditButtonClicked);
@@ -38,21 +39,26 @@ public class DeckUI : MonoBehaviour
         }
     }
 
-    public void Initialize(Deck deck, Action<Deck> onSelected)
+    public void Initialize(Deck deck, Action<DeckUI> onSelected)
+    {
+        InternalSetup(deck);
+        this.onDeckSelectedCallback_Play = onSelected;
+        GetComponent<Button>().onClick.RemoveAllListeners();
+        GetComponent<Button>().onClick.AddListener(() => onDeckSelectedCallback_Play?.Invoke(this));
+    }
+
+    private void InternalSetup(Deck deck)
     {
         this.assignedDeck = deck;
-        if (deckNameText != null)
+        if (deckNameText != null && assignedDeck != null)
         {
             deckNameText.text = assignedDeck.DeckName;
         }
-        GetComponent<Button>().onClick.RemoveAllListeners();
-        GetComponent<Button>().onClick.AddListener(() => onSelected(deck));
-
-        if (editButton != null) editButton.gameObject.SetActive(false);
-        if (deleteButton != null) deleteButton.gameObject.SetActive(false);
+        HideActions();
+        SetHighlight(false);
     }
 
-    private void OnDeckSelected()
+    private void OnDeckSelectedForEdit()
     {
         if (manager != null)
         {
@@ -78,14 +84,26 @@ public class DeckUI : MonoBehaviour
 
     public void ShowActions()
     {
-        if (editButton != null) editButton.gameObject.SetActive(true);
-        if (deleteButton != null) deleteButton.gameObject.SetActive(true);
+        if (editButtonObject != null) 
+            editButtonObject.SetActive(true);
+        if (deleteButtonObject != null) 
+            deleteButtonObject.SetActive(true);
     }
 
     public void HideActions()
     {
-        if (editButton != null) editButton.gameObject.SetActive(false);
-        if (deleteButton != null) deleteButton.gameObject.SetActive(false);
+        if (editButtonObject != null) 
+            editButtonObject.SetActive(false);
+        if (deleteButtonObject != null) 
+            deleteButtonObject.SetActive(false);
+    }
+
+    public void SetHighlight(bool isHighlighted)
+    {
+        if (highlightOverlay != null)
+        {
+            highlightOverlay.SetActive(isHighlighted);
+        }
     }
 
     public Deck GetAssignedDeck()
