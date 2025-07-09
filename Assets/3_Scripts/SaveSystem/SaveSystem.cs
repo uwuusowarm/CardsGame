@@ -26,7 +26,7 @@ public static class SaveSystem
         }
         else
         {
-            Debug.LogWarning("No save file found. Returning new empty deck list.");
+            Debug.LogWarning("No save files found.");
             return new List<Deck>();
         }
     }
