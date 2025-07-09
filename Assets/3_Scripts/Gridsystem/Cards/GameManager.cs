@@ -60,15 +60,65 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitForManagersAndStartGame()
     {
-        yield return new WaitUntil(() => CardManager.Instance != null &&
-                                         UnitManager.Instance != null &&
-                                         HexGrid.Instance != null &&
-                                         AttackManager.Instance != null &&
-                                         PlayedCardEffectCache.Instance != null &&
-                                         ExhaustionSystem.Instance != null &&
-                                         ActionPointSystem.Instance != null &&
-                                         EquipmentManager.Instance != null &&
-                                         PlayerDataManager.Instance.IsDataLoaded);
+        Debug.Log("Starting manager initialization check...");
+    
+        while (true)
+        {
+            bool allInitialized = true;
+        
+            if (CardManager.Instance == null) {
+                Debug.Log("Waiting for CardManager...");
+                allInitialized = false;
+            }
+        
+            if (UnitManager.Instance == null) {
+                Debug.Log("Waiting for UnitManager...");
+                allInitialized = false;
+            }
+        
+            if (HexGrid.Instance == null) {
+                Debug.Log("Waiting for HexGrid...");
+                allInitialized = false;
+            }
+        
+            if (AttackManager.Instance == null) {
+                Debug.Log("Waiting for AttackManager...");
+                allInitialized = false;
+            }
+        
+            if (PlayedCardEffectCache.Instance == null) {
+                Debug.Log("Waiting for PlayedCardEffectCache...");
+                allInitialized = false;
+            }
+        
+            if (ExhaustionSystem.Instance == null) {
+                Debug.Log("Waiting for ExhaustionSystem...");
+                allInitialized = false;
+            }
+        
+            if (ActionPointSystem.Instance == null) {
+                Debug.Log("Waiting for ActionPointSystem...");
+                allInitialized = false;
+            }
+        
+            if (EquipmentManager.Instance == null) {
+                Debug.Log("Waiting for EquipmentManager...");
+                allInitialized = false;
+            }
+        
+            if (PlayerDataManager.Instance == null || !PlayerDataManager.Instance.IsDataLoaded) {
+                Debug.Log("Waiting for PlayerDataManager or data to load...");
+                allInitialized = false;
+            }
+
+            if (allInitialized) {
+                Debug.Log("All managers initialized successfully!");
+                break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+    
         StartGame();
     }
 
