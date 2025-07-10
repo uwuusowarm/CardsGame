@@ -1087,13 +1087,18 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2794656795010923637, guid: 0eebf37d75cc5d4499f9238d1e3320fc,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 55
+      objectReference: {fileID: 0}
+    - target: {fileID: 2794656795010923637, guid: 0eebf37d75cc5d4499f9238d1e3320fc,
+        type: 3}
       propertyPath: m_LocalScale.y
-      value: 75.54169
+      value: 55
       objectReference: {fileID: 0}
     - target: {fileID: 2794656795010923637, guid: 0eebf37d75cc5d4499f9238d1e3320fc,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 75.54169
+      value: 55
       objectReference: {fileID: 0}
     - target: {fileID: 2794656795010923637, guid: 0eebf37d75cc5d4499f9238d1e3320fc,
         type: 3}
@@ -1143,6 +1148,11 @@ PrefabInstance:
     - target: {fileID: 2794656795010923637, guid: 0eebf37d75cc5d4499f9238d1e3320fc,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2794656795010923637, guid: 0eebf37d75cc5d4499f9238d1e3320fc,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3279549756802705103, guid: 0eebf37d75cc5d4499f9238d1e3320fc,
@@ -9780,6 +9790,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyTurnDelay: 1
+  gameOverCanvasGroup: {fileID: 0}
+  gameOverFadeDuration: 1.5
+  mainMenuSceneName: MainMenu
 --- !u!4 &1651346450
 Transform:
   m_ObjectHideFlags: 0

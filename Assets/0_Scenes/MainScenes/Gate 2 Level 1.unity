@@ -2550,8 +2550,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
+        type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.035460472
       objectReference: {fileID: 0}
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
@@ -2561,12 +2576,12 @@ PrefabInstance:
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.050976753
       objectReference: {fileID: 0}
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8660254
+      value: 0.96968573
       objectReference: {fileID: 0}
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
@@ -2576,7 +2591,7 @@ PrefabInstance:
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.5
+      value: -0.2443557
       objectReference: {fileID: 0}
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
@@ -2591,7 +2606,7 @@ PrefabInstance:
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -60
+      value: -28.288
       objectReference: {fileID: 0}
     - target: {fileID: 8780032900086209593, guid: bd76924e9b533fb4fa87ad526e2d71dc,
         type: 3}
@@ -9138,6 +9153,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyTurnDelay: 1
+  gameOverCanvasGroup: {fileID: 0}
+  gameOverFadeDuration: 1.5
+  mainMenuSceneName: MainMenu
 --- !u!4 &1651346450
 Transform:
   m_ObjectHideFlags: 0
