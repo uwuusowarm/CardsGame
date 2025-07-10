@@ -100,6 +100,28 @@ public class CardManager : MonoBehaviour
         hasDrawnStartHand = true;
         DrawCards(drawCount);
     }
+    
+    public void DrawExtraCards(int count)
+    {
+        if (deck.Count == 0 && discardPile.Count > 0)
+        {
+            deck.AddRange(discardPile);
+            discardPile.Clear();
+            Shuffle(deck);
+        }
+
+        int toDraw = Mathf.Min(count, deck.Count);
+
+        for (int i = 0; i < toDraw; i++)
+        {
+            if (deck.Count > 0)
+            {
+                hand.Add(deck[0]);
+                deck.RemoveAt(0);
+            }
+        }
+        UpdateAllUI();
+    }
 
     public void DrawCards(int count)
     {
@@ -127,6 +149,13 @@ public class CardManager : MonoBehaviour
 
     public void OnDeckClicked()
     {
+        if (hand.Count > 0)
+        {
+            discardPile.AddRange(hand);
+            hand.Clear();
+            Sound_Manager.instance.Play("Discard");
+        }
+        
         DrawCards(drawCount);
         Sound_Manager.instance.Play("Deck_Shuffel");
     }
