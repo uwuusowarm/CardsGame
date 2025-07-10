@@ -11,7 +11,7 @@ public class Unit : MonoBehaviour
     [SerializeField] public int movementPoints = 0;
     [SerializeField] public int actionPoints = 4;
     public int shieldPoints = 0;
-    protected Hex currentHex;
+    public Hex currentHex;
     public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
     
