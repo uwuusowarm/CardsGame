@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 
 public class Sound_Manager : MonoBehaviour
@@ -36,6 +37,17 @@ public class Sound_Manager : MonoBehaviour
 
     }
 
+    private void Start()
+    {
+        if (SceneManager.GetActiveScene().name == "DefaultLevel")
+        {
+            Sound_Manager.instance.Play("Level_Music");
+        }
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+            Sound_Manager.instance.Play("Main_Menu_Music");
+        }
+    }
 
     public void Play(string name)
     {

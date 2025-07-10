@@ -53,8 +53,8 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnDrag(PointerEventData e)
     {
         if (isInMenu) return;
-
         rt.position = e.position;
+        
     }
 
     public void OnEndDrag(PointerEventData e)
@@ -85,6 +85,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         bool droppedOnDiscard = RectTransformUtility.RectangleContainsScreenPoint(
             discardZone, e.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
+     
         );
 
         if (droppedOnLeft)
@@ -107,6 +108,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         else if (droppedOnDiscard) 
         {
             CardManager.Instance.MoveToZone(Card, DropType.Discard);
+            Sound_Manager.instance.Play("Discard");
         }
         else
         {

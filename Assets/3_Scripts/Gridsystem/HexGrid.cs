@@ -130,6 +130,11 @@ public class HexGrid : MonoBehaviour
     
     public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range = 1) { return new List<Vector3Int>(); }
     public void AddMovementPoints(int points) {  }
+
+    public Dictionary<Vector3Int, Hex> GetAllHexes()
+    {
+        return hexTileDict;
+    }
 }
 
 

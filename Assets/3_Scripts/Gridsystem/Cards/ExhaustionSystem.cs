@@ -35,4 +35,14 @@ public class ExhaustionSystem : MonoBehaviour
         Debug.Log($"Removed {cardsToRemove} random cards from deck due to exhaustion");
     }
 
+    public int GetExhaustionStacks()
+    {
+        return exhaustionStacks;
+    }
+
+    public void SetExhaustionStacks(int stacks)
+    {
+        exhaustionStacks = stacks;
+        Debug.Log($"Exhaustion stacks set to: {exhaustionStacks}");
+    }
 }
