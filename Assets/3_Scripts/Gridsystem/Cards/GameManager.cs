@@ -355,11 +355,50 @@ public class GameManager : MonoBehaviour
     {
         if (effect == null) return;
 
+        switch (effect.effectType)
+        {
+            case CardEffect.EffectType.Draw:
+                if (CardManager.Instance != null)
+                {
+                    Debug.Log($"Drawing {effect.value} card(s) from always effect.");
+                    CardManager.Instance.DrawExtraCards(effect.value);
+                }
+                else
+                {
+                    Debug.LogError("CardManager.Instance is null. Cannot draw cards.");
+                }
+                return; 
+
+            case CardEffect.EffectType.ActionPlus:
+                if (ActionPointSystem.Instance != null)
+                {
+                    Debug.Log($"Gaining {effect.value} Action Point(s) from always effect.");
+                    ActionPointSystem.Instance.AddActionPoints(effect.value);
+                }
+                else
+                {
+                    Debug.LogError("ActionPointSystem.Instance is null. Cannot add action points.");
+                }
+                return; 
+            
+            case CardEffect.EffectType.Block:
+                if (ShieldSystem.Instance != null)
+                {
+                    Debug.Log($"Gaining {effect.value} Action Point(s) from always effect.");
+                    ShieldSystem.Instance.AddShields(effect.value);
+                }
+                else
+                {
+                    Debug.LogError("ActionPointSystem.Instance is null. Cannot add action points.");
+                }
+                return; 
+        }
+
         Unit effectiveTarget = defaultTarget;
 
         if (effectiveTarget == null)
         {
-            Debug.LogWarning($"No effective target found for immediate effect {effect.effectType}. Tried default: {defaultTarget?.name}");
+            Debug.LogWarning($"No effective target found for targeted immediate effect {effect.effectType}. Tried default: {defaultTarget?.name}");
             return;
         }
 
