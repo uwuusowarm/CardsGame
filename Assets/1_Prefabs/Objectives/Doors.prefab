@@ -27,8 +27,8 @@ Transform:
   m_GameObject: {fileID: 8281124835954512970}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.010877, y: 0.067, z: -0.10606}
-  m_LocalScale: {x: 0.62619, y: 0.62619, z: 0.62619}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.53137857, y: 0.53137857, z: 0.53137857}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 549946319388154406}
@@ -70,8 +70,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomID: 0
   isOpen: 0
-  "t\xFCrGeschlossenObjekt": {fileID: 0}
-  "t\xFCrOffenObjekt": {fileID: 0}
+  "t\xFCrGeschlossenObjekt": {fileID: 7335863105739785750}
+  "t\xFCrOffenObjekt": {fileID: 930589185844854940}
 --- !u!1001 &1749549342531228967
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -166,6 +166,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1749549342531228967}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &930589185844854940 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1490049587766744507, guid: 36673e14ccd948943b95b8f78ae48b4d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1749549342531228967}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3548326330406299381
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -239,6 +245,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f5193a10b2bf2274cb29d5e9589e7057, type: 3}
+--- !u!1 &7335863105739785750 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6120417593834332387, guid: f5193a10b2bf2274cb29d5e9589e7057,
+    type: 3}
+  m_PrefabInstance: {fileID: 3548326330406299381}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7964026655120546988 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6898327102202559065, guid: f5193a10b2bf2274cb29d5e9589e7057,
