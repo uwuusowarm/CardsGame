@@ -139,8 +139,19 @@ public class HealthSystem : MonoBehaviour
 
     public void LoseHealth(int amount)
     {
+        if (currentHealth <= 0) return;
+
         currentHealth = Mathf.Max(currentHealth - amount, 0);
         UpdateHealthDisplay();
+
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Player health depleted. Signaling game over.");
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.HandlePlayerDeath();
+            }
+        }
     }
 
     private void UpdateHealthDisplay()

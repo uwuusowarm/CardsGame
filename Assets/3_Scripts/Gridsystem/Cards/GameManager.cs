@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -7,10 +9,16 @@ public class GameManager : MonoBehaviour
 
     [Header("Game Settings")]
     [SerializeField] private float enemyTurnDelay = 1f;
+    
+    [Header("Game Over")]
+    [SerializeField] private CanvasGroup gameOverCanvasGroup;
+    [SerializeField] private float gameOverFadeDuration = 1.5f;
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private bool isFirstTurn = true;
     public bool IsPlayerTurn { get; private set; } = false;
     private bool isWaitingForPlayerActionResolution = false;
+    private bool isGameOver = false;
     
     private bool attackAvailable = false;
     private int pendingAttackDamage = 0;
@@ -33,6 +41,12 @@ public class GameManager : MonoBehaviour
             Destroy(this);
         }
 
+        if (gameOverCanvasGroup != null)
+        {
+            gameOverCanvasGroup.alpha = 0;
+            gameOverCanvasGroup.interactable = false;
+            gameOverCanvasGroup.blocksRaycasts = false;
+        }
     }
 
     private void Start()
@@ -131,6 +145,7 @@ public class GameManager : MonoBehaviour
 
     public void StartPlayerTurn()
     {
+        if (isGameOver) return;
         Debug.Log("Starting Player Turn.");
         IsPlayerTurn = true;
         isWaitingForPlayerActionResolution = false;
@@ -190,6 +205,7 @@ public class GameManager : MonoBehaviour
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
     {
+        if (isGameOver) return;
         int AP = ActionPointSystem.Instance.GetCurrentActionPoints();
         
         if (AP <= 0)
@@ -398,6 +414,8 @@ public class GameManager : MonoBehaviour
 
     public void PlayerEndsTurn()
     {
+        if (isGameOver) return;
+
         if (!IsPlayerTurn)
         {
             Debug.LogWarning("PlayerEndsTurn called, but it's not the player's turn.");
@@ -436,10 +454,12 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator EnemyTurnRoutine()
     {
+        if (isGameOver) yield break;
         Debug.Log("Starting Enemy Turn Routine.");
 
         foreach (var enemy in UnitManager.Instance.GetEnemyUnits())
         {
+            if (isGameOver) yield break;
             Debug.Log($"Enemy {enemy.name} is taking its turn.");
             if (enemy != null)
             {
@@ -448,7 +468,56 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(enemyTurnDelay);
             }
         }
-        ShieldSystem.Instance.LoseShields(100);
-        StartPlayerTurn();
+        if (!isGameOver)
+        {
+            ShieldSystem.Instance.LoseShields(100);
+            StartPlayerTurn();
+        }
+    }
+
+    public void HandlePlayerDeath()
+    {
+        if (isGameOver) return;
+
+        isGameOver = true;
+        IsPlayerTurn = false;
+        Debug.Log("Game Over sequence initiated.");
+
+        if (UnitManager.Instance?.SelectedUnit != null)
+        {
+            UnitManager.Instance.ClearOldSelection();
+        }
+
+        StopAllCoroutines();
+
+        if (gameOverCanvasGroup != null)
+        {
+            StartCoroutine(FadeInGameOverScreen());
+        }
+        else
+        {
+            Debug.LogError("GameOverCanvasGroup is not assigned in the GameManager inspector!");
+        }
+    }
+
+    private IEnumerator FadeInGameOverScreen()
+    {
+        float time = 0;
+        gameOverCanvasGroup.gameObject.SetActive(true);
+        while (time < gameOverFadeDuration)
+        {
+            gameOverCanvasGroup.alpha = Mathf.Lerp(0, 1, time / gameOverFadeDuration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        gameOverCanvasGroup.alpha = 1;
+        gameOverCanvasGroup.interactable = true;
+        gameOverCanvasGroup.blocksRaycasts = true;
+    }
+
+    public void ReturnToMainMenu()
+    {
+        Debug.Log($"Returning to Main Menu scene: {mainMenuSceneName}");
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }
