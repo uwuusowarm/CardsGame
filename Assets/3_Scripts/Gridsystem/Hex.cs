@@ -7,6 +7,7 @@ public class Hex : MonoBehaviour
     [SerializeField] private GlowHighlight highlight;
     private HexCoordinates hexCoordinates;
     public Vector3Int HexCoords { get; set; }
+    public Vector3Int hexCoords => hexCoordinates.GetHexCoords();
 
     [SerializeField] private HexType hexType;
     
@@ -18,8 +19,8 @@ public class Hex : MonoBehaviour
 
     [Tooltip("A non-unit object placed on this hex (e.g., door, chest, obstacle).")]
     public GameObject PlacedObject { get; private set; }
-
-    public Vector3Int hexCoords => hexCoordinates.GetHexCoords();
+    
+    private ChestController chestOnTile;
 
     public int GetCost()
         => hexType switch
@@ -118,6 +119,27 @@ public class Hex : MonoBehaviour
     public bool HasEnemyUnit()
     {
         return EnemyUnitOnHex != null;
+    }
+
+    public void SetChest(ChestController chest)
+    {
+        chestOnTile = chest;
+    }
+
+    public void ClearChest()
+    {
+        chestOnTile = null;
+    }
+    
+    public ChestController GetChest()
+    {
+        return chestOnTile;
+    }
+    
+    public HexType HexType
+    {
+        get => hexType;
+        set => hexType = value;
     }
 }
 

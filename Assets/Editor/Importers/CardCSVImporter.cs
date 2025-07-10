@@ -271,7 +271,7 @@ public class CardCSVImporter
     {
         cardPrefabTemplate = AssetDatabase.LoadAssetAtPath<GameObject>(CARD_PREFAB_PATH);
 
-        string bgPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Card Layouts";
+        string bgPath = "Assets/Art Complete/UI/2D_Card_Art/Cards_Image_2D/Card Layouts";
         classBackgrounds = new Dictionary<string, Sprite>()
         {
             { "Wizard", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Wizard_v1_NC.png") },
@@ -281,7 +281,7 @@ public class CardCSVImporter
             { "Base", AssetDatabase.LoadAssetAtPath<Sprite>($"{bgPath}/Card_Layout_Base_v1_NC.png") }
         };
 
-        string rarityPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Rarity Layer";
+        string rarityPath = "Assets/Art Complete/UI/2D_Card_Art/Cards_Image_2D/Rarity Layer";
         rarityBorders = new Dictionary<CardRarity, Sprite>()
         {
             { CardRarity.Common, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Common_v1_NC.png") },
@@ -290,7 +290,7 @@ public class CardCSVImporter
             { CardRarity.Monster, AssetDatabase.LoadAssetAtPath<Sprite>($"{rarityPath}/Card_Rarity_Monster_v1_NC.png") }
         };
 
-        string iconsPath = "Assets/2_Art/Art Complete/2D_Card_Art/Cards_Image_2D/Card Icons";
+        string iconsPath = "Assets/Art Complete/UI/2D_Card_Art/Cards_Image_2D/Card Icons";
         effectIcons = new Dictionary<CardEffect.EffectType, Sprite>()
         {
             { CardEffect.EffectType.Attack, AssetDatabase.LoadAssetAtPath<Sprite>($"{iconsPath}/Card_Icon_Core_Attack_v1_NC.png") },

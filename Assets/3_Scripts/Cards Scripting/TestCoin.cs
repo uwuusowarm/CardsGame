@@ -20,7 +20,7 @@ public class TestCoin : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Sound_Manager.instance.Play("Coin");
+            Sound_Manager.instance.Play("Basic_Block_Deflect");
             Destroy(gameObject);
         }
 

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96a61ce38373274c97e49ef39b7eb27, type: 3}
+  m_Name: Card_05_Rest
+  m_EditorClassIdentifier: 
+  cardName: Rest
+  manaCost: 0
+  cardArt: {fileID: 0}
+  cardClass: 0
+  backgroundSprite: {fileID: 21300000, guid: 77a670940da9aba4ea7a0d9633558eaf, type: 3}
+  rarity: 0
+  borderSprite: {fileID: 21300000, guid: f27e6455f35991d43b1d632dbc02a8fe, type: 3}
+  leftEffects:
+  - effectType: 4
+    value: 2
+    isTemporary: 0
+    duration: 0
+    range: 0
+  rightEffects:
+  - effectType: 2
+    value: 1
+    isTemporary: 0
+    duration: 0
+    range: 0
+  alwaysEffects: []
+  leftEffectIcon: {fileID: 21300000, guid: a3140e3babcf7c740b0fabd24226422c, type: 3}
+  rightEffectIcon: {fileID: 21300000, guid: bd99b52efebbfb844bc14b4a7bcf7465, type: 3}
+  cardPrefab: {fileID: 6918540791798848588, guid: c888081eedaef114cba8267e80037a32,
+    type: 3}
+  description: 
