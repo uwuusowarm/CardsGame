@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.MaterialProperty;
 
 public class CardManager : MonoBehaviour
 {

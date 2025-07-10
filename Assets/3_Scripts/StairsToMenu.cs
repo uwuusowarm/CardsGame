@@ -7,7 +7,7 @@ public class StairsToMenu : MonoBehaviour
     private Hex myHex;
     private bool isInitialized = false;
     
-    public string scene;
+    public int scene;
 
     private IEnumerator Start()
     {
@@ -34,8 +34,8 @@ public class StairsToMenu : MonoBehaviour
 
         if (IsPlayerAdjacent())
         {
-            Debug.Log("Player is adjacent and clicked the exit. Loading Main Menu.");
-            
+            Debug.Log("Player is close enough and clicked the exit. Loading scene: " + scene);
+            PlayerDataManager.Instance.SavePlayerState();
             SceneManager.LoadScene(scene);
         }
         else
@@ -56,8 +56,12 @@ public class StairsToMenu : MonoBehaviour
 
         Vector3Int playerHexCoords = HexGrid.Instance.GetClosestHex(player.transform.position);
 
-        var neighbors = HexGrid.Instance.GetNeighborsFor(myHex.hexCoords);
+        if (myHex.hexCoords == playerHexCoords)
+        {
+            return true;
+        }
 
+        var neighbors = HexGrid.Instance.GetNeighborsFor(myHex.hexCoords);
         return neighbors.Contains(playerHexCoords);
     }
 
@@ -65,8 +69,10 @@ public class StairsToMenu : MonoBehaviour
     {
         if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out RaycastHit hit, 2f))
         {
-            return hit.collider.GetComponent<Hex>();
+            Hex hex = hit.collider.GetComponent<Hex>();
+            if (hex != null) return hex;
         }
+        
         Vector3Int coords = HexGrid.Instance.GetClosestHex(transform.position);
         return HexGrid.Instance.GetTileAt(coords);
     }
