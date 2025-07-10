@@ -33,6 +33,8 @@ public static class CardAssetUpdater
     {
         if (cardData == null) return;
 
+        cardData.cardArt = FindCardArtSprite(cardData.cardName);
+
         string bgPath = "Assets/Art Complete/UI/2D_Card_Art/Cards_Image_2D/Card Layouts";
         var classBackgrounds = new Dictionary<string, Sprite>()
         {
