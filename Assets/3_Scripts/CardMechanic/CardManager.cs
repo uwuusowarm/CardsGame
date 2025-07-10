@@ -127,6 +127,13 @@ public class CardManager : MonoBehaviour
 
     public void OnDeckClicked()
     {
+        if (hand.Count > 0)
+        {
+            discardPile.AddRange(hand);
+            hand.Clear();
+            Sound_Manager.instance.Play("Discard");
+        }
+        
         DrawCards(drawCount);
         Sound_Manager.instance.Play("Deck_Shuffel");
     }
