@@ -33,7 +33,7 @@ MonoBehaviour:
       type: 3}
     isDoor: 0
     yOffset: 1.4
-  - name: Door
+  - name: 'Door '
     prefab: {fileID: 8281124835954512970, guid: 18aec2beceb41884a8b98b620c9e02db,
       type: 3}
     isDoor: 1
@@ -42,7 +42,7 @@ MonoBehaviour:
     prefab: {fileID: 148060536615876267, guid: b685b267a667b294aa9368df544c8879, type: 3}
     isDoor: 0
     yOffset: 1.7
-  - name: Chest
+  - name: Crate
     prefab: {fileID: 8019294540727934668, guid: 41f62f4573955ab499080a6c989d9a7b,
       type: 3}
     isDoor: 0
@@ -91,3 +91,13 @@ MonoBehaviour:
     prefab: {fileID: 919132149155446097, guid: aa99f4271237c45489ae735a1eb5b5ea, type: 3}
     isDoor: 0
     yOffset: 2
+  - name: Door Turn 1
+    prefab: {fileID: 8281124835954512970, guid: bd76924e9b533fb4fa87ad526e2d71dc,
+      type: 3}
+    isDoor: 0
+    yOffset: 1
+  - name: Door Turn 2
+    prefab: {fileID: 8281124835954512970, guid: cf80beaaa49582e40aff8b0777d5591d,
+      type: 3}
+    isDoor: 0
+    yOffset: 1
