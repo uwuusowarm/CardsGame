@@ -20,6 +20,7 @@ public class PlayedCardEffectCache : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject); 
         }
         else
         {

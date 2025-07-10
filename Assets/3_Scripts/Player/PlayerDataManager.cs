@@ -37,6 +37,8 @@ public class PlayerDataManager : MonoBehaviour
 
     private IEnumerator LoadDataAfterSceneLoad()
     {
+        yield return new WaitForEndOfFrame(); 
+        
         yield return new WaitUntil(() => HealthSystem.Instance != null &&
                                          ExhaustionSystem.Instance != null &&
                                          EquipmentManager.Instance != null);
