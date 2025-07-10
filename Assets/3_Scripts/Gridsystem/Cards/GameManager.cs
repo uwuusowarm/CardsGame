@@ -31,9 +31,6 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        // THIS IS THE MOST IMPORTANT LOG.
-        // If you don't see this in your build log, the GameManager object is
-        // either inactive or not in the starting scene (see Build Settings fix).
         Debug.Log($"--- GameManager Awake() called on object '{gameObject.name}' in scene '{gameObject.scene.name}' ---");
 
         if (Instance == null)
@@ -51,11 +48,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-// Add this method to see if it's being destroyed unexpectedly
     private void OnDestroy()
     {
         Debug.LogWarning($"--- GameManager OnDestroy() called for object '{gameObject.name}'. Was this intentional? ---");
-        // We expect this to be called on duplicates, but NOT on the original instance unless the game is closing.
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
     
@@ -67,7 +62,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            isGameOver = false; // Reset game over state when returning to menu
+            isGameOver = false; 
             if (gameOverCanvasGroup != null)
             {
                 gameOverCanvasGroup.alpha = 0;
@@ -85,7 +80,7 @@ public class GameManager : MonoBehaviour
         playerUnit = null;
 
         GameObject playerGameObject = null;
-        float searchTimeout = 5f; // Wait max 5 seconds for a player
+        float searchTimeout = 5f; 
         float searchTimer = 0f;
         while (playerGameObject == null && searchTimer < searchTimeout)
         {
@@ -114,9 +109,6 @@ public class GameManager : MonoBehaviour
         
         StartGame();
     }
-    
-    // --- NO CHANGES to the rest of the file ---
-    // (The rest of your GameManager logic remains the same)
     
     public void StartGame()
     {
