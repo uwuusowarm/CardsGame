@@ -149,11 +149,11 @@ public class MainMenu : MonoBehaviour
         if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
         {
             GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(2);
         }
         else
         {
-            Debug.LogError("Kein Deck ausgewählt oder GameDataManager nicht gefunden!");
+            Debug.LogError("Kein Deck ausgewï¿½hlt oder GameDataManager nicht gefunden!");
         }
     }
 

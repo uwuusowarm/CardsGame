@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject); 
         }
         else if (Instance != this)
         {
@@ -461,7 +462,6 @@ public class GameManager : MonoBehaviour
             return;
         }
         
-        PlayerDataManager.Instance.SavePlayerState();
         if (attackAvailable)
         {
             attackAvailable = false;
