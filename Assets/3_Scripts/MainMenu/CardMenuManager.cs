@@ -81,7 +81,7 @@ public class CardMenuManager : MonoBehaviour
         else
         {
             Deck newDeck = new Deck();
-            newDeck.DeckName = "Neues Deck " + (allPlayerDecks.Count + 1);
+            newDeck.DeckName = "Deck " + (allPlayerDecks.Count + 1);
             newDeck.Cards = new List<CardData>(currentlySelectedCards);
             allPlayerDecks.Add(newDeck);
         }
