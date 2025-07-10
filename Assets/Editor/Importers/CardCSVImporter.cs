@@ -7,7 +7,7 @@ using System.Globalization;
 public class CardCSVImporter
 {
     private const string CSV_PATH_KEY = "CardCSVImporter_Path";
-    private const string DEFAULT_ASSET_FOLDER = "Assets/1_Prefabs/Cards/IngameCards"; // Or wherever you want to save them
+    private const string DEFAULT_ASSET_FOLDER = "Assets/1_Prefabs/Cards/IngameCards"; 
     private const string CARD_PREFAB_PATH = "Assets/3_Scripts/Gridsystem/Cards/Card.prefab";
 
     private static Dictionary<string, Sprite> classBackgrounds;
@@ -121,10 +121,8 @@ public class CardCSVImporter
         card.cardName = values[1];
         card.cardClass = ParseCardClass(values[2]);
         card.rarity = ParseCardRarity(values[3]);
-        card.description = "";
         card.cardArt = CardAssetUpdater.FindCardArtSprite(card.cardName);
 
-        
         card.leftEffects.Clear();
         card.rightEffects.Clear();
         card.alwaysEffects.Clear();
@@ -141,11 +139,30 @@ public class CardCSVImporter
             card.rightEffects.Add(new CardEffect { effectType = rightType, value = ParseInt(values[7]) });
         }
 
+        string generatedDescription = "";
         var specialType = ParseEffectType(values[8]);
         if (specialType != CardEffect.EffectType.None)
         {
-            card.alwaysEffects.Add(new CardEffect { effectType = specialType, value = ParseInt(values[9]) });
+            var alwaysEffect = new CardEffect { effectType = specialType, value = ParseInt(values[9]) };
+            card.alwaysEffects.Add(alwaysEffect);
+
+            switch (alwaysEffect.effectType)
+            {
+                case CardEffect.EffectType.Draw:
+                    generatedDescription = $"Draw {alwaysEffect.value} {(alwaysEffect.value > 1 ? "cards" : "card")}.";
+                    break;
+                case CardEffect.EffectType.ActionPlus:
+                    generatedDescription = $"Gain {alwaysEffect.value} Action Point{(alwaysEffect.value > 1 ? "s" : "")}.";
+                    break;
+                case CardEffect.EffectType.Block:
+                    generatedDescription = $"Gain {alwaysEffect.value} Block.";
+                    break;
+                default:
+                    generatedDescription = ""; 
+                    break;
+            }
         }
+        card.description = generatedDescription;
         
         if (card.leftEffects.Count > 0 && effectIcons.TryGetValue(card.leftEffects[0].effectType, out Sprite leftIcon))
         {
