@@ -7,12 +7,9 @@ public class SettingsManager : MonoBehaviour
 {
     public static SettingsManager Instance { get; private set; }
 
-    [Header("Options-Panel")]
     [SerializeField] private GameObject optionsPanel;
-
-    [Header("UI-Elemente")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
-    [SerializeField] private Slider masterVolumeSlider; // kommender volume slider
+    [SerializeField] private Slider masterVolumeSlider;
 
     private Resolution[] resolutions;
     private bool isPanelActive = false;
@@ -56,23 +53,25 @@ public class SettingsManager : MonoBehaviour
 
     private void SetupResolutions()
     {
-        if (resolutionDropdown == null) 
+        if (resolutionDropdown == null)
+        {
             return;
+        }
 
         resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
 
         List<string> options = new List<string>();
         int currentResolutionIndex = 0;
-        for (int i = 0; i < resolutions.Length; i++)
+        for (int index = 0; index < resolutions.Length; index++)
         {
-            string option = resolutions[i].width + " x " + resolutions[i].height;
+            string option = resolutions[index].width + " x " + resolutions[index].height;
             options.Add(option);
 
-            if (resolutions[i].width == Screen.currentResolution.width &&
-                resolutions[i].height == Screen.currentResolution.height)
+            if (resolutions[index].width == Screen.currentResolution.width &&
+                resolutions[index].height == Screen.currentResolution.height)
             {
-                currentResolutionIndex = i;
+                currentResolutionIndex = index;
             }
         }
         resolutionDropdown.AddOptions(options);
@@ -82,7 +81,6 @@ public class SettingsManager : MonoBehaviour
 
     public void SetMasterVolume(float volume)
     {
-        // kommender audiomixer
         AudioListener.volume = volume;
         Debug.Log("Master Volume set to: " + volume);
     }
