@@ -6179,7 +6179,7 @@ PrefabInstance:
         type: 3}
       propertyPath: gameOverCanvasGroup
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1913957236}
     m_RemovedComponents:
     - {fileID: 4293695108036222106, guid: 300174d50ee720f4b801604303867876, type: 3}
     m_RemovedGameObjects: []
@@ -9384,6 +9384,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1973393619}
+        m_TargetAssemblyTypeName: HealthSystem, Assembly-CSharp
+        m_MethodName: LoseHealth
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 5
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1591044494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12178,6 +12190,12 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 208050202}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &1913957236 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 8025893079215391256, guid: 5f0b0165398aa96489518a4ea4faed14,
+    type: 3}
+  m_PrefabInstance: {fileID: 208050202}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1917153881
 GameObject:
   m_ObjectHideFlags: 0
@@ -12758,6 +12776,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 6103499295536480549}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1973393619 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 535550668167897991, guid: fb1777b635d412846b6b952713dc8b9d,
+    type: 3}
+  m_PrefabInstance: {fileID: 6103499295536480549}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59b054fdb2b63044fab3d4eceab1fb1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1979399897
 GameObject:
   m_ObjectHideFlags: 0
@@ -14185,8 +14215,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 2962387816477496117, guid: fb1777b635d412846b6b952713dc8b9d, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

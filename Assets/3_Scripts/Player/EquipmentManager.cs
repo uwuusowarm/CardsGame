@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text; 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro; 
 
 public class EquipmentManager : MonoBehaviour
@@ -18,27 +19,56 @@ public class EquipmentManager : MonoBehaviour
     private Dictionary<ItemSlot, ItemData> equippedItems = new Dictionary<ItemSlot, ItemData>();
     public ItemClassType playerClass = ItemClassType.Warrior; 
 
-    private Coroutine displayCoroutine; 
-
+    private Coroutine displayCoroutine;
+    
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); 
+            DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
             Destroy(this);
+            return;
         }
 
         InitializeEquipmentSlots();
-        
-        if (itemStatsDisplay != null)
-        {
-            itemStatsDisplay.gameObject.SetActive(false);
-        }
+        FindItemTooltipText();
     }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        FindItemTooltipText();
+    }
+
+    private void FindItemTooltipText()
+    {
+        var tooltips = FindObjectsOfType<TextMeshProUGUI>(true);
+        foreach (var tmp in tooltips)
+        {
+            if (tmp.gameObject.name.Contains("ItemTooltipText"))
+            {
+                itemStatsDisplay = tmp;
+                Debug.Log($"Found ItemTooltipText: {tmp.gameObject.name} in {tmp.gameObject.scene.name}");
+                
+                if (itemStatsDisplay != null)
+                {
+                    itemStatsDisplay.gameObject.SetActive(false);
+                }
+                return;
+            }
+        }
+        Debug.LogWarning("ItemTooltipText component not found in the scene.");
+    }
+
 
     private void InitializeEquipmentSlots()
     {
