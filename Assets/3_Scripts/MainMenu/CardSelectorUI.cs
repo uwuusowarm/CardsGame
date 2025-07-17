@@ -4,24 +4,18 @@ using TMPro;
 using UnityEngine.EventSystems;
 using System.Collections;
 
-[RequireComponent(typeof(Button), typeof(LayoutElement))] 
 public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Wrapper Referenzen")]
     [SerializeField] private GameObject highlightOverlay;
     [SerializeField] private Transform cardParent;
-
-    [Header("Hover-Effekt Einstellungen")]
     [SerializeField] private float hoverScaleFactor = 1.1f;
     [SerializeField] private float scaleDuration = 0.1f;
 
     private CardData assignedCard;
-    private CardMenuManager manager;
+    private CardMenuManager cardMenuManager;
     private bool isCurrentlySelected = false;
-
     private Vector3 originalScale;
     private Coroutine scaleCoroutine;
-    
     private LayoutElement layoutElement;
 
     private void Awake()
@@ -33,9 +27,9 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void Initialize(CardData card, CardMenuManager menuManager, bool isSelected, Vector2 targetSize)
     {
         this.assignedCard = card;
-        this.manager = menuManager;
+        this.cardMenuManager = menuManager;
         this.isCurrentlySelected = isSelected;
-        
+
         Graphic raycastTargetGraphic = GetComponent<Graphic>();
         if (raycastTargetGraphic != null)
         {
@@ -64,8 +58,7 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         GetComponent<Button>().onClick.RemoveAllListeners();
         GetComponent<Button>().onClick.AddListener(OnCardClicked);
     }
-    
-    #region Unveränderte Methoden
+
     private void TameCardInstance(GameObject cardInstance)
     {
         if (cardInstance.TryGetComponent<CardDragHandler>(out var dragHandler))
@@ -78,14 +71,17 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             canvasGroup.blocksRaycasts = false;
         }
 
-        TextMeshProUGUI[] texts = cardInstance.GetComponentsInChildren<TextMeshProUGUI>(true);
-        foreach (var text in texts)
+        TextMeshProUGUI[] allTextComponents = cardInstance.GetComponentsInChildren<TextMeshProUGUI>(true);
+        foreach (var textComponent in allTextComponents)
         {
-            if (text.fontMaterial.name.Contains("_Masked")) continue;
+            if (textComponent.fontMaterial.name.Contains("_Masked"))
+            {
+                continue;
+            }
 
-            Material editableMaterial = new Material(text.fontMaterial);
+            Material editableMaterial = new Material(textComponent.fontMaterial);
             editableMaterial.EnableKeyword("MASK_HARD");
-            text.fontMaterial = editableMaterial;
+            textComponent.fontMaterial = editableMaterial;
         }
     }
 
@@ -93,24 +89,28 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         RectTransform cardRect = cardInstance.GetComponent<RectTransform>();
         RectTransform parentRect = parentContainer.GetComponent<RectTransform>();
-        if (cardRect == null || parentRect == null) return;
+        if (cardRect == null || parentRect == null)
+        {
+            return;
+        }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
         Canvas.ForceUpdateCanvases();
 
-        cardRect.anchorMin = cardRect.anchorMax = cardRect.pivot = new Vector2(0.5f, 0.5f);
+        cardRect.anchorMin = new Vector2(0.5f, 0.5f);
+        cardRect.anchorMax = new Vector2(0.5f, 0.5f);
+        cardRect.pivot = new Vector2(0.5f, 0.5f);
 
         Vector2 availableSpace = targetSize;
-
         float cardWidth = cardRect.rect.width;
         float cardHeight = cardRect.rect.height;
 
-        if (cardWidth <= 0 || cardHeight <= 0) return;
+        if (cardWidth <= 0 || cardHeight <= 0)
+        {
+            return;
+        }
 
-        float scaleRatio = Mathf.Min(
-            availableSpace.x / cardWidth,
-            availableSpace.y / cardHeight
-        );
+        float scaleRatio = Mathf.Min(availableSpace.x / cardWidth, availableSpace.y / cardHeight);
 
         cardRect.localScale = new Vector3(scaleRatio, scaleRatio, 1f);
         cardRect.anchoredPosition = Vector2.zero;
@@ -118,7 +118,7 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void OnCardClicked()
     {
-        manager.ToggleCardSelection(assignedCard);
+        cardMenuManager.ToggleCardSelection(assignedCard);
     }
 
     public void SetHighlight(bool isHighlighted)
@@ -134,8 +134,6 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         return this.assignedCard;
     }
-    #endregion
-
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -143,7 +141,6 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         {
             highlightOverlay.SetActive(true);
         }
-
         StartScaling(originalScale * hoverScaleFactor);
     }
 
@@ -153,10 +150,9 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         {
             highlightOverlay.SetActive(this.isCurrentlySelected);
         }
-
         StartScaling(originalScale);
     }
-    
+
     private void StartScaling(Vector3 targetScale, System.Action onComplete = null)
     {
         if (scaleCoroutine != null)
@@ -179,7 +175,10 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         }
 
         transform.localScale = targetScale;
-        onComplete?.Invoke();
-    }
 
+        if (onComplete != null)
+        {
+            onComplete();
+        }
+    }
 }

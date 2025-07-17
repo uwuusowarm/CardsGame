@@ -3,25 +3,22 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 
-[RequireComponent(typeof(Button))]
 public class DeckUI : MonoBehaviour
 {
-    [Header("UI-Elemente im Prefab")]
     [SerializeField] private TextMeshProUGUI deckNameText;
     [SerializeField] private GameObject editButtonObject;
     [SerializeField] private GameObject deleteButtonObject;
     [SerializeField] private GameObject highlightOverlay;
-
     [SerializeField] private Button editButton;
     [SerializeField] private Button deleteButton;
 
     private Deck assignedDeck;
-    private CardMenuManager manager;
-    private Action<DeckUI> onDeckSelectedCallback_Play;
+    private CardMenuManager cardMenuManager;
+    private Action<DeckUI> onDeckSelectedCallback;
 
     public void Initialize(Deck deck, CardMenuManager menuManager)
     {
-        this.manager = menuManager;
+        this.cardMenuManager = menuManager;
         InternalSetup(deck);
 
         GetComponent<Button>().onClick.RemoveAllListeners();
@@ -42,9 +39,15 @@ public class DeckUI : MonoBehaviour
     public void Initialize(Deck deck, Action<DeckUI> onSelected)
     {
         InternalSetup(deck);
-        this.onDeckSelectedCallback_Play = onSelected;
+        this.onDeckSelectedCallback = onSelected;
         GetComponent<Button>().onClick.RemoveAllListeners();
-        GetComponent<Button>().onClick.AddListener(() => onDeckSelectedCallback_Play?.Invoke(this));
+        GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (onDeckSelectedCallback != null)
+            {
+                onDeckSelectedCallback(this);
+            }
+        });
     }
 
     private void InternalSetup(Deck deck)
@@ -60,41 +63,41 @@ public class DeckUI : MonoBehaviour
 
     private void OnDeckSelectedForEdit()
     {
-        if (manager != null)
+        if (cardMenuManager != null)
         {
-            manager.SelectDeckForEditing(this);
+            cardMenuManager.SelectDeckForEditing(this);
         }
     }
 
     private void OnEditButtonClicked()
     {
-        if (manager != null)
+        if (cardMenuManager != null)
         {
-            manager.OpenEditDeckEditor();
+            cardMenuManager.OpenEditDeckEditor();
         }
     }
 
     private void OnDeleteButtonClicked()
     {
-        if (manager != null)
+        if (cardMenuManager != null)
         {
-            manager.DeleteSelectedDeck();
+            cardMenuManager.DeleteSelectedDeck();
         }
     }
 
     public void ShowActions()
     {
-        if (editButtonObject != null) 
+        if (editButtonObject != null)
             editButtonObject.SetActive(true);
-        if (deleteButtonObject != null) 
+        if (deleteButtonObject != null)
             deleteButtonObject.SetActive(true);
     }
 
     public void HideActions()
     {
-        if (editButtonObject != null) 
+        if (editButtonObject != null)
             editButtonObject.SetActive(false);
-        if (deleteButtonObject != null) 
+        if (deleteButtonObject != null)
             deleteButtonObject.SetActive(false);
     }
 

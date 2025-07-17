@@ -7,85 +7,92 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     private bool isInMenu = false;
 
-    RectTransform rt;
-    CanvasGroup cg;
-    Canvas gameCanvas;
-    Vector2 startPos;
-    Transform startParent;
+    private RectTransform rectTransform;
+    private CanvasGroup canvasGroup;
+    private Canvas gameCanvas;
+    private Vector2 startPosition;
+    private Transform startParent;
 
-    RectTransform handZone;
-    RectTransform leftZone;
-    RectTransform rightZone;
-    RectTransform discardZone;
+    private RectTransform handZone;
+    private RectTransform leftZone;
+    private RectTransform rightZone;
+    private RectTransform discardZone;
 
     void Awake()
     {
         isInMenu = FindObjectOfType<CardMenuManager>() != null;
-        
-        if (isInMenu) return;
+        if (isInMenu)
+        {
+            return;
+        }
 
-        rt = GetComponent<RectTransform>();
-        cg = GetComponent<CanvasGroup>();
+        rectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
         gameCanvas = GetComponentInParent<Canvas>();
 
-        var grab = CardManager.Instance;
-        handZone = grab.HandGridRect;
-        leftZone = grab.LeftGridRect;
-        rightZone = grab.RightGridRect;
-        discardZone = grab.DiscardGridRect;
+        var cardManager = CardManager.Instance;
+        handZone = cardManager.HandGridRect;
+        leftZone = cardManager.LeftGridRect;
+        rightZone = cardManager.RightGridRect;
+        discardZone = cardManager.DiscardGridRect;
     }
 
-    public void OnBeginDrag(PointerEventData e)
+    public void OnBeginDrag(PointerEventData eventData)
     {
-        if (isInMenu) return;
+        if (isInMenu)
+        {
+            return;
+        }
 
         Sound_Manager.instance.PlayRandomFromGroup("Draw_Card");
 
-
         startParent = transform.parent;
-        startPos = rt.anchoredPosition;
+        startPosition = rectTransform.anchoredPosition;
 
         transform.SetParent(gameCanvas.transform, true);
 
-        cg.blocksRaycasts = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
-    public void OnDrag(PointerEventData e)
+    public void OnDrag(PointerEventData eventData)
     {
-        if (isInMenu) return;
-        rt.position = e.position;
-        
+        if (isInMenu)
+        {
+            return;
+        }
+        rectTransform.position = eventData.position;
     }
 
-    public void OnEndDrag(PointerEventData e)
+    public void OnEndDrag(PointerEventData eventData)
     {
-        if (isInMenu) return;
+        if (isInMenu)
+        {
+            return;
+        }
 
-        cg.blocksRaycasts = true;
-
+        canvasGroup.blocksRaycasts = true;
 
         bool droppedOnLeft = RectTransformUtility.RectangleContainsScreenPoint(
-            leftZone, e.position,
+            leftZone, eventData.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
         );
 
         bool droppedOnRight = RectTransformUtility.RectangleContainsScreenPoint(
-            rightZone, e.position,
+            rightZone, eventData.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
         );
-        
+
         if ((droppedOnLeft || droppedOnRight) && ActionPointSystem.Instance.GetCurrentActionPoints() <= 0)
         {
-            Debug.Log("Not enough action points to play this card!");
+            Debug.Log("Not enough action points!");
             CardManager.Instance.MoveToZone(Card, DropType.Hand);
             Destroy(gameObject);
             return;
         }
 
         bool droppedOnDiscard = RectTransformUtility.RectangleContainsScreenPoint(
-            discardZone, e.position,
+            discardZone, eventData.position,
             gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : gameCanvas.worldCamera
-     
         );
 
         if (droppedOnLeft)
@@ -95,7 +102,6 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 GameManager.Instance.ProcessPlayedCard(Card, true);
             }
-
         }
         else if (droppedOnRight)
         {
@@ -105,7 +111,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 GameManager.Instance.ProcessPlayedCard(Card, false);
             }
         }
-        else if (droppedOnDiscard) 
+        else if (droppedOnDiscard)
         {
             CardManager.Instance.MoveToZone(Card, DropType.Discard);
             Sound_Manager.instance.Play("Discard");
