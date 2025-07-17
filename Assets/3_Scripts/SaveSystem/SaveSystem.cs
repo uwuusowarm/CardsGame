@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public static class SaveSystem
 {
-    private static readonly string SAVE_FILE_NAME = "decks.json";
+    private static readonly string SAVE_FILE_NAME = "CardsAgainstDungeonsSave.json";
 
     public static void SaveDecks(List<Deck> decks)
     {
