@@ -231,10 +231,10 @@ public class CardManager : MonoBehaviour
             }
             handCardObjects.Clear();
 
-            Sound_Manager.instance.Play("Discard");
+//            Sound_Manager.instance.Play("Discard");
         }
         DrawExtraCards(drawCount);
-        Sound_Manager.instance.Play("Deck_Shuffel");
+//        Sound_Manager.instance.Play("Deck_Shuffel");
     }
 
     public void DrawInitialCards()
@@ -246,7 +246,7 @@ public class CardManager : MonoBehaviour
     }
     private void Shuffle(List<CardData> cardList)
     {
-        Sound_Manager.instance.Play("Deck_Shuffel");
+//       Sound_Manager.instance.Play("Deck_Shuffel");
         for (int i = 0; i < cardList.Count; i++)
         {
             int r = Random.Range(i, cardList.Count);
@@ -270,6 +270,6 @@ public class CardManager : MonoBehaviour
             rightZone.Remove(card);
         discardPile.Add(card);
         UpdateAllUI();
-        Sound_Manager.instance.Play("Discard");
+//        Sound_Manager.instance.Play("Discard");
     }
 }
