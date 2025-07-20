@@ -35,7 +35,9 @@ public class PlayedCardEffectCache : MonoBehaviour
             Debug.LogError("CardData is null!");
             return;
         }
-        
+
+        ResetEffectKeepAttack();
+            
         PlayedCardName = cardData.cardName;
         PlayedCardManaCost = cardData.manaCost;
         
@@ -54,7 +56,6 @@ public class PlayedCardEffectCache : MonoBehaviour
                 case CardEffect.EffectType.Attack:
                     PendingDamage += effect.value;
                     PendingRange = Mathf.Max(PendingRange, effect.range);
-
                     break;
                 case CardEffect.EffectType.Move:
                     PendingMovement = effect.value;
@@ -84,6 +85,15 @@ public class PlayedCardEffectCache : MonoBehaviour
         PendingHealing = 0;
         PendingBlock = 0;
         HasPendingEffects = false;
+    }
+    
+    private void ResetEffectKeepAttack()
+    {
+        PendingMovement = 0;
+        PendingHealing = 0;
+        PendingBlock = 0;
+        
+        HasPendingEffects = (PendingDamage > 0);
     }
 
     public void ClearCache()
