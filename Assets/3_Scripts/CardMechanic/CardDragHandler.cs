@@ -41,6 +41,7 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (isDragging)
         {
             rectTransform.position = (Vector2)Input.mousePosition + dragStartPositionOffset;
+            rectTransform.rotation = Quaternion.identity;
         }
         else
         {

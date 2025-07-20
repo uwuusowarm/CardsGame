@@ -187,6 +187,11 @@ public class CardManager : MonoBehaviour
                 cardUI.Initialize(cardData);
             if (cardObject.TryGetComponent<CardDragHandler>(out var dragHandler)) 
                 Destroy(dragHandler);
+            
+            if (parent == discardGrid)
+            {
+                cardObject.transform.localScale = Vector3.one * 1f;
+            }
         }
     }
 
@@ -241,6 +246,7 @@ public class CardManager : MonoBehaviour
         {
             discardPile.AddRange(hand);
             hand.Clear();
+            ActionPointSystem.Instance.UseActionPoints(1);
             foreach (var cardObj in handCardObjects) Destroy(cardObj.gameObject);
             handCardObjects.Clear();
             if (Sound_Manager.instance != null) 
