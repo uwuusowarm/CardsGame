@@ -87,7 +87,6 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
         }
     }
 
-    #region Unver�nderte Methoden
     public void OnPointerEnter(PointerEventData eventData) 
     { 
         if (isDragging) 
@@ -113,5 +112,4 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
     { 
         return isDragging; 
     }
-    #endregion
 }
