@@ -15,9 +15,9 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
     private Canvas canvas;
     private int defaultSortOrder;
 
-    private const float POSITION_SPEED = 500f;
-    private const float ROTATION_SPEED = 12f;
-    private const float SCALE_SPEED = 8f;
+    private const float POSITION_SPEED = 3000f;
+    public const float ROTATION_SPEED = 1200f;
+    public const float SCALE_SPEED = 8f;
     private const float HOVER_SCALE_MULTIPLIER = 1.2f;
 
     void Awake()
@@ -45,7 +45,7 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (isDragging) 
+        if (isDragging)
             return;
         isHovered = true;
         defaultSortOrder = rectTransform.GetSiblingIndex();
