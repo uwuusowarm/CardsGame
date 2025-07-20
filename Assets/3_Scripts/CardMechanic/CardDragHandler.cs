@@ -60,6 +60,12 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public void OnPointerUp(PointerEventData eventData)
     {
         isDragging = false;
+        
+        if (ActionPointSystem.Instance != null && !ActionPointSystem.Instance.CanUseActionPoints(1))
+        {
+            CardManager.Instance.MoveToZone(Card, DropType.Hand);
+            return;
+        }
 
         if (leftZone != null && RectTransformUtility.RectangleContainsScreenPoint(leftZone, eventData.position, canvas.worldCamera))
         {
@@ -75,10 +81,13 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
         {
             CardManager.Instance.MoveToZone(Card, DropType.Discard);
         }
-
+        else
+        {
+            CardManager.Instance.MoveToZone(Card, DropType.Hand);
+        }
     }
 
-    #region Unveränderte Methoden
+    #region Unverï¿½nderte Methoden
     public void OnPointerEnter(PointerEventData eventData) 
     { 
         if (isDragging) 
