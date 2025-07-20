@@ -15,15 +15,25 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
     private Canvas canvas;
     private int defaultSortOrder;
 
-    private const float POSITION_SPEED = 3000f;
-    public const float ROTATION_SPEED = 1200f;
-    public const float SCALE_SPEED = 8f;
+    private RectTransform leftZone;
+    private RectTransform rightZone;
+    private RectTransform discardZone;
+
+    private const float ROTATION_SPEED = 12f;
+    private const float SCALE_SPEED = 8f;
     private const float HOVER_SCALE_MULTIPLIER = 1.2f;
 
     void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
+
+        if (CardManager.Instance != null)
+        {
+            leftZone = CardManager.Instance.LeftGridRect;
+            rightZone = CardManager.Instance.RightGridRect;
+            discardZone = CardManager.Instance.DiscardGridRect;
+        }
     }
 
     void Update()
@@ -34,7 +44,11 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
         }
         else
         {
-            rectTransform.position = Vector3.Lerp(rectTransform.position, targetPosition, Time.deltaTime * POSITION_SPEED / Vector3.Distance(rectTransform.position, targetPosition));
+            if (Vector3.Distance(rectTransform.position, targetPosition) > 0.1f)
+                rectTransform.position = Vector3.Lerp(rectTransform.position, targetPosition, Time.deltaTime * 10f);
+            else
+                rectTransform.position = targetPosition;
+
             rectTransform.rotation = Quaternion.Slerp(rectTransform.rotation, targetRotation, Time.deltaTime * ROTATION_SPEED);
         }
 
@@ -45,7 +59,7 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (isDragging)
+        if (isDragging) 
             return;
         isHovered = true;
         defaultSortOrder = rectTransform.GetSiblingIndex();
@@ -54,6 +68,8 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (isDragging) 
+            return;
         isHovered = false;
         rectTransform.SetSiblingIndex(defaultSortOrder);
     }
@@ -69,6 +85,19 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public void OnPointerUp(PointerEventData eventData)
     {
         isDragging = false;
+
+        if (leftZone != null && RectTransformUtility.RectangleContainsScreenPoint(leftZone, eventData.position, canvas.worldCamera))
+        {
+            GameManager.Instance.ProcessPlayedCard(Card, true);
+        }
+        else if (rightZone != null && RectTransformUtility.RectangleContainsScreenPoint(rightZone, eventData.position, canvas.worldCamera))
+        {
+            GameManager.Instance.ProcessPlayedCard(Card, false);
+        }
+        else if (discardZone != null && RectTransformUtility.RectangleContainsScreenPoint(discardZone, eventData.position, canvas.worldCamera))
+        {
+            CardManager.Instance.MoveToZone(Card, DropType.Discard);
+        }
     }
 
     public bool IsBeingDragged()

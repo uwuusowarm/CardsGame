@@ -8,20 +8,20 @@ public class CardManager : MonoBehaviour
 {
     public static CardManager Instance { get; private set; }
 
-    [Header("Kartendatenbank")]
+    [Header("Zentrale Kartendatenbank")]
     [SerializeField] private CardDatabaseSO cardDatabase;
 
     [Header("Einstellungen")]
     [SerializeField, Min(1)] private int drawCount = 4;
     public int DrawCount => drawCount;
 
-    [Header("Hand Layout Einstellungen")]
+    [Header("Hand-Layout Einstellungen")]
     [SerializeField] private Transform handTransform;
     [SerializeField] private float maxCardRotation = 45f;
     [SerializeField] private float cardHeightDisplacement = 50f;
     [SerializeField] private float cardSpacing = 100f;
 
-    [Header("Spielzonen Referenzen")]
+    [Header("Spielzonen-Referenzen")]
     [SerializeField] private Transform leftGrid;
     [SerializeField] private Transform rightGrid;
     [SerializeField] private Transform discardGrid;
@@ -29,7 +29,7 @@ public class CardManager : MonoBehaviour
 
     [Header("Gameplay")]
     [SerializeField] private float playCooldown = 0.5f;
-    [SerializeField] private float autoDiscardDelay = 3f;
+    [SerializeField] private float autoDiscardDelay = 1f;
 
     private List<CardData> deck = new List<CardData>();
     private List<CardData> hand = new List<CardData>();
@@ -62,11 +62,7 @@ public class CardManager : MonoBehaviour
         }
         else
         {
-            if (cardDatabase == null) 
-            { 
-                Debug.LogError("CardDatabaseSO wurde nicht im CardManager zugewiesen"); 
-                return; 
-            }
+            if (cardDatabase == null) { Debug.LogError("FATAL: CardDatabaseSO wurde nicht im CardManager zugewiesen!"); return; }
             deck.Clear();
             deck.AddRange(cardDatabase.allCards);
         }
@@ -81,25 +77,25 @@ public class CardManager : MonoBehaviour
 
     private void UpdateHandLayout()
     {
-        if (handCardObjects.Count == 0) 
-            return;
+        if (handCardObjects.Count == 0) return;
 
         float totalWidthOfHand = (handCardObjects.Count - 1) * cardSpacing;
         float startX = -(totalWidthOfHand / 2f);
 
-        for (int card = 0; card < handCardObjects.Count; card++)
+        for (int i = 0; i < handCardObjects.Count; i++)
         {
-            CardDragHandler cardHandler = handCardObjects[card];
+            CardDragHandler cardHandler = handCardObjects[i];
+            if (cardHandler == null) 
+                continue;
 
             if (cardHandler.IsBeingDragged()) 
                 continue;
 
-            float horizontalPosition = startX + (card * cardSpacing);
-            float normalizedPosition = (handCardObjects.Count > 1) ? (float)card / (handCardObjects.Count - 1) : 0.5f;
+            float horizontalPosition = startX + (i * cardSpacing);
+            float normalizedPosition = (handCardObjects.Count > 1) ? (float)i / (handCardObjects.Count - 1) : 0.5f;
 
             float verticalPosition = Mathf.Sin(normalizedPosition * Mathf.PI) * cardHeightDisplacement;
             float fanAngle = Mathf.Lerp(maxCardRotation, -maxCardRotation, normalizedPosition);
-
             if (handCardObjects.Count <= 1) 
                 fanAngle = 0;
 
@@ -108,88 +104,63 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    public void DrawCard()
-    {
-        DrawExtraCards(1);
-    }
-    public void DrawCard(int count)
-    {
-        DrawExtraCards(count);
-    }
-
-    public void DrawExtraCards(int amountToDraw)
-    {
-        if (deck.Count == 0 && discardPile.Count > 0)
-        {
-            deck.AddRange(discardPile);
-            discardPile.Clear();
-            Shuffle(deck);
-        }
-
-        int cardsToDraw = Mathf.Min(amountToDraw, deck.Count);
-
-        for (int draw = 0; draw < cardsToDraw; draw++)
-        {
-            if (deck.Count > 0)
-            {
-                CardData newCardData = deck[0];
-                deck.RemoveAt(0);
-                hand.Add(newCardData);
-                InstantiateCardInHand(newCardData);
-            }
-        }
-    }
-
-    private void InstantiateCardInHand(CardData cardData)
-    {
-        GameObject cardObject = (cardData.cardPrefab != null)
-            ? Instantiate(cardData.cardPrefab, handTransform)
-            : Instantiate(cardPrefab, handTransform);
-
-        if (cardObject != null)
-        {
-            if (cardObject.TryGetComponent<CardUI>(out var cardUI))
-            {
-                cardUI.Initialize(cardData);
-            }
-            if (cardObject.TryGetComponent<CardDragHandler>(out var dragHandler))
-            {
-                dragHandler.Card = cardData;
-                handCardObjects.Add(dragHandler);
-            }
-        }
-    }
-
     public void MoveToZone(CardData card, DropType type)
     {
-        if (isPlayingCard) return;
+        if (isPlayingCard) 
+            return;
 
         CardDragHandler handlerToRemove = handCardObjects.FirstOrDefault(h => h.Card == card);
-        if (handlerToRemove != null)
+        if (handlerToRemove == null)
         {
-            hand.Remove(card);
-            handCardObjects.Remove(handlerToRemove);
-
-            switch (type)
-            {
-                case DropType.Left:
-                    leftZone.Add(card);
-                    handlerToRemove.transform.SetParent(leftGrid);
-                    break;
-                case DropType.Right:
-                    rightZone.Add(card);
-                    handlerToRemove.transform.SetParent(rightGrid);
-                    break;
-                case DropType.Discard:
-                    discardPile.Add(card);
-                    Destroy(handlerToRemove.gameObject);
-                    break;
-                default: // Hand
-                    hand.Add(card);
-                    handCardObjects.Add(handlerToRemove);
-                    break;
-            }
+            return;
         }
+
+        hand.Remove(card);
+        handCardObjects.Remove(handlerToRemove);
+
+        switch (type)
+        {
+            case DropType.Left:
+                leftZone.Add(card);
+                handlerToRemove.transform.SetParent(leftGrid);
+                StartCoroutine(AutoDiscard(card, handlerToRemove.gameObject, DropType.Left));
+                break;
+            case DropType.Right:
+                rightZone.Add(card);
+                handlerToRemove.transform.SetParent(rightGrid);
+                StartCoroutine(AutoDiscard(card, handlerToRemove.gameObject, DropType.Right));
+                break;
+            case DropType.Discard:
+                discardPile.Add(card);
+                Destroy(handlerToRemove.gameObject);
+                UpdateAllUI();
+                break;
+            default: // Hand
+                hand.Add(card);
+                handCardObjects.Add(handlerToRemove);
+                break;
+        }
+    }
+
+    private IEnumerator AutoDiscard(CardData card, GameObject cardObject, DropType fromZone)
+    {
+        if (cardObject != null)
+        {
+            if (cardObject.TryGetComponent<CardDragHandler>(out var dragHandler)) 
+                Destroy(dragHandler);
+            cardObject.transform.rotation = Quaternion.identity;
+            cardObject.transform.localScale = Vector3.one;
+            cardObject.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        }
+
+        yield return new WaitForSeconds(autoDiscardDelay);
+
+        if (fromZone == DropType.Left) leftZone.Remove(card);
+        else if (fromZone == DropType.Right) 
+            rightZone.Remove(card);
+
+        discardPile.Add(card);
+        Destroy(cardObject); 
         UpdateAllUI();
     }
 
@@ -202,7 +173,8 @@ public class CardManager : MonoBehaviour
 
     private void RebuildZoneContainer(Transform parent, List<CardData> list)
     {
-        if (parent == null) return;
+        if (parent == null) 
+            return;
         foreach (Transform child in parent) 
             Destroy(child.gameObject);
         foreach (var cardData in list)
@@ -218,58 +190,67 @@ public class CardManager : MonoBehaviour
         }
     }
 
+    #region Öffentliche Helfer-Methoden
+    public void DrawCard() { DrawExtraCards(1); }
+    public void DrawCard(int count) { DrawExtraCards(count); }
+    public void DrawInitialCards() 
+    { 
+        if (hasDrawnInitialHand) 
+            return; 
+        hasDrawnInitialHand = true; 
+        DrawExtraCards(drawCount); }
+
+    public void DrawExtraCards(int amountToDraw)
+    {
+        if (deck.Count == 0 && discardPile.Count > 0)
+        {
+            deck.AddRange(discardPile);
+            discardPile.Clear();
+            Shuffle(deck);
+        }
+        int cardsToDraw = Mathf.Min(amountToDraw, deck.Count);
+        for (int i = 0; i < cardsToDraw; i++)
+        {
+            if (deck.Count > 0)
+            {
+                CardData newCardData = deck[0];
+                deck.RemoveAt(0);
+                hand.Add(newCardData);
+                InstantiateCardInHand(newCardData);
+            }
+        }
+    }
+
+    private void InstantiateCardInHand(CardData cardData)
+    {
+        GameObject cardObject = (cardData.cardPrefab != null) ? Instantiate(cardData.cardPrefab, handTransform) : Instantiate(cardPrefab, handTransform);
+        if (cardObject != null)
+        {
+            if (cardObject.TryGetComponent<CardUI>(out var cardUI)) 
+                cardUI.Initialize(cardData);
+            if (cardObject.TryGetComponent<CardDragHandler>(out var dragHandler)) 
+            { dragHandler.Card = cardData; 
+                handCardObjects.Add(dragHandler); 
+            }
+        }
+    }
+
     public void OnDeckClicked()
     {
         if (hand.Count > 0)
         {
             discardPile.AddRange(hand);
             hand.Clear();
-
-            foreach (var cardObj in handCardObjects)
-            {
-                Destroy(cardObj.gameObject);
-            }
+            foreach (var cardObj in handCardObjects) Destroy(cardObj.gameObject);
             handCardObjects.Clear();
-
-//            Sound_Manager.instance.Play("Discard");
+            if (Sound_Manager.instance != null) 
+                Sound_Manager.instance.Play("Discard");
         }
         DrawExtraCards(drawCount);
-//        Sound_Manager.instance.Play("Deck_Shuffel");
+        if (Sound_Manager.instance != null) 
+            Sound_Manager.instance.Play("Deck_Shuffel");
     }
 
-    public void DrawInitialCards()
-    {
-        if (hasDrawnInitialHand)
-            return;
-        hasDrawnInitialHand = true;
-        DrawExtraCards(drawCount);
-    }
-    private void Shuffle(List<CardData> cardList)
-    {
-//       Sound_Manager.instance.Play("Deck_Shuffel");
-        for (int i = 0; i < cardList.Count; i++)
-        {
-            int r = Random.Range(i, cardList.Count);
-            var tmp = cardList[i];
-            cardList[i] = cardList[r];
-            cardList[i] = tmp;
-        }
-    }
-    private IEnumerator StartPlayCooldown()
-    {
-        yield return new WaitForSeconds(playCooldown);
-        isPlayingCard = false;
-    }
-    private IEnumerator AutoDiscard(CardData card, DropType fromZone)
-    {
-        yield return new WaitForSeconds(autoDiscardDelay);
-
-        if (fromZone == DropType.Left)
-            leftZone.Remove(card);
-        else if (fromZone == DropType.Right)
-            rightZone.Remove(card);
-        discardPile.Add(card);
-        UpdateAllUI();
-//        Sound_Manager.instance.Play("Discard");
-    }
+    private void Shuffle(List<CardData> cardList) { if (Sound_Manager.instance != null) Sound_Manager.instance.Play("Deck_Shuffel"); for (int i = 0; i < cardList.Count; i++) { int r = Random.Range(i, cardList.Count); var tmp = cardList[i]; cardList[i] = cardList[r]; cardList[i] = tmp; } }
+    #endregion
 }
