@@ -77,9 +77,9 @@ public class MovementSystem : MonoBehaviour
         {
             PlayerStatusUI.Instance.UpdateMovementPoints(remainingMovementPoints);
         }
-
+        
         selectedUnit.SetMovementPoints(remainingMovementPoints);
-    
+        
         Debug.Log($"Moving to {selectedHexPosition}, Cost: {moveCost}, Remaining Points: {remainingMovementPoints}");
     }
 
