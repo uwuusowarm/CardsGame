@@ -281,10 +281,10 @@ public class CardManager : MonoBehaviour
             handCardObjects.Clear();
             if (Sound_Manager.instance != null) 
                 Sound_Manager.instance.Play("Discard");
+            DrawExtraCards(drawCount);
+            if (Sound_Manager.instance != null) 
+                Sound_Manager.instance.Play("Deck_Shuffel");
         }
-        DrawExtraCards(drawCount);
-        if (Sound_Manager.instance != null) 
-            Sound_Manager.instance.Play("Deck_Shuffel");
     }
 
     private void Shuffle(List<CardData> cardList) 
