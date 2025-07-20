@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    [Header("Panel Management")]
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private GameObject optionsPanel;
     [SerializeField] private GameObject cardMenuPanel;
@@ -14,20 +13,15 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject deckSelectionPanel;
     [SerializeField] private GameObject deckEditorSlideout;
     [SerializeField] private GameObject boostersSlideout;
-
-    [Header("Resolution")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
-    private Resolution[] resolutions;
-
-    [Header("FPS Settings")]
-    public int targetFPS;
-    public Text selectedFPS;
-
-    [Header("Wichtige Referenzen")]
+    [SerializeField] private Text selectedFPS;
     [SerializeField] private CardMenuManager cardMenuManager;
     [SerializeField] private Transform deckSelectionContainer;
     [SerializeField] private Button playGameButton;
 
+    public int targetFPS;
+
+    private Resolution[] resolutions;
     private Deck currentlySelectedDeckForPlay;
     private DeckUI currentlySelectedDeckUIForPlay;
 
@@ -49,13 +43,13 @@ public class MainMenu : MonoBehaviour
             var options = new List<string>();
             resolutions = Screen.resolutions;
             var currentResolutionIndex = 0;
-            for (var i = 0; i < resolutions.Length; i++)
+            for (var index = 0; index < resolutions.Length; index++)
             {
-                var option = resolutions[i].width + " x " + resolutions[i].height;
+                var option = resolutions[index].width + " x " + resolutions[index].height;
                 options.Add(option);
-                if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height)
+                if (resolutions[index].width == Screen.currentResolution.width && resolutions[index].height == Screen.currentResolution.height)
                 {
-                    currentResolutionIndex = i;
+                    currentResolutionIndex = index;
                 }
             }
             resolutionDropdown.AddOptions(options);
@@ -107,12 +101,12 @@ public class MainMenu : MonoBehaviour
         foreach (Transform child in deckSelectionContainer) Destroy(child.gameObject);
 
         List<Deck> playerDecks = cardMenuManager.GetPlayerDecks();
-        GameObject deckDisplayPrefab = cardMenuManager.deckDisplayPrefab;
+        GameObject deckDisplayPrefab = cardMenuManager.DeckDisplayPrefab;
 
         foreach (var deck in playerDecks)
         {
-            GameObject deckGO = Instantiate(deckDisplayPrefab, deckSelectionContainer);
-            DeckUI deckUI = deckGO.GetComponent<DeckUI>();
+            GameObject deckGameObject = Instantiate(deckDisplayPrefab, deckSelectionContainer);
+            DeckUI deckUI = deckGameObject.GetComponent<DeckUI>();
             if (deckUI != null)
             {
                 deckUI.Initialize(deck, (selectedUI) => {
@@ -153,7 +147,7 @@ public class MainMenu : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Kein Deck ausgew�hlt oder GameDataManager nicht gefunden!");
+            Debug.LogError("No deck selected or GameDataManager not found!");
         }
     }
 
@@ -189,6 +183,7 @@ public class MainMenu : MonoBehaviour
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
     }
+
 
     public void LoadSettings(int currentResolutionIndex)
     {

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using TMPro; 
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -9,7 +10,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Game Settings")]
     [SerializeField] private float enemyTurnDelay = 1f;
-    
+
+
     [Header("Game Over")]
     [SerializeField] private CanvasGroup gameOverCanvasGroup;
     [SerializeField] private float gameOverFadeDuration = 1.5f;
@@ -31,28 +33,28 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log($"--- GameManager Awake() called on object '{gameObject.name}' in scene '{gameObject.scene.name}' ---");
+        Debug.Log($"GameManager Awake() called on object '{gameObject.name}' in scene '{gameObject.scene.name}'");
 
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
-            Debug.Log($"--- GameManager Instance SET to '{gameObject.name}'. It is now persistent. ---");
+            Debug.Log($"GameManager Instance SET to '{gameObject.name}'. It is now persistent.");
         }
         else if (Instance != this)
         {
-            Debug.LogWarning($"--- Duplicate GameManager found on '{gameObject.name}'. The original is '{Instance.gameObject.name}'. Destroying the duplicate. ---");
+            Debug.LogWarning($"Duplicate GameManager found on '{gameObject.name}'. The original is '{Instance.gameObject.name}'. Destroying the duplicate.");
             Destroy(gameObject);
-            return;
         }
     }
 
     private void OnDestroy()
     {
-        Debug.LogWarning($"--- GameManager OnDestroy() called for object '{gameObject.name}'. Was this intentional? ---");
+        Debug.LogWarning($"GameManager OnDestroy() called for object '{gameObject.name}'. Was this intentional?");
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
+    
     
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
@@ -63,22 +65,39 @@ public class GameManager : MonoBehaviour
         else
         {
             isGameOver = false; 
-            if (gameOverCanvasGroup != null)
-            {
-                gameOverCanvasGroup.alpha = 0;
-                gameOverCanvasGroup.interactable = false;
-                gameOverCanvasGroup.blocksRaycasts = false;
-            }
+            gameOverCanvasGroup = null; 
         }
     }
 
     private IEnumerator InitializeLevel()
     {
-        yield return null;
+        yield return null; 
 
         isGameOver = false;
         playerUnit = null;
+        gameOverCanvasGroup = null; 
 
+        GameObject gameOverUIObject = GameObject.FindGameObjectWithTag("GameOverCanvas");
+        if (gameOverUIObject != null)
+        {
+            gameOverCanvasGroup = gameOverUIObject.GetComponent<CanvasGroup>();
+            if (gameOverCanvasGroup != null)
+            {
+                gameOverCanvasGroup.alpha = 0;
+                gameOverCanvasGroup.interactable = false;
+                gameOverCanvasGroup.blocksRaycasts = false;
+                Debug.Log("GameManager: Found and initialized GameOverCanvasGroup.");
+            }
+            else
+            {
+                Debug.LogError("GameManager: GameObject with tag 'GameOverCanvas' found, but it's missing a CanvasGroup component!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("GameManager: Could not find GameObject with tag 'GameOverCanvas' in this scene. The game over screen may not function.");
+        }
+        
         GameObject playerGameObject = null;
         float searchTimeout = 5f; 
         float searchTimer = 0f;
@@ -164,17 +183,6 @@ public class GameManager : MonoBehaviour
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
         }
-    }
-
-    private void DrawPlayerCards()
-    {
-        if (CardManager.Instance == null)
-        {
-            Debug.LogError("CardManager.Instance is null for card draw.");
-            return;
-        }
-        Debug.Log("Drawing new cards based on exhaustion level.");
-        CardManager.Instance.DrawExtraCards(CardManager.Instance.DrawCount);
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
@@ -401,12 +409,6 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"{effectiveTarget.name} gained {totalBlock} Block (Base: {effect.value}, Equipment: {EquipmentManager.Instance.GetTotalDefenseBonus()}).");
                 break;
         }
-    }
-
-    private bool IsAttackPending()
-    {
-        if(PlayedCardEffectCache.Instance == null) return false;
-        return PlayedCardEffectCache.Instance.PendingDamage > 0 && isWaitingForPlayerActionResolution;
     }
 
     public void PlayerActionResolved(bool actionWasCompleted)

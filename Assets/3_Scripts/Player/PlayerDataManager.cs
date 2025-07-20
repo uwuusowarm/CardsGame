@@ -24,6 +24,11 @@ public class PlayerDataManager : MonoBehaviour
         }
     }
 
+    public void ResetPlayerData()
+    {
+        playerData.ResetToDefaults();
+    }
+    
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
