@@ -12643,15 +12643,31 @@ MonoBehaviour:
   cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
   drawCount: 4
   handTransform: {fileID: 571336533}
-  maxCardRotation: 45
-  cardHeightDisplacement: 50
-  cardSpacing: 100
+  layout4Cards:
+    maxCardRotation: 0
+    cardHeightDisplacement: 0
+    cardSpacing: 0
+    hoverScaleMultiplier: 1.2
+  layout3Cards:
+    maxCardRotation: 0
+    cardHeightDisplacement: 0
+    cardSpacing: 0
+    hoverScaleMultiplier: 1.2
+  layout2Cards:
+    maxCardRotation: 0
+    cardHeightDisplacement: 0
+    cardSpacing: 0
+    hoverScaleMultiplier: 1.2
+  layout1Card:
+    maxCardRotation: 0
+    cardHeightDisplacement: 0
+    cardSpacing: 0
+    hoverScaleMultiplier: 1.2
   leftGrid: {fileID: 1881224939}
   rightGrid: {fileID: 1473173885}
   discardGrid: {fileID: 836372842}
   cardPrefab: {fileID: 5023809833648921849, guid: 721ca12277cd76745b148fb32da44af6,
     type: 3}
-  playCooldown: 0.5
   autoDiscardDelay: 3
 --- !u!1001 &1934723656
 PrefabInstance:
