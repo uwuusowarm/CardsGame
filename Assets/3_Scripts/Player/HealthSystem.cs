@@ -40,6 +40,41 @@ public class HealthSystem : MonoBehaviour
         UpdateHealthDisplay();
     }
 
+    public void UpdateMaxHealth()
+    {
+        int totalMaxHealth = maxBaseHealth;
+    
+        if (EquipmentManager.Instance != null)
+        {
+            totalMaxHealth += EquipmentManager.Instance.GetTotalMaxHPBonus();
+        }
+    
+        if (extraHealthUnlocked != null)
+        {
+            for (int i = 0; i < extraHealthUnlocked.Length; i++)
+            {
+                if (extraHealthUnlocked[i])
+                {
+                    totalMaxHealth++;
+                }
+            }
+        }
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null && playerObj.TryGetComponent<Unit>(out var playerUnit))
+        {
+            playerUnit.maxHealth = totalMaxHealth;
+        }
+
+        if (currentHealth > totalMaxHealth)
+        {
+            currentHealth = totalMaxHealth;
+        }
+
+        UpdateHealthDisplay();
+    }
+
+
     public int GetCurrentHealth()
     {
         return currentHealth;
@@ -48,6 +83,12 @@ public class HealthSystem : MonoBehaviour
     public int GetMaxHealth()
     {
         int maxPossibleHealth = maxBaseHealth;
+    
+        if (EquipmentManager.Instance != null)
+        {
+            maxPossibleHealth += EquipmentManager.Instance.GetTotalMaxHPBonus();
+        }
+    
         if (extraHealthUnlocked != null)
         {
             for (int i = 0; i < maxExtraHealth; i++)
@@ -58,8 +99,10 @@ public class HealthSystem : MonoBehaviour
                     break;
             }
         }
+    
         return maxPossibleHealth;
     }
+
     
     public int GetUnlockedExtraHealthCount()
     {
@@ -85,6 +128,13 @@ public class HealthSystem : MonoBehaviour
         {
             int healAmount = Mathf.Min(amount, maxPossibleHealth - currentHealth);
             currentHealth += healAmount;
+        
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null && playerObj.TryGetComponent<Unit>(out var playerUnit))
+            {
+                playerUnit.currentHealth = currentHealth;
+            }
+        
             UpdateHealthDisplay();
             Debug.Log($"Heal {healAmount}. Now: {currentHealth}/{maxPossibleHealth}");
         }
@@ -93,6 +143,7 @@ public class HealthSystem : MonoBehaviour
             Debug.Log("Full!");
         }
     }
+
 
     public void UnlockExtraHealth(int amount)
     {
@@ -118,7 +169,7 @@ public class HealthSystem : MonoBehaviour
                 break;
             }
         }
-        UpdateHealthDisplay();
+        UpdateMaxHealth();
     }
 
     public void AddHealth(int amount)

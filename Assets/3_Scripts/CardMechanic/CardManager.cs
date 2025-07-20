@@ -1,8 +1,17 @@
-﻿using System.Collections;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using System.Collections;
 using UnityEngine.UI;
+
+[System.Serializable]
+public class HandLayoutSettings
+{
+    public float maxCardRotation;
+    public float cardHeightDisplacement;
+    public float cardSpacing;
+    public float hoverScaleMultiplier = 1.2f;
+}
 
 public class CardManager : MonoBehaviour
 {
@@ -17,18 +26,23 @@ public class CardManager : MonoBehaviour
 
     [Header("Hand-Layout Einstellungen")]
     [SerializeField] private Transform handTransform;
-    [SerializeField] private float maxCardRotation = 45f;
-    [SerializeField] private float cardHeightDisplacement = 50f;
-    [SerializeField] private float cardSpacing = 100f;
 
-    [Header("Spielzonen-Referenzen")]
+    [Header("Layout für 4 Karten")]
+    [SerializeField] private HandLayoutSettings layoutFor4Cards;
+    [Header("Layout für 3 Karten")]
+    [SerializeField] private HandLayoutSettings layoutFor3Cards;
+    [Header("Layout für 2 Karten")]
+    [SerializeField] private HandLayoutSettings layoutFor2Cards;
+    [Header("Layout für 1 Karte")]
+    [SerializeField] private HandLayoutSettings layoutFor1Card;
+
+    [Header("Spielzonen Referenzen")]
     [SerializeField] private Transform leftGrid;
     [SerializeField] private Transform rightGrid;
     [SerializeField] private Transform discardGrid;
     [SerializeField] private GameObject cardPrefab;
 
     [Header("Gameplay")]
-    [SerializeField] private float playCooldown = 0.5f;
     [SerializeField] private float autoDiscardDelay = 1f;
 
     private List<CardData> deck = new List<CardData>();
@@ -36,7 +50,6 @@ public class CardManager : MonoBehaviour
     private List<CardData> leftZone = new List<CardData>();
     private List<CardData> rightZone = new List<CardData>();
     private List<CardData> discardPile = new List<CardData>();
-
     private List<CardDragHandler> handCardObjects = new List<CardDragHandler>();
     private bool hasDrawnInitialHand = false;
     private bool isPlayingCard = false;
@@ -62,7 +75,11 @@ public class CardManager : MonoBehaviour
         }
         else
         {
-            if (cardDatabase == null) { Debug.LogError("FATAL: CardDatabaseSO wurde nicht im CardManager zugewiesen!"); return; }
+            if (cardDatabase == null) 
+            {
+                Debug.LogError(" CardDatabaseSO wurde nicht im CardManager zugewiesen!"); 
+                return; 
+            }
             deck.Clear();
             deck.AddRange(cardDatabase.allCards);
         }
@@ -77,9 +94,26 @@ public class CardManager : MonoBehaviour
 
     private void UpdateHandLayout()
     {
-        if (handCardObjects.Count == 0) return;
+        if (handCardObjects.Count == 0) 
+            return;
 
-        float totalWidthOfHand = (handCardObjects.Count - 1) * cardSpacing;
+        HandLayoutSettings currentSettings = null;
+        switch (handCardObjects.Count)
+        {
+            case 4: currentSettings = layoutFor4Cards; 
+                break;
+            case 3: currentSettings = layoutFor3Cards; 
+                break;
+            case 2: currentSettings = layoutFor2Cards; 
+                break;
+            case 1: currentSettings = layoutFor1Card; 
+                break;
+        }
+
+        if (currentSettings == null) 
+            return;
+
+        float totalWidthOfHand = (handCardObjects.Count - 1) * currentSettings.cardSpacing;
         float startX = -(totalWidthOfHand / 2f);
 
         for (int i = 0; i < handCardObjects.Count; i++)
@@ -88,14 +122,16 @@ public class CardManager : MonoBehaviour
             if (cardHandler == null) 
                 continue;
 
+            cardHandler.hoverScaleMultiplier = currentSettings.hoverScaleMultiplier;
+
             if (cardHandler.IsBeingDragged()) 
                 continue;
 
-            float horizontalPosition = startX + (i * cardSpacing);
+            float horizontalPosition = startX + (i * currentSettings.cardSpacing);
             float normalizedPosition = (handCardObjects.Count > 1) ? (float)i / (handCardObjects.Count - 1) : 0.5f;
 
-            float verticalPosition = Mathf.Sin(normalizedPosition * Mathf.PI) * cardHeightDisplacement;
-            float fanAngle = Mathf.Lerp(maxCardRotation, -maxCardRotation, normalizedPosition);
+            float verticalPosition = Mathf.Sin(normalizedPosition * Mathf.PI) * currentSettings.cardHeightDisplacement;
+            float fanAngle = Mathf.Lerp(currentSettings.maxCardRotation, -currentSettings.maxCardRotation, normalizedPosition);
             if (handCardObjects.Count <= 1) 
                 fanAngle = 0;
 
@@ -110,10 +146,7 @@ public class CardManager : MonoBehaviour
             return;
 
         CardDragHandler handlerToRemove = handCardObjects.FirstOrDefault(h => h.Card == card);
-        if (handlerToRemove == null)
-        {
-            return;
-        }
+        if (handlerToRemove == null) return;
 
         hand.Remove(card);
         handCardObjects.Remove(handlerToRemove);
@@ -142,7 +175,7 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    private IEnumerator AutoDiscard(CardData card, GameObject cardObject, DropType fromZone)
+    private System.Collections.IEnumerator AutoDiscard(CardData card, GameObject cardObject, DropType fromZone)
     {
         if (cardObject != null)
         {
@@ -155,12 +188,13 @@ public class CardManager : MonoBehaviour
 
         yield return new WaitForSeconds(autoDiscardDelay);
 
-        if (fromZone == DropType.Left) leftZone.Remove(card);
+        if (fromZone == DropType.Left) 
+            leftZone.Remove(card);
         else if (fromZone == DropType.Right) 
             rightZone.Remove(card);
 
         discardPile.Add(card);
-        Destroy(cardObject); 
+        Destroy(cardObject);
         UpdateAllUI();
     }
 
@@ -179,26 +213,30 @@ public class CardManager : MonoBehaviour
             Destroy(child.gameObject);
         foreach (var cardData in list)
         {
-            GameObject cardObject = (cardData.cardPrefab != null)
-                ? Instantiate(cardData.cardPrefab, parent)
-                : Instantiate(cardPrefab, parent);
-
+            GameObject cardObject = (cardData.cardPrefab != null) ? Instantiate(cardData.cardPrefab, parent) : Instantiate(cardPrefab, parent);
             if (cardObject.TryGetComponent<CardUI>(out var cardUI)) 
                 cardUI.Initialize(cardData);
             if (cardObject.TryGetComponent<CardDragHandler>(out var dragHandler)) 
                 Destroy(dragHandler);
+            if (parent == discardGrid) cardObject.transform.localScale = Vector3.one * 1f;
         }
     }
 
-    #region Öffentliche Helfer-Methoden
-    public void DrawCard() { DrawExtraCards(1); }
-    public void DrawCard(int count) { DrawExtraCards(count); }
+    public void DrawCard() 
+    { 
+        DrawExtraCards(1); 
+    }
+    public void DrawCard(int count) 
+    {
+        DrawExtraCards(count); 
+    }
     public void DrawInitialCards() 
     { 
         if (hasDrawnInitialHand) 
             return; 
         hasDrawnInitialHand = true; 
-        DrawExtraCards(drawCount); }
+        DrawExtraCards(drawCount); 
+    }
 
     public void DrawExtraCards(int amountToDraw)
     {
@@ -229,8 +267,8 @@ public class CardManager : MonoBehaviour
             if (cardObject.TryGetComponent<CardUI>(out var cardUI)) 
                 cardUI.Initialize(cardData);
             if (cardObject.TryGetComponent<CardDragHandler>(out var dragHandler)) 
-            { dragHandler.Card = cardData; 
-                handCardObjects.Add(dragHandler); 
+            { 
+                dragHandler.Card = cardData; handCardObjects.Add(dragHandler); 
             }
         }
     }
@@ -241,7 +279,9 @@ public class CardManager : MonoBehaviour
         {
             discardPile.AddRange(hand);
             hand.Clear();
-            foreach (var cardObj in handCardObjects) Destroy(cardObj.gameObject);
+            ActionPointSystem.Instance.UseActionPoints(1);
+            foreach (var cardObj in handCardObjects) 
+                Destroy(cardObj.gameObject);
             handCardObjects.Clear();
             if (Sound_Manager.instance != null) 
                 Sound_Manager.instance.Play("Discard");
@@ -251,6 +291,16 @@ public class CardManager : MonoBehaviour
             Sound_Manager.instance.Play("Deck_Shuffel");
     }
 
-    private void Shuffle(List<CardData> cardList) { if (Sound_Manager.instance != null) Sound_Manager.instance.Play("Deck_Shuffel"); for (int i = 0; i < cardList.Count; i++) { int r = Random.Range(i, cardList.Count); var tmp = cardList[i]; cardList[i] = cardList[r]; cardList[i] = tmp; } }
-    #endregion
+    private void Shuffle(List<CardData> cardList) 
+    { 
+        if (Sound_Manager.instance != null) 
+            Sound_Manager.instance.Play("Deck_Shuffel"); 
+        for (int card = 0; card < cardList.Count; card++) 
+        { 
+            int GetMeOuttaThisFuckingShuffleHell = Random.Range(card, cardList.Count); 
+            var tmp = cardList[card]; 
+            cardList[card] = cardList[GetMeOuttaThisFuckingShuffleHell]; 
+            cardList[card] = tmp; 
+        } 
+    }
 }

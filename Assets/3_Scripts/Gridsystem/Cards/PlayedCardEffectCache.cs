@@ -39,8 +39,6 @@ public class PlayedCardEffectCache : MonoBehaviour
         PlayedCardName = cardData.cardName;
         PlayedCardManaCost = cardData.manaCost;
         
-        ResetEffectValues();
-        
         List<CardEffect> effectsToUse = isLeft ? cardData.leftEffects : cardData.rightEffects;
         
         Debug.Log($"Werte für Karte '{PlayedCardName}' (Mana: {PlayedCardManaCost}, Seite: {(isLeft ? "Links" : "Rechts")})  gespeichert.");
@@ -54,8 +52,9 @@ public class PlayedCardEffectCache : MonoBehaviour
             switch (effect.effectType)
             {
                 case CardEffect.EffectType.Attack:
-                    PendingDamage = effect.value;
-                    PendingRange = effect.range;
+                    PendingDamage += effect.value;
+                    PendingRange = Mathf.Max(PendingRange, effect.range);
+
                     break;
                 case CardEffect.EffectType.Move:
                     PendingMovement = effect.value;

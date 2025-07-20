@@ -212,6 +212,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError("PlayedCardEffectCache.Instance is null.");
             return;
         }
+        
         PlayedCardEffectCache.Instance.CacheCardEffect(cardData, isLeftEffectChosen);
 
         if (playerUnit != null && UnitManager.Instance != null)
@@ -244,16 +245,11 @@ public class GameManager : MonoBehaviour
             attackAvailable = true;
             pendingAttackDamage = PlayedCardEffectCache.Instance.PendingDamage;
             pendingAttackRange = PlayedCardEffectCache.Instance.PendingRange;
-            
+        
             if(AttackManager.Instance != null)
             {
                 AttackManager.Instance.PrepareAttack(pendingAttackDamage, pendingAttackRange);
             }
-        }
-
-        if(PlayedCardEffectCache.Instance != null)
-        {
-            PlayedCardEffectCache.Instance.ClearCache();
         }
         
         ActionPointSystem.Instance.UseActionPoints(1);
@@ -424,6 +420,8 @@ public class GameManager : MonoBehaviour
         {
             AttackManager.Instance.ClearHighlights();
         }
+        
+        PlayedCardEffectCache.Instance.ClearCache();
     }
 
 

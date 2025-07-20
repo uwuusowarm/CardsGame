@@ -58,6 +58,7 @@ public class PlayerDataManager : MonoBehaviour
         }
 
         HealthSystem.Instance.UnlockExtraHealth(playerData.savedUnlockedExtraHealthSlots);
+        HealthSystem.Instance.UpdateMaxHealth();
         HealthSystem.Instance.InitializeHealth(playerData.savedCurrentHealth);
         
         ExhaustionSystem.Instance.SetExhaustionStacks(playerData.savedExhaustionStacks);
