@@ -12643,15 +12643,31 @@ MonoBehaviour:
   cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
   drawCount: 4
   handTransform: {fileID: 571336533}
-  maxCardRotation: 45
-  cardHeightDisplacement: 50
-  cardSpacing: 100
+  layoutFor4Cards:
+    maxCardRotation: 30
+    cardHeightDisplacement: 25
+    cardSpacing: 100
+    hoverScaleMultiplier: 1.5
+  layoutFor3Cards:
+    maxCardRotation: 20
+    cardHeightDisplacement: 25
+    cardSpacing: 100
+    hoverScaleMultiplier: 1.2
+  layoutFor2Cards:
+    maxCardRotation: 10
+    cardHeightDisplacement: 25
+    cardSpacing: 100
+    hoverScaleMultiplier: 1.5
+  layoutFor1Card:
+    maxCardRotation: 0
+    cardHeightDisplacement: 0
+    cardSpacing: 0
+    hoverScaleMultiplier: 1.2
   leftGrid: {fileID: 1881224939}
   rightGrid: {fileID: 1473173885}
   discardGrid: {fileID: 836372842}
   cardPrefab: {fileID: 5023809833648921849, guid: 721ca12277cd76745b148fb32da44af6,
     type: 3}
-  playCooldown: 0.5
   autoDiscardDelay: 3
 --- !u!1001 &1934723656
 PrefabInstance:
@@ -14199,6 +14215,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 110229109692004221, guid: fb1777b635d412846b6b952713dc8b9d,
+        type: 3}
+      propertyPath: m_Depth
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 535550668167897991, guid: fb1777b635d412846b6b952713dc8b9d,
         type: 3}
       propertyPath: healthIcons.Array.data[0]
@@ -14469,7 +14490,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2962387816477496117, guid: fb1777b635d412846b6b952713dc8b9d, type: 3}
     m_RemovedGameObjects:
     - {fileID: 6998426086256656634, guid: fb1777b635d412846b6b952713dc8b9d, type: 3}
     m_AddedGameObjects: []
