@@ -54,7 +54,6 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    // KORRIGIERT: Ruft jetzt nur noch den SettingsManager auf, ohne andere Panels zu schlieﬂen.
     public void OpenOptionsPanel()
     {
         if (SettingsManager.Instance != null)
