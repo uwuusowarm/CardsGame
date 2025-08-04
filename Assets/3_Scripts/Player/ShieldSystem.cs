@@ -83,4 +83,9 @@ public class ShieldSystem : MonoBehaviour
     {
         return currentShields;
     }
+
+    public void SetShields(int amount)
+    {
+        currentShields = amount;
+    }
 }

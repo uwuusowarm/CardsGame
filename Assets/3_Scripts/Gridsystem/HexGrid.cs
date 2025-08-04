@@ -1,15 +1,18 @@
-using System.Collections;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.VisualScripting;
 
 public class HexGrid : MonoBehaviour
 {
     Dictionary<Vector3Int, Hex> hexTileDict = new Dictionary<Vector3Int, Hex>();
     Dictionary<Vector3Int, List<Vector3Int>> hexTileNeighboursDict = new Dictionary<Vector3Int, List<Vector3Int>>();
-    public static float xOffset = 2f;
-    public static float zOffset = 1.73f;
+
+    [Header("Grid Dimensions")]
+    [Tooltip("The full width of a single hex tile (corner to corner). Can be auto-calculated in the Level Painter.")]
+    public float hexWidth = 1.732f;
+    [Tooltip("The full height of a single hex tile (flat side to flat side). Can be auto-calculated in the Level Painter.")]
+    public float hexHeight = 2f;
+
+    public float ZSpacing => hexHeight * 0.75f;
 
     public static HexGrid Instance { get; private set; }
 
@@ -23,40 +26,6 @@ public class HexGrid : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
-        InitializeGrid();
-    }
-
-    public void AddMovementPoints(int points)
-    {
-        if (UnitManager.Instance == null)
-        {
-            Debug.LogError("UnitManager nicht gefunden!");
-            return;
-        }
-        if (UnitManager.Instance.SelectedUnit == null)
-        {
-            var playerUnits = FindObjectsOfType<Unit>();
-            foreach (var unit in playerUnits)
-            {
-                if (!unit.IsEnemy)
-                {
-                    UnitManager.Instance.PrepareUnitForMovement(unit);
-                    break;
-                }
-            }
-        }
-        if (UnitManager.Instance.SelectedUnit != null)
-        {
-            UnitManager.Instance.SelectedUnit.AddMovementPoints(points);
-        }
-        else
-        {
-            Debug.LogWarning("Keine Einheit für Bewegung gefunden!");
-        }
-    }
-    private void InitializeGrid()
-    {
     }
 
     private void Start()
@@ -65,56 +34,89 @@ public class HexGrid : MonoBehaviour
         foreach (Hex hex in FindObjectsOfType<Hex>())
         {
             hexTileDict[hex.hexCoords] = hex;
-            Debug.Log($"Registered hex at {hex.hexCoords}");
-        }
-        foreach (Hex hex in FindObjectsOfType<Hex>())
-        {
-            hexTileDict[hex.hexCoords] = hex;
-            hex.HexCoords = hex.hexCoords;
-        }
-        foreach (var hexPair in hexTileDict)
-        {
-            hexTileNeighboursDict[hexPair.Key] = new List<Vector3Int>();
-
-            foreach (var direction in Direction.GetDirectionList(hexPair.Key.z))
-            {
-                Vector3Int neighborCoords = hexPair.Key + direction;
-                if (hexTileDict.ContainsKey(neighborCoords))
-                {
-                    hexTileNeighboursDict[hexPair.Key].Add(neighborCoords);
-                }
-            }
         }
 
+        foreach (var hexCoords in hexTileDict.Keys)
+        {
+            GetNeighborsFor(hexCoords);
+        }
         Debug.Log($"Grid initialized with {hexTileDict.Count} hexes");
     }
+    public int GetDistance(Hex hexA, Hex hexB)
+    {
+        Vector3Int cubeA = OffsetToCube(hexA.hexCoords);
+        Vector3Int cubeB = OffsetToCube(hexB.hexCoords);
 
+        return (Mathf.Abs(cubeA.x - cubeB.x) + Mathf.Abs(cubeA.y - cubeB.y) + Mathf.Abs(cubeA.z - cubeB.z)) / 2;
+    }
+    
+    private Vector3Int OffsetToCube(Vector3Int offset)
+    {
+        var q = offset.x - (offset.z - (offset.z & 1)) / 2;
+        var r = offset.z;
+        var s = -q - r;
+        
+        return new Vector3Int(q, s, r);
+    }
     public Vector3Int GetClosestHex(Vector3 worldPosition)
     {
-        return new Vector3Int(
-            Mathf.RoundToInt(worldPosition.x / xOffset),
-            0,
-            Mathf.RoundToInt(worldPosition.z / zOffset)
-        );
+        float q_axial = (worldPosition.x * Mathf.Sqrt(3) / 3f - worldPosition.z / 3f) / (hexHeight / 2f);
+        float r_axial = (worldPosition.z * 2f / 3f) / (hexHeight / 2f);
+
+        Vector3 cube = new Vector3(q_axial, -q_axial - r_axial, r_axial);
+        
+        int rx = Mathf.RoundToInt(cube.x);
+        int ry = Mathf.RoundToInt(cube.y);
+        int rz = Mathf.RoundToInt(cube.z);
+
+        float dx = Mathf.Abs(rx - cube.x);
+        float dy = Mathf.Abs(ry - cube.y);
+        float dz = Mathf.Abs(rz - cube.z);
+
+        if (dx > dy && dx > dz)
+            rx = -ry - rz;
+        else if (dy > dz)
+            ry = -rx - rz;
+        else
+            rz = -rx - ry;
+
+        int col = rx;
+        int row = rz + (rx - (rx & 1)) / 2;
+
+        int z = Mathf.RoundToInt(worldPosition.z / ZSpacing);
+        float xOffset = (z % 2 != 0) ? hexWidth / 2f : 0;
+        int x = Mathf.RoundToInt((worldPosition.x - xOffset) / hexWidth);
+
+        return new Vector3Int(x, 0, z);
+    }
+    
+    public Vector3 GetWorldPosition(Vector3Int hexCoordinates)
+    {
+        float x = hexCoordinates.x * hexWidth;
+        float z = hexCoordinates.z * ZSpacing;
+
+        if (hexCoordinates.z % 2 != 0)
+        {
+            x += hexWidth / 2f;
+        }
+        return new Vector3(x, 0, z);
     }
 
     public Hex GetTileAt(Vector3Int hexCoordinates)
     {
-        Hex result = null;
-        hexTileDict.TryGetValue(hexCoordinates, out result);
+        hexTileDict.TryGetValue(hexCoordinates, out Hex result);
         return result;
     }
 
     public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates)
     {
-        if (hexTileDict.ContainsKey(hexCoordinates) == false)
+        if (!hexTileDict.ContainsKey(hexCoordinates))
             return new List<Vector3Int>();
 
         if (hexTileNeighboursDict.ContainsKey(hexCoordinates))
             return hexTileNeighboursDict[hexCoordinates];
 
         hexTileNeighboursDict[hexCoordinates] = new List<Vector3Int>();
-
         foreach (var direction in Direction.GetDirectionList(hexCoordinates.z))
         {
             Vector3Int neighborCoords = hexCoordinates + direction;
@@ -123,50 +125,41 @@ public class HexGrid : MonoBehaviour
                 hexTileNeighboursDict[hexCoordinates].Add(neighborCoords);
             }
         }
-
         return hexTileNeighboursDict[hexCoordinates];
     }
-    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range = 1)
+    
+    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range = 1) { return new List<Vector3Int>(); }
+    public void AddMovementPoints(int points) {  }
+
+    public Dictionary<Vector3Int, Hex> GetAllHexes()
     {
-        List<Vector3Int> result = new List<Vector3Int>();
-
-        if (range == 1)
-        {
-            return GetNeighborsFor(hexCoordinates); 
-        }
-        else
-        {
-
-        }
-
-        return result;
+        return hexTileDict;
     }
 }
-
 
 
 public static class Direction
 {
     public static List<Vector3Int> directionsOffsetOdd = new List<Vector3Int>
     {
-        new Vector3Int(-1,0,1),
-        new Vector3Int(0,0,1),
-        new Vector3Int(1,0,0),
-        new Vector3Int(0,0,-1),
-        new Vector3Int(-1,0,-1),
-        new Vector3Int(-1,0,0),
+        new Vector3Int(1, 0, 0),    // E
+        new Vector3Int(0, 0, -1),   // SW
+        new Vector3Int(-1, 0, -1),  // NW
+        new Vector3Int(-1, 0, 0),   // W
+        new Vector3Int(-1, 0, 1),   // NE
+        new Vector3Int(0, 0, 1)     // SE
     };
 
     public static List<Vector3Int> directionsOffsetEven = new List<Vector3Int>
     {
-        new Vector3Int(0,0,1),
-        new Vector3Int(1,0,1),
-        new Vector3Int(1,0,0),
-        new Vector3Int(1,0,-1),
-        new Vector3Int(0,0,-1),
-        new Vector3Int(-1,0,0),
+        new Vector3Int(1, 0, 0),    // E
+        new Vector3Int(1, 0, -1),   // SW
+        new Vector3Int(0, 0, -1),   // NW
+        new Vector3Int(-1, 0, 0),   // W
+        new Vector3Int(0, 0, 1),    // NE
+        new Vector3Int(1, 0, 1)     // SE
     };
 
     public static List<Vector3Int> GetDirectionList(int z)
-        => z % 2 == 0 ? directionsOffsetEven : directionsOffsetOdd;
+        => z % 2 != 0 ? directionsOffsetOdd : directionsOffsetEven;
 }

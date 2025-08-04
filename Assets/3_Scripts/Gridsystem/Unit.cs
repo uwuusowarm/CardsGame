@@ -11,12 +11,10 @@ public class Unit : MonoBehaviour
     [SerializeField] public int movementPoints = 0;
     [SerializeField] public int actionPoints = 4;
     public int shieldPoints = 0;
-    protected Hex currentHex;
+    public Hex currentHex;
     public bool IsEnemy = false;
     public int MovementPoints { get => movementPoints; }
     
-    public static Unit Instance { get; private set; }
-
     [SerializeField] private float movementDuration = 1, rotationDuration = 0.3f;
     private GlowHighlight glowHighlight;
     private Queue<Vector3> pathPositions = new Queue<Vector3>();
@@ -28,15 +26,6 @@ public class Unit : MonoBehaviour
         if (glowHighlight == null)
         {
             Debug.LogError("GlowHighlight component missing on Unit!", gameObject);
-        }
-        
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
         }
     }
     private void Start()
@@ -79,9 +68,14 @@ public class Unit : MonoBehaviour
     
     public void AddMovementPoints(int points)
     {
-        movementPoints += (points*10);
+        movementPoints += points /*+= (points*10)*/;
     }
-    
+
+    public void SetMovementPoints(int points)
+    {
+        movementPoints = points;
+    }
+
     public void ResetMovementPoints()
     {
         movementPoints = 0;
@@ -114,11 +108,11 @@ public class Unit : MonoBehaviour
     }
     internal void Deselect()
     {
-        glowHighlight.ToggleGlow(false);
+        //glowHighlight.ToggleGlow(false);
     }
     public void Select()
     {
-        glowHighlight.ToggleGlow(true);
+        //glowHighlight.ToggleGlow(true);
     }
 
     internal void MoveTroughPath(List<Vector3> currentPath)
@@ -152,6 +146,7 @@ public class Unit : MonoBehaviour
             transform.rotation = endRotation;
         }
         StartCoroutine(MovementCoroutine(endPosition));
+        yield break;
     }
 
     private IEnumerator MovementCoroutine(Vector3 endPosition)
@@ -176,15 +171,26 @@ public class Unit : MonoBehaviour
         }
         transform.position = endPosition;
 
-        Vector3Int newHexCoords = hexGrid.GetClosestHex(endPosition);
-        currentHex = hexGrid.GetTileAt(newHexCoords);
+        if (intendedEndPosition.HasValue)
+        {
+            float dist = Vector3.Distance(transform.position, intendedEndPosition.Value);
+            if (dist > 0.1f)
+            {
+                Debug.LogWarning($"Error! Finish was {intendedEndPosition.Value}, stopt at {transform.position}");
+            }
+            intendedEndPosition = null; 
+        }
+        Vector3Int fallbackHexCoords = FindNearestExistingHex(hexGrid, transform.position);
+        currentHex = hexGrid.GetTileAt(fallbackHexCoords);
         if (currentHex != null)
         {
+            Vector3 hexPos = currentHex.transform.position;
+            transform.position = new Vector3(hexPos.x, transform.position.y, hexPos.z);
             currentHex.SetUnit(this);
         }
         else
         {
-            Debug.Log("Error");
+            Debug.LogError("[Unit] Error no Hex found!");
         }
 
         if (pathPositions.Count > 0)
@@ -195,9 +201,39 @@ public class Unit : MonoBehaviour
         else
         {
             Debug.Log("Movement finished!");
-            movementPoints = 0;
-                
             MovementFinished?.Invoke(this);
         }
     }
+
+    private Vector3Int FindNearestExistingHex(HexGrid hexGrid, Vector3 position)
+{
+    Vector3Int center = hexGrid.GetClosestHex(position);
+    int searchRadius = 1;
+    while (searchRadius < 5) 
+    {
+        foreach (var kvp in hexGrid.GetAllHexes())
+        {
+            if (Vector3.Distance(kvp.Value.transform.position, position) < searchRadius * 2f)
+            {
+                return kvp.Key;
+            }
+        }
+        searchRadius++;
+    }
+    return center;
+}
+
+    private Vector3? intendedEndPosition = null;
+
+    public void SetIntendedEndPosition(Vector3 pos)
+    {
+        intendedEndPosition = pos;
+    }
+    
+    public Hex GetCurrentHex()
+    {
+        return currentHex;
+    }
+    
+    
 }

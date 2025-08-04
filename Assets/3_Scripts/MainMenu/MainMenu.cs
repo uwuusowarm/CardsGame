@@ -1,84 +1,141 @@
-using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.Audio;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.Windows;
 
 public class MainMenu : MonoBehaviour
 {
+    [Header("Panel Management")]
+    [SerializeField] private GameObject mainPanel;
+    [SerializeField] private GameObject cardMenuPanel;
+    [SerializeField] private GameObject creditsPanel;
+    [SerializeField] private GameObject deckSelectionPanel;
+    [SerializeField] private GameObject deckEditorSlideout;
+    [SerializeField] private GameObject boostersSlideout;
 
-    [Header("Resolution")]
-    [SerializeField] private TMP_Dropdown resolutionDropdown;
-    private GameObject resolution;
-    private Resolution[] resolutions;
-    public int targetFPS;
-    public Text selectedFPS;
-    private static MainMenu singleton;
+    [Header("Wichtige Referenzen")]
+    [SerializeField] private CardMenuManager cardMenuManager;
+    [SerializeField] private Transform deckSelectionContainer;
+    [SerializeField] private Button playGameButton;
 
-    public void StartButton()
+    private Deck currentlySelectedDeckForPlay;
+    private DeckUI currentlySelectedDeckUIForPlay;
+
+    private void Awake()
     {
-        SceneManager.LoadScene(1);
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit();
-
-#if UNITY_EDITOR
-        EditorApplication.ExitPlaymode();
-#endif
+        if (FindObjectOfType<GameDataManager>() == null)
+        {
+            new GameObject("GameDataManager").AddComponent<GameDataManager>();
+        }
+        if (FindObjectOfType<SettingsManager>() == null)
+        {
+            Debug.LogWarning("Kein SettingsManager in der Szene gefunden.");
+        }
     }
 
     private void Start()
     {
-        #region Resolution Dropdown
-        resolutionDropdown.ClearOptions();
-
-        var options = new List<string>();
-        resolutions = Screen.resolutions;
-        var currentResolutionIndex = 0;
-        for (var i = 0; i < resolutions.Length; i++)
-        {
-            var option = resolutions[i].width + " x " + resolutions[i].height;
-            options.Add(option);
-            if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height)
-            {
-                currentResolutionIndex = i;
-            }
-        }
-
-        resolutionDropdown.AddOptions(options);
-        resolutionDropdown.RefreshShownValue();
-        LoadSettings(currentResolutionIndex);
-        #endregion
+        ReturnToMainMenu();
     }
 
-    void Update()
+    private void ShowPanel(GameObject panelToShow)
     {
-         string input = selectedFPS.text;
+        if (mainPanel != null) mainPanel.SetActive(false);
+        if (cardMenuPanel != null) cardMenuPanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (deckSelectionPanel != null) deckSelectionPanel.SetActive(false);
+        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(false);
+        if (boostersSlideout != null) boostersSlideout.SetActive(false);
 
-
-        if (int.TryParse(input, out int fps) && fps >= 30)
+        if (panelToShow != null)
         {
-            targetFPS = fps;
+            panelToShow.SetActive(true);
+        }
+    }
+
+    // KORRIGIERT: Ruft jetzt nur noch den SettingsManager auf, ohne andere Panels zu schlieﬂen.
+    public void OpenOptionsPanel()
+    {
+        if (SettingsManager.Instance != null)
+        {
+            SettingsManager.Instance.ToggleOptionsPanel();
+        }
+    }
+
+    public void OpenDeckSelectionScreen()
+    {
+        ShowPanel(deckSelectionPanel);
+        if (playGameButton != null) playGameButton.gameObject.SetActive(false);
+        currentlySelectedDeckForPlay = null;
+        if (currentlySelectedDeckUIForPlay != null)
+        {
+            currentlySelectedDeckUIForPlay.SetHighlight(false);
+            currentlySelectedDeckUIForPlay = null;
+        }
+
+        foreach (Transform child in deckSelectionContainer) Destroy(child.gameObject);
+
+        List<Deck> playerDecks = cardMenuManager.GetPlayerDecks();
+        GameObject deckDisplayPrefab = cardMenuManager.deckDisplayPrefab;
+
+        foreach (var deck in playerDecks)
+        {
+            GameObject deckGO = Instantiate(deckDisplayPrefab, deckSelectionContainer);
+            DeckUI deckUI = deckGO.GetComponent<DeckUI>();
+            if (deckUI != null)
+            {
+                deckUI.Initialize(deck, (selectedUI) => {
+                    SelectDeckForPlay(selectedUI);
+                });
+            }
+        }
+    }
+
+    private void SelectDeckForPlay(DeckUI selectedUI)
+    {
+        if (currentlySelectedDeckUIForPlay == selectedUI)
+        {
+            selectedUI.SetHighlight(false);
+            currentlySelectedDeckUIForPlay = null;
+            currentlySelectedDeckForPlay = null;
+            if (playGameButton != null) playGameButton.gameObject.SetActive(false);
         }
         else
         {
-            targetFPS = 30;
+            if (currentlySelectedDeckUIForPlay != null)
+            {
+                currentlySelectedDeckUIForPlay.SetHighlight(false);
+            }
+            currentlySelectedDeckUIForPlay = selectedUI;
+            currentlySelectedDeckForPlay = selectedUI.GetAssignedDeck();
+            currentlySelectedDeckUIForPlay.SetHighlight(true);
+            if (playGameButton != null) playGameButton.gameObject.SetActive(true);
         }
-
-
-        Application.targetFrameRate = targetFPS;
     }
 
-    public void LoadSettings(int currentResolutionIndex)
+    public void LaunchGame()
     {
-        resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex;
+        if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
+            SceneManager.LoadScene(5);
+        }
+        else
+        {
+            Debug.LogError("Kein Deck ausgew‰hlt oder GameDataManager nicht gefunden!");
+        }
+    }
+
+    public void ReturnToMainMenu() { ShowPanel(mainPanel); }
+    public void OpenCardMenuPanel() { ShowPanel(cardMenuPanel); }
+    public void OpenCreditsPanel() { ShowPanel(creditsPanel); }
+    public void StartButton() { OpenDeckSelectionScreen(); }
+    public void QuitGame()
+    {
+        Application.Quit(); 
+        #if UNITY_EDITOR 
+        UnityEditor.EditorApplication.isPlaying = false; 
+        #endif 
     }
 }
-

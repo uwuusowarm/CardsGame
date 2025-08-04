@@ -14,8 +14,7 @@ public class ActionPointSystem : MonoBehaviour
     private bool[] pointsUnlocked; 
     
     public static ActionPointSystem Instance { get; private set; }
-
-
+    
     private void Start()
     {
         if (actionPointIcons.Count != maxActionPoints)
@@ -25,7 +24,7 @@ public class ActionPointSystem : MonoBehaviour
         }
 
         pointsUnlocked = new bool[maxActionPoints];
-        InitializeActionPoints(2); 
+        InitializeActionPoints(2);
     }
 
     private void Awake()
@@ -52,10 +51,15 @@ public class ActionPointSystem : MonoBehaviour
         UpdateActionPointDisplay();
     }
 
+    public void ResetActionPoints()
+    {
+        InitializeActionPoints(0);
+    }
+
     public void AddActionPoints(int amount)
     {
-        int newPoints = Mathf.Min(currentActionPoints + amount, maxActionPoints);
-        for (int i = currentActionPoints; i < newPoints; i++)
+        var newPoints = Mathf.Min(currentActionPoints + amount, maxActionPoints);
+        for (var i = currentActionPoints; i < newPoints; i++)
         {
             pointsUnlocked[i] = true;
         }

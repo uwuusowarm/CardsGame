@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-
 public class HealthSystem : MonoBehaviour
 {
     [Header("Settings")]
@@ -16,12 +15,6 @@ public class HealthSystem : MonoBehaviour
     private bool[] extraHealthUnlocked;
     public static HealthSystem Instance { get; private set; }
 
-    private void Start()
-    {
-        extraHealthUnlocked = new bool[maxExtraHealth];
-        InitializeHealth(maxBaseHealth);
-    }
-    
     private void Awake()
     {
         if (Instance == null)
@@ -32,6 +25,13 @@ public class HealthSystem : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
+        extraHealthUnlocked = new bool[maxExtraHealth];
+    }
+    
+    private void Start()
+    {
+        InitializeHealth(maxBaseHealth);
     }
     
     public void InitializeHealth(int startingHealth)
@@ -39,21 +39,102 @@ public class HealthSystem : MonoBehaviour
         currentHealth = startingHealth;
         UpdateHealthDisplay();
     }
-    public void Heal(int amount)
+
+    public void UpdateMaxHealth()
+    {
+        int totalMaxHealth = maxBaseHealth;
+    
+        if (EquipmentManager.Instance != null)
+        {
+            totalMaxHealth += EquipmentManager.Instance.GetTotalMaxHPBonus();
+        }
+    
+        if (extraHealthUnlocked != null)
+        {
+            for (int i = 0; i < extraHealthUnlocked.Length; i++)
+            {
+                if (extraHealthUnlocked[i])
+                {
+                    totalMaxHealth++;
+                }
+            }
+        }
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null && playerObj.TryGetComponent<Unit>(out var playerUnit))
+        {
+            playerUnit.maxHealth = totalMaxHealth;
+        }
+
+        if (currentHealth > totalMaxHealth)
+        {
+            currentHealth = totalMaxHealth;
+        }
+
+        UpdateHealthDisplay();
+    }
+
+
+    public int GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+    
+    public int GetMaxHealth()
     {
         int maxPossibleHealth = maxBaseHealth;
-        for (int i = 0; i < maxExtraHealth; i++)
+    
+        if (EquipmentManager.Instance != null)
         {
-            if (extraHealthUnlocked[i])
-                maxPossibleHealth++;
-            else
-                break; 
+            maxPossibleHealth += EquipmentManager.Instance.GetTotalMaxHPBonus();
         }
+    
+        if (extraHealthUnlocked != null)
+        {
+            for (int i = 0; i < maxExtraHealth; i++)
+            {
+                if (extraHealthUnlocked[i])
+                    maxPossibleHealth++;
+                else
+                    break;
+            }
+        }
+    
+        return maxPossibleHealth;
+    }
+
+    
+    public int GetUnlockedExtraHealthCount()
+    {
+        int count = 0;
+        if (extraHealthUnlocked != null)
+        {
+            for (int i = 0; i < extraHealthUnlocked.Length; i++)
+            {
+                if (extraHealthUnlocked[i])
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public void Heal(int amount)
+    {
+        int maxPossibleHealth = GetMaxHealth();
 
         if (currentHealth < maxPossibleHealth)
         {
             int healAmount = Mathf.Min(amount, maxPossibleHealth - currentHealth);
             currentHealth += healAmount;
+        
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null && playerObj.TryGetComponent<Unit>(out var playerUnit))
+            {
+                playerUnit.currentHealth = currentHealth;
+            }
+        
             UpdateHealthDisplay();
             Debug.Log($"Heal {healAmount}. Now: {currentHealth}/{maxPossibleHealth}");
         }
@@ -62,6 +143,8 @@ public class HealthSystem : MonoBehaviour
             Debug.Log("Full!");
         }
     }
+
+
     public void UnlockExtraHealth(int amount)
     {
         for (int i = 0; i < amount; i++)
@@ -86,7 +169,7 @@ public class HealthSystem : MonoBehaviour
                 break;
             }
         }
-        UpdateHealthDisplay();
+        UpdateMaxHealth();
     }
 
     public void AddHealth(int amount)
@@ -107,10 +190,20 @@ public class HealthSystem : MonoBehaviour
 
     public void LoseHealth(int amount)
     {
+        if (currentHealth <= 0) return;
+
         currentHealth = Mathf.Max(currentHealth - amount, 0);
         UpdateHealthDisplay();
-    }
 
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Player health depleted. Signaling game over.");
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.HandlePlayerDeath();
+            }
+        }
+    }
 
     private void UpdateHealthDisplay()
     {
@@ -133,10 +226,5 @@ public class HealthSystem : MonoBehaviour
                 }
             }
         }
-    }
-
-    public int GetCurrentHealth()
-    {
-        return currentHealth;
     }
 }

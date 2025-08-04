@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96a61ce38373274c97e49ef39b7eb27, type: 3}
+  m_Name: test
+  m_EditorClassIdentifier: 
+  cardName: Cheesy Chase
+  manaCost: 0
+  cardArt: {fileID: 21300000, guid: b876d106c57729e4aa9d515867e141e3, type: 3}
+  cardClass: 3
+  backgroundSprite: {fileID: 21300000, guid: e64cc4fb4f722334c9fd9dbc37ec1ed4, type: 3}
+  rarity: 1
+  borderSprite: {fileID: 21300000, guid: 168c1ee8bc10775439fe38671b50fe8e, type: 3}
+  leftEffects:
+  - effectType: 1
+    value: 4
+    isTemporary: 0
+    duration: 0
+    range: 0
+  rightEffects:
+  - effectType: 0
+    value: 2
+    isTemporary: 0
+    duration: 0
+    range: 0
+  alwaysEffects: []
+  leftEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
+  rightEffectIcon: {fileID: 21300000, guid: 8587820d2bca2ef429dec60d514637f5, type: 3}
+  cardPrefab: {fileID: 5264587354914885709, guid: 7bb24ce76b8d40545b147a14757077a2,
+    type: 3}
+  description: 

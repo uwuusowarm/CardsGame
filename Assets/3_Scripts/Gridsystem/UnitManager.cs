@@ -66,8 +66,8 @@ public class UnitManager : MonoBehaviour
 
         if (!hexGO.TryGetComponent<Hex>(out var selectedHex)) return;
 
-        if (HandleHexOutOfRange(selectedHex.HexCoords) ||
-            HandleSelectedHexIsUnitHex(selectedHex.HexCoords)) return;
+        if (HandleHexOutOfRange(selectedHex.hexCoords) ||
+            HandleSelectedHexIsUnitHex(selectedHex.hexCoords)) return;
 
         HandleTargetHexSelected(selectedHex);
     }
@@ -87,23 +87,16 @@ public class UnitManager : MonoBehaviour
         selectedUnit?.Deselect();
         movementSystem.HideRange();
         selectedUnit = null;
+        if (PlayerStatusUI.Instance != null)
+        {
+            PlayerStatusUI.Instance.ClearAttackInfo();
+        }
         AttackManager.Instance?.ClearHighlights();
     }
 
     private void HandleTargetHexSelected(Hex selectedHex)
     {
-        if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
-        {
-            previouslySelectedHex = selectedHex;
-            movementSystem.AddToPath(selectedHex.HexCoords);
-        }
-        else
-        {
-            movementSystem.MoveUnit();
-            animator.SetBool("IsWalking", true);
-            selectedUnit.MovementFinished += OnMovementFinished;
-            ClearOldSelection();
-        }
+        movementSystem.AddToPath(selectedHex.hexCoords); 
     }
 
     private void OnMovementFinished(Unit unit)
@@ -128,7 +121,7 @@ public class UnitManager : MonoBehaviour
     {
         if (!movementSystem.IsHexInRange(hexPosition))
         {
-            Debug.Log("Hex out of range!");
+            Debug.Log($"Hex out of range! Hex: {hexPosition}");
             return true;
         }
         return false;
@@ -145,7 +138,6 @@ public class UnitManager : MonoBehaviour
         ClearOldSelection();
         if (CardManager.Instance != null)
         {
-            // Statt UpdateDiscardUI nun UpdateAllUI aufrufen
             CardManager.Instance.UpdateAllUI();
         }
 
@@ -158,7 +150,7 @@ public class UnitManager : MonoBehaviour
         {
             if (enemy != null)
             {
-                enemy.AttackPlayer();
+                enemy.EnemyTurn();
                 yield return new WaitForSeconds(0.5f);
             }
         }
@@ -178,9 +170,7 @@ public class UnitManager : MonoBehaviour
     public void RegisterEnemy(EnemyUnit enemy)
     {
         if (!enemyUnits.Contains(enemy))
-        {
             enemyUnits.Add(enemy);
-        }
     }
 
     public void UnregisterEnemy(EnemyUnit enemy)
@@ -203,5 +193,11 @@ public class UnitManager : MonoBehaviour
         {
             Debug.LogWarning("Keine Spieler-Unit (ohne EnemyUnit-Skript) gefunden!");
         }
+    }
+
+    public List<EnemyUnit> GetEnemyUnits()
+    {
+        enemyUnits.RemoveAll(e => e == null);
+        return enemyUnits;
     }
 }
