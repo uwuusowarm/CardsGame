@@ -42,7 +42,6 @@ public class SettingsManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Schließe das Panel nur, wenn es aktiv ist
             if (isPanelActive)
             {
                 ToggleOptionsPanel();
@@ -57,7 +56,6 @@ public class SettingsManager : MonoBehaviour
         Time.timeScale = isPanelActive ? 0f : 1f;
     }
 
-    // NEUE METHODE für den Save-Button
     public void SaveAndCloseOptions()
     {
         SaveSettings();

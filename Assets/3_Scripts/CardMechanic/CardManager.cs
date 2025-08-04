@@ -24,17 +24,13 @@ public class CardManager : MonoBehaviour
     [SerializeField, Min(1)] private int drawCount = 4;
     public int DrawCount => drawCount;
 
-    [Header("Hand-Layout Einstellungen")]
+    [Header("Hand Layout Einstellungen")]
     [SerializeField] private Transform handTransform;
 
-    [Header("Layout für 4 Karten")]
-    [SerializeField] private HandLayoutSettings layoutFor4Cards;
-    [Header("Layout für 3 Karten")]
-    [SerializeField] private HandLayoutSettings layoutFor3Cards;
-    [Header("Layout für 2 Karten")]
-    [SerializeField] private HandLayoutSettings layoutFor2Cards;
-    [Header("Layout für 1 Karte")]
-    [SerializeField] private HandLayoutSettings layoutFor1Card;
+    [SerializeField] private HandLayoutSettings layout4Cards;
+    [SerializeField] private HandLayoutSettings layout3Cards;
+    [SerializeField] private HandLayoutSettings layout2Cards;
+    [SerializeField] private HandLayoutSettings layout1Card;
 
     [Header("Spielzonen Referenzen")]
     [SerializeField] private Transform leftGrid;
@@ -100,13 +96,13 @@ public class CardManager : MonoBehaviour
         HandLayoutSettings currentSettings = null;
         switch (handCardObjects.Count)
         {
-            case 4: currentSettings = layoutFor4Cards; 
+            case 4: currentSettings = layout4Cards; 
                 break;
-            case 3: currentSettings = layoutFor3Cards; 
+            case 3: currentSettings = layout3Cards; 
                 break;
-            case 2: currentSettings = layoutFor2Cards; 
+            case 2: currentSettings = layout2Cards; 
                 break;
-            case 1: currentSettings = layoutFor1Card; 
+            case 1: currentSettings = layout1Card; 
                 break;
         }
 
