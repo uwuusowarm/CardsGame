@@ -1,0 +1,165 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class HexGrid : MonoBehaviour
+{
+    Dictionary<Vector3Int, Hex> hexTileDict = new Dictionary<Vector3Int, Hex>();
+    Dictionary<Vector3Int, List<Vector3Int>> hexTileNeighboursDict = new Dictionary<Vector3Int, List<Vector3Int>>();
+
+    [Header("Grid Dimensions")]
+    [Tooltip("The full width of a single hex tile (corner to corner). Can be auto-calculated in the Level Painter.")]
+    public float hexWidth = 1.732f;
+    [Tooltip("The full height of a single hex tile (flat side to flat side). Can be auto-calculated in the Level Painter.")]
+    public float hexHeight = 2f;
+
+    public float ZSpacing => hexHeight * 0.75f;
+
+    public static HexGrid Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        Debug.Log("Initializing grid...");
+        foreach (Hex hex in FindObjectsOfType<Hex>())
+        {
+            hexTileDict[hex.hexCoords] = hex;
+        }
+
+        foreach (var hexCoords in hexTileDict.Keys)
+        {
+            GetNeighborsFor(hexCoords);
+        }
+        Debug.Log($"Grid initialized with {hexTileDict.Count} hexes");
+    }
+    public int GetDistance(Hex hexA, Hex hexB)
+    {
+        Vector3Int cubeA = OffsetToCube(hexA.hexCoords);
+        Vector3Int cubeB = OffsetToCube(hexB.hexCoords);
+
+        return (Mathf.Abs(cubeA.x - cubeB.x) + Mathf.Abs(cubeA.y - cubeB.y) + Mathf.Abs(cubeA.z - cubeB.z)) / 2;
+    }
+    
+    private Vector3Int OffsetToCube(Vector3Int offset)
+    {
+        var q = offset.x - (offset.z - (offset.z & 1)) / 2;
+        var r = offset.z;
+        var s = -q - r;
+        
+        return new Vector3Int(q, s, r);
+    }
+    public Vector3Int GetClosestHex(Vector3 worldPosition)
+    {
+        float q_axial = (worldPosition.x * Mathf.Sqrt(3) / 3f - worldPosition.z / 3f) / (hexHeight / 2f);
+        float r_axial = (worldPosition.z * 2f / 3f) / (hexHeight / 2f);
+
+        Vector3 cube = new Vector3(q_axial, -q_axial - r_axial, r_axial);
+        
+        int rx = Mathf.RoundToInt(cube.x);
+        int ry = Mathf.RoundToInt(cube.y);
+        int rz = Mathf.RoundToInt(cube.z);
+
+        float dx = Mathf.Abs(rx - cube.x);
+        float dy = Mathf.Abs(ry - cube.y);
+        float dz = Mathf.Abs(rz - cube.z);
+
+        if (dx > dy && dx > dz)
+            rx = -ry - rz;
+        else if (dy > dz)
+            ry = -rx - rz;
+        else
+            rz = -rx - ry;
+
+        int col = rx;
+        int row = rz + (rx - (rx & 1)) / 2;
+
+        int z = Mathf.RoundToInt(worldPosition.z / ZSpacing);
+        float xOffset = (z % 2 != 0) ? hexWidth / 2f : 0;
+        int x = Mathf.RoundToInt((worldPosition.x - xOffset) / hexWidth);
+
+        return new Vector3Int(x, 0, z);
+    }
+    
+    public Vector3 GetWorldPosition(Vector3Int hexCoordinates)
+    {
+        float x = hexCoordinates.x * hexWidth;
+        float z = hexCoordinates.z * ZSpacing;
+
+        if (hexCoordinates.z % 2 != 0)
+        {
+            x += hexWidth / 2f;
+        }
+        return new Vector3(x, 0, z);
+    }
+
+    public Hex GetTileAt(Vector3Int hexCoordinates)
+    {
+        hexTileDict.TryGetValue(hexCoordinates, out Hex result);
+        return result;
+    }
+
+    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates)
+    {
+        if (!hexTileDict.ContainsKey(hexCoordinates))
+            return new List<Vector3Int>();
+
+        if (hexTileNeighboursDict.ContainsKey(hexCoordinates))
+            return hexTileNeighboursDict[hexCoordinates];
+
+        hexTileNeighboursDict[hexCoordinates] = new List<Vector3Int>();
+        foreach (var direction in Direction.GetDirectionList(hexCoordinates.z))
+        {
+            Vector3Int neighborCoords = hexCoordinates + direction;
+            if (hexTileDict.ContainsKey(neighborCoords))
+            {
+                hexTileNeighboursDict[hexCoordinates].Add(neighborCoords);
+            }
+        }
+        return hexTileNeighboursDict[hexCoordinates];
+    }
+    
+    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range = 1) { return new List<Vector3Int>(); }
+    public void AddMovementPoints(int points) {  }
+
+    public Dictionary<Vector3Int, Hex> GetAllHexes()
+    {
+        return hexTileDict;
+    }
+}
+
+
+public static class Direction
+{
+    public static List<Vector3Int> directionsOffsetOdd = new List<Vector3Int>
+    {
+        new Vector3Int(1, 0, 0),    // E
+        new Vector3Int(0, 0, -1),   // SW
+        new Vector3Int(-1, 0, -1),  // NW
+        new Vector3Int(-1, 0, 0),   // W
+        new Vector3Int(-1, 0, 1),   // NE
+        new Vector3Int(0, 0, 1)     // SE
+    };
+
+    public static List<Vector3Int> directionsOffsetEven = new List<Vector3Int>
+    {
+        new Vector3Int(1, 0, 0),    // E
+        new Vector3Int(1, 0, -1),   // SW
+        new Vector3Int(0, 0, -1),   // NW
+        new Vector3Int(-1, 0, 0),   // W
+        new Vector3Int(0, 0, 1),    // NE
+        new Vector3Int(1, 0, 1)     // SE
+    };
+
+    public static List<Vector3Int> GetDirectionList(int z)
+        => z % 2 != 0 ? directionsOffsetOdd : directionsOffsetEven;
+}
