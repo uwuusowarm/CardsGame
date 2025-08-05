@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Analytics;
 
-public class GraphSearch
+public static class GraphSearch
 {
     public static BFSResult BFSGetRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
     {
@@ -62,6 +62,46 @@ public class GraphSearch
         }
         path.Reverse();
         return path.Skip(1).ToList();
+    }
+
+    public static List<Vector3Int> BFSGetPath(HexGrid grid, Vector3Int start, Vector3Int goal, int maxSteps)
+    {
+        var queue = new Queue<Vector3Int>();
+        var cameFrom = new Dictionary<Vector3Int, Vector3Int?>();
+        queue.Enqueue(start);
+        cameFrom[start] = null;
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            if (current == goal)
+                break;
+
+            foreach (var neighborPos in grid.GetNeighborsFor(current))
+            {
+                Hex neighborHex = grid.GetTileAt(neighborPos);
+                if (neighborHex == null) continue;
+                if (neighborHex.IsObstacle() || neighborHex.IsOccupied()) continue;
+
+                if (cameFrom.ContainsKey(neighborPos)) continue;
+
+                queue.Enqueue(neighborPos);
+                cameFrom[neighborPos] = current;
+            }
+        }
+        var path = new List<Vector3Int>();
+        Vector3Int? curr = goal;
+        if (!cameFrom.ContainsKey(goal))
+        {
+            curr = cameFrom.Keys.OrderBy(x => HexGrid.Instance.GetDistance(grid.GetTileAt(x), grid.GetTileAt(goal))).FirstOrDefault();
+            if (curr == null) return null;
+        }
+        while (curr != null)
+        {
+            path.Insert(0, curr.Value);
+            curr = cameFrom[curr.Value];
+        }
+        return path;
     }
 }
 
