@@ -7,15 +7,17 @@ public class SettingsManager : MonoBehaviour
 {
     public static SettingsManager Instance { get; private set; }
 
-    [Header("Options-Panel")]
+    [Header("Options panel")]
     [SerializeField] private GameObject optionsPanel;
 
-    [Header("UI-Elemente")]
+    [Header("UI elements")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
     [SerializeField] private Slider masterVolumeSlider;
 
     private Resolution[] resolutions;
     private bool isPanelActive = false;
+    int saveResolutionIndex;
+    int currentResolutionIndex = 0;
 
     private void Awake()
     {
@@ -29,7 +31,7 @@ public class SettingsManager : MonoBehaviour
                 optionsPanel.SetActive(false);
             }
 
-            SetupResolutions();
+            Resolutions();
             LoadSettings();
         }
         else
@@ -42,7 +44,7 @@ public class SettingsManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isPanelActive)
+            if (optionsPanel.activeSelf) 
             {
                 ToggleOptionsPanel();
             }
@@ -51,15 +53,22 @@ public class SettingsManager : MonoBehaviour
 
     public void ToggleOptionsPanel()
     {
-        isPanelActive = !isPanelActive;
+        if (optionsPanel == null) 
+            return;
+
+        isPanelActive = !optionsPanel.activeSelf;
         optionsPanel.SetActive(isPanelActive);
         Time.timeScale = isPanelActive ? 0f : 1f;
+    }
+    public GameObject GetOptionsPanelObject()
+    {
+        return optionsPanel;
     }
 
     public void SaveAndCloseOptions()
     {
         SaveSettings();
-        if (isPanelActive)
+        if (optionsPanel.activeSelf)
         {
             ToggleOptionsPanel();
         }
@@ -72,7 +81,8 @@ public class SettingsManager : MonoBehaviour
 
     public void SetResolution(int resolutionIndex)
     {
-        if (resolutions == null || resolutionIndex >= resolutions.Length) return;
+        if (resolutions == null || resolutionIndex >= resolutions.Length) 
+            return;
         Resolution resolution = resolutions[resolutionIndex];
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
     }
@@ -81,48 +91,56 @@ public class SettingsManager : MonoBehaviour
     {
         if (resolutionDropdown != null)
         {
-            PlayerPrefs.SetInt("ResolutionPreference", resolutionDropdown.value);
+            PlayerPrefs.SetInt("Resolution", resolutionDropdown.value);
         }
         if (masterVolumeSlider != null)
         {
-            PlayerPrefs.SetFloat("MasterVolumePreference", masterVolumeSlider.value);
+            PlayerPrefs.SetFloat("MasterVolume", masterVolumeSlider.value);
         }
         PlayerPrefs.Save();
-        Debug.Log("Settings saved!");
+        Debug.Log("Settings saved");
     }
 
     public void LoadSettings()
     {
         if (resolutionDropdown != null)
         {
-            resolutionDropdown.value = PlayerPrefs.GetInt("ResolutionPreference", resolutionDropdown.value);
+            saveResolutionIndex = PlayerPrefs.GetInt("Resolution", -1);
+            if (saveResolutionIndex != -1)
+            {
+                resolutionDropdown.value = saveResolutionIndex;
+            }
         }
+
         if (masterVolumeSlider != null)
         {
-            masterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolumePreference", 1f);
+            masterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolume", 1f);
             SetMasterVolume(masterVolumeSlider.value);
         }
     }
 
-    private void SetupResolutions()
+    //shit sollte jz gehen wenn nicht spring ich
+    private void Resolutions()
     {
-        if (resolutionDropdown == null) return;
+        if (resolutionDropdown == null) 
+            return;
         resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
         List<string> options = new List<string>();
-        int currentResolutionIndex = 0;
-        for (int i = 0; i < resolutions.Length; i++)
+        for (int res = 0; res < resolutions.Length; res++)
         {
-            string option = resolutions[i].width + " x " + resolutions[i].height;
+            string option = resolutions[res].width + " x " + resolutions[res].height;
             options.Add(option);
-            if (resolutions[i].width == Screen.currentResolution.width &&
-                resolutions[i].height == Screen.currentResolution.height)
+            if (resolutions[res].width == Screen.currentResolution.width &&
+                resolutions[res].height == Screen.currentResolution.height)
             {
-                currentResolutionIndex = i;
+                currentResolutionIndex = res;
             }
         }
         resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = currentResolutionIndex;
+
+        saveResolutionIndex = PlayerPrefs.GetInt("ResolutionPreference", currentResolutionIndex);
+        resolutionDropdown.value = saveResolutionIndex;
         resolutionDropdown.RefreshShownValue();
     }
 }
