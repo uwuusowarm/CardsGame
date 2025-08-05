@@ -239,18 +239,6 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("CardManager.Instance is null. Cannot move card to discard.");
         }
-
-        if (PlayedCardEffectCache.Instance.PendingDamage > 0)
-        {
-            attackAvailable = true;
-            pendingAttackDamage = PlayedCardEffectCache.Instance.PendingDamage;
-            pendingAttackRange = PlayedCardEffectCache.Instance.PendingRange;
-        
-            if(AttackManager.Instance != null)
-            {
-                AttackManager.Instance.PrepareAttack(pendingAttackDamage, pendingAttackRange);
-            }
-        }
         
         ActionPointSystem.Instance.UseActionPoints(1);
     }
@@ -308,6 +296,8 @@ public class GameManager : MonoBehaviour
 
             if (AttackManager.Instance != null && attacker != null)
             {
+                attackAvailable = true;
+
                 int damageAmount = PlayedCardEffectCache.Instance.PendingDamage;
                 int damageBonus = EquipmentManager.Instance.GetTotalDamageBonus();
                 int totalDamage = damageAmount + damageBonus;
@@ -409,19 +399,18 @@ public class GameManager : MonoBehaviour
 
     public void PlayerActionResolved(bool actionWasCompleted)
     {
-        Debug.Log($"Player action resolved. Completed: {actionWasCompleted}");
-        if(PlayerStatusUI.Instance != null) PlayerStatusUI.Instance.ClearAttackInfo();
-        
+        isWaitingForPlayerActionResolution = false;
+
         attackAvailable = false;
         pendingAttackDamage = 0;
         pendingAttackRange = 0;
-        
-        if(AttackManager.Instance != null)
+    
+        if (PlayerStatusUI.Instance != null)
         {
-            AttackManager.Instance.ClearHighlights();
+            PlayerStatusUI.Instance.ClearAttackInfo();
         }
         
-        PlayedCardEffectCache.Instance.ClearCache();
+        Debug.Log($"Player action resolved. Attack available reset to: {attackAvailable}");
     }
 
 
@@ -527,6 +516,20 @@ public class GameManager : MonoBehaviour
         gameOverCanvasGroup.blocksRaycasts = true;
     }
 
+    public void ResetAttackAvailability()
+    {
+        attackAvailable = false;
+        pendingAttackDamage = 0;
+        pendingAttackRange = 0;
+    
+        if (PlayerStatusUI.Instance != null)
+        {
+            PlayerStatusUI.Instance.ClearAttackInfo();
+        }
+    
+        Debug.Log("Attack availability reset");
+    }
+    
     public void ReturnToMainMenu()
     {
         Debug.Log($"Returning to Main Menu scene: {mainMenuSceneName}");

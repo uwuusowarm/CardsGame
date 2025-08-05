@@ -67,12 +67,24 @@ public class EnemyUnit : MonoBehaviour
 
     private void OnMouseDown()
     {
+        Debug.Log($"=== ENEMY CLICK DEBUG ===");
+        Debug.Log($"Enemy clicked: {name}");
+        Debug.Log($"Is highlighted: {isHighlighted}");
+        Debug.Log($"UnitManager exists: {UnitManager.Instance != null}");
+        Debug.Log($"PlayersTurn: {UnitManager.Instance?.PlayersTurn}");
+        Debug.Log($"AttackManager exists: {AttackManager.Instance != null}");
+        Debug.Log($"========================");
+    
         if (UnitManager.Instance.PlayersTurn && isHighlighted)
         {
+            Debug.Log("🎯 Calling AttackManager.HandleEnemyClick!");
             AttackManager.Instance?.HandleEnemyClick(this);
         }
+        else
+        {
+            Debug.LogWarning("Click ignored - wrong turn or not highlighted");
+        }
     }
-
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
@@ -95,11 +107,6 @@ public class EnemyUnit : MonoBehaviour
         else
             Debug.Log($"Enemy registered at {hexCoords}");
             currentHex.SetEnemyUnit(this);
-    }
-
-    public void AttackPlayer()
-    {
-
     }
 
     private void AttackPlayer(int damage)

@@ -66,9 +66,21 @@ public class UnitManager : MonoBehaviour
 
         if (!hexGO.TryGetComponent<Hex>(out var selectedHex)) return;
 
-        if (HandleHexOutOfRange(selectedHex.hexCoords) ||
-            HandleSelectedHexIsUnitHex(selectedHex.hexCoords)) return;
+        Debug.Log($"HandleTerrainSelected: Clicked hex {selectedHex.hexCoords}");
 
+        if (HandleSelectedHexIsUnitHex(selectedHex.hexCoords))
+        {
+            Debug.Log($"Clicked on current unit hex - clearing selection");
+            return;
+        }
+
+        if (HandleHexOutOfRange(selectedHex.hexCoords))
+        {
+            Debug.Log($"Hex {selectedHex.hexCoords} is out of range");
+            return;
+        }
+
+        Debug.Log($"Processing movement to hex {selectedHex.hexCoords}");
         HandleTargetHexSelected(selectedHex);
     }
 
@@ -109,8 +121,22 @@ public class UnitManager : MonoBehaviour
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)
     {
-        if (hexPosition == hexGrid.GetClosestHex(selectedUnit.transform.position))
+        Vector3Int currentUnitHex;
+        
+        if (selectedUnit.currentHex != null)
         {
+            currentUnitHex = selectedUnit.currentHex.hexCoords;
+        }
+        else
+        {
+            currentUnitHex = hexGrid.GetClosestHex(selectedUnit.transform.position);
+        }
+
+        Debug.Log($"HandleSelectedHexIsUnitHex: Clicked {hexPosition}, Unit at {currentUnitHex}");
+
+        if (hexPosition == currentUnitHex)
+        {
+            Debug.Log($"Clicked on current unit hex - clearing selection");
             ClearOldSelection();
             return true;
         }
