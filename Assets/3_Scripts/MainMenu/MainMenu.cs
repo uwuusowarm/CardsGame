@@ -11,6 +11,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject cardMenuPanel;
     [SerializeField] private GameObject creditsPanel;
     [SerializeField] private GameObject deckSelectionPanel;
+    [SerializeField] private GameObject deckEditorSlideout;
+    [SerializeField] private GameObject boostersSlideout;
 
     [Header("Wichtige Referenzen")]
     [SerializeField] private CardMenuManager cardMenuManager;
@@ -26,10 +28,9 @@ public class MainMenu : MonoBehaviour
         {
             new GameObject("GameDataManager").AddComponent<GameDataManager>();
         }
-
         if (FindObjectOfType<SettingsManager>() == null)
         {
-            Debug.LogWarning("Kein SettingsManager in der Szene gefunden. Bitte sicherstellen, dass dieser in der ersten Szene geladen wird, um zu funktionieren.");
+            Debug.LogWarning("Kein SettingsManager in der Szene gefunden.");
         }
     }
 
@@ -44,6 +45,8 @@ public class MainMenu : MonoBehaviour
         if (cardMenuPanel != null) cardMenuPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(false);
         if (deckSelectionPanel != null) deckSelectionPanel.SetActive(false);
+        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(false);
+        if (boostersSlideout != null) boostersSlideout.SetActive(false);
 
         if (panelToShow != null)
         {
@@ -115,7 +118,7 @@ public class MainMenu : MonoBehaviour
         if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
         {
             GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
-            SceneManager.LoadScene(3);
+            SceneManager.LoadScene(5);
         }
         else
         {
@@ -123,35 +126,15 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    public void ReturnToMainMenu()
-    {
-        ShowPanel(mainPanel);
-    }
-
-    public void OpenCardMenuPanel()
-    {
-        ShowPanel(cardMenuPanel);
-        if (cardMenuManager != null)
-        {
-            cardMenuManager.PopulateDeckDisplay();
-        }
-    }
-
-    public void OpenCreditsPanel()
-    {
-        ShowPanel(creditsPanel);
-    }
-
-    public void StartButton()
-    {
-        OpenDeckSelectionScreen();
-    }
-
+    public void ReturnToMainMenu() { ShowPanel(mainPanel); }
+    public void OpenCardMenuPanel() { ShowPanel(cardMenuPanel); }
+    public void OpenCreditsPanel() { ShowPanel(creditsPanel); }
+    public void StartButton() { OpenDeckSelectionScreen(); }
     public void QuitGame()
     {
-        Application.Quit();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#endif
+        Application.Quit(); 
+        #if UNITY_EDITOR 
+        UnityEditor.EditorApplication.isPlaying = false; 
+        #endif 
     }
 }

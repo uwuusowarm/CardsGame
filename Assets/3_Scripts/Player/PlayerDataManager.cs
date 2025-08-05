@@ -24,6 +24,11 @@ public class PlayerDataManager : MonoBehaviour
         }
     }
 
+    public void ResetPlayerData()
+    {
+        playerData.ResetToDefaults();
+    }
+    
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -37,6 +42,8 @@ public class PlayerDataManager : MonoBehaviour
 
     private IEnumerator LoadDataAfterSceneLoad()
     {
+        yield return new WaitForEndOfFrame(); 
+        
         yield return new WaitUntil(() => HealthSystem.Instance != null &&
                                          ExhaustionSystem.Instance != null &&
                                          EquipmentManager.Instance != null);
@@ -51,6 +58,7 @@ public class PlayerDataManager : MonoBehaviour
         }
 
         HealthSystem.Instance.UnlockExtraHealth(playerData.savedUnlockedExtraHealthSlots);
+        HealthSystem.Instance.UpdateMaxHealth();
         HealthSystem.Instance.InitializeHealth(playerData.savedCurrentHealth);
         
         ExhaustionSystem.Instance.SetExhaustionStacks(playerData.savedExhaustionStacks);

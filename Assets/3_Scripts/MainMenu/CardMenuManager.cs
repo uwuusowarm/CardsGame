@@ -5,22 +5,15 @@ using TMPro;
 
 public class CardMenuManager : MonoBehaviour
 {
-    [Header("Panel-Referenzen")]
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject cardMenuPanel;
     [SerializeField] private GameObject deckEditorSlideout;
     [SerializeField] private GameObject boostersSlideout;
-
-    [Header("Deck Editor Referenzen")]
     [SerializeField] private Transform allCardsContainer;
     [SerializeField] private GameObject cardInListPrefab;
     [SerializeField] private Button saveDeckButton;
-
-    [Header("Card Menu Referenzen")]
     [SerializeField] private Transform decksDisplayContainer;
-    public GameObject deckDisplayPrefab;
-
-    [Header("Zentrale Datenbank")]
+    [SerializeField] public GameObject deckDisplayPrefab;
     [SerializeField] private CardDatabaseSO cardDatabase;
 
     private List<Deck> allPlayerDecks = new List<Deck>();
@@ -32,6 +25,7 @@ public class CardMenuManager : MonoBehaviour
     void Start()
     {
         allPlayerDecks = SaveSystem.LoadDecks();
+        PopulateDeckDisplay();
     }
 
     public List<Deck> GetPlayerDecks()
@@ -39,6 +33,10 @@ public class CardMenuManager : MonoBehaviour
         return allPlayerDecks;
     }
 
+    public GameObject DeckDisplayPrefab
+    {
+        get { return deckDisplayPrefab; }
+    }
     public void SelectDeckForEditing(DeckUI selectedUI)
     {
         if (currentlySelectedDeckUI != null && currentlySelectedDeckUI != selectedUI)
@@ -81,7 +79,7 @@ public class CardMenuManager : MonoBehaviour
         else
         {
             Deck newDeck = new Deck();
-            newDeck.DeckName = "Deck " + (allPlayerDecks.Count + 1);
+            newDeck.DeckName = "New Deck " + (allPlayerDecks.Count + 1);
             newDeck.Cards = new List<CardData>(currentlySelectedCards);
             allPlayerDecks.Add(newDeck);
         }
@@ -102,9 +100,9 @@ public class CardMenuManager : MonoBehaviour
         foreach (var cardData in cardDatabase.allCards)
         {
             if (cardData.cardPrefab == null) continue;
-            GameObject wrapperGO = Instantiate(cardInListPrefab, allCardsContainer);
-            wrapperGO.name = "Wrapper_" + cardData.cardName;
-            CardSelectorUI cardUI = wrapperGO.GetComponent<CardSelectorUI>();
+            GameObject wrapperGameObject = Instantiate(cardInListPrefab, allCardsContainer);
+            wrapperGameObject.name = "Wrapper_" + cardData.cardName;
+            CardSelectorUI cardUI = wrapperGameObject.GetComponent<CardSelectorUI>();
             if (cardUI != null)
             {
                 bool isSelected = currentlySelectedCards.Contains(cardData);
@@ -127,10 +125,10 @@ public class CardMenuManager : MonoBehaviour
     {
         foreach (var cardUI in spawnedCardUIs)
         {
-            CardData data = cardUI.GetCardData();
-            if (data != null)
+            CardData cardData = cardUI.GetCardData();
+            if (cardData != null)
             {
-                cardUI.SetHighlight(currentlySelectedCards.Contains(data));
+                cardUI.SetHighlight(currentlySelectedCards.Contains(cardData));
             }
         }
     }
@@ -144,9 +142,13 @@ public class CardMenuManager : MonoBehaviour
         UpdateSaveButtonState();
     }
 
+
     private void UpdateSaveButtonState()
     {
-        if (saveDeckButton != null) saveDeckButton.interactable = currentlySelectedCards.Count >= 15;
+        if (saveDeckButton != null)
+        {
+            saveDeckButton.interactable = currentlySelectedCards.Count >= 15;
+        }
     }
 
     public void PopulateDeckDisplay()
@@ -158,8 +160,8 @@ public class CardMenuManager : MonoBehaviour
         foreach (Transform child in decksDisplayContainer) Destroy(child.gameObject);
         foreach (Deck deck in allPlayerDecks)
         {
-            GameObject deckGO = Instantiate(deckDisplayPrefab, decksDisplayContainer);
-            if (deckGO.TryGetComponent<DeckUI>(out var deckUI))
+            GameObject deckGameObject = Instantiate(deckDisplayPrefab, decksDisplayContainer);
+            if (deckGameObject.TryGetComponent<DeckUI>(out var deckUI))
             {
                 deckUI.Initialize(deck, this);
             }
