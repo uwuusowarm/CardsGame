@@ -271,7 +271,7 @@ public class CardManager : MonoBehaviour
 
     public void OnDeckClicked()
     {
-        if (hand.Count > 0 && ActionPointSystem.Instance.GetCurrentActionPoints() > 0)
+        if (hand.Count >= 0 && ActionPointSystem.Instance.GetCurrentActionPoints() > 0)
         {
             discardPile.AddRange(hand);
             hand.Clear();
