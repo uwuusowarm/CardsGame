@@ -12,16 +12,16 @@ public class MainMenu : MonoBehaviour
 
     [Header("!references!")]
     [SerializeField] private CardMenuManager cardMenuManager;
-    [SerializeField] private Transform deckSelectionContainer;
+    [SerializeField] private Transform SelectionContainer;
     [SerializeField] private Button playGameButton;
 
     private GameObject settingsPanel;
-    private GameObject currentlyActivePanel;
+    private GameObject ActivePanel;
 
-    private Deck currentlySelectedDeckForPlay;
-    private DeckUI currentlySelectedDeckUIForPlay;
-    bool isSettingsPanelActive = false;
-    bool isActive = false;
+    private Deck SelectedDeckPlay;
+    private DeckUI SelectedDeckUI;
+    public bool isSettingsPanelActive = false;
+    public bool Active = false;
 
     private void Start()
     {
@@ -38,14 +38,14 @@ public class MainMenu : MonoBehaviour
         if (panelToToggle == null) 
             return;
 
-        isActive = panelToToggle.activeSelf;
+        Active = panelToToggle.activeSelf;
 
         CloseAllPanels();
 
-        if (!isActive)
+        if (!Active)
         {
             panelToToggle.SetActive(true);
-            currentlyActivePanel = panelToToggle;
+            ActivePanel = panelToToggle;
         }
     }
 
@@ -60,7 +60,7 @@ public class MainMenu : MonoBehaviour
         if (settingsPanel != null) 
             settingsPanel.SetActive(false);
 
-        currentlyActivePanel = null;
+        ActivePanel = null;
     }
 
     public void DeckMenuButton()
@@ -82,7 +82,7 @@ public class MainMenu : MonoBehaviour
         if (!isSettingsPanelActive && SettingsManager.Instance != null)
         {
             SettingsManager.Instance.ToggleOptionsPanel();
-            currentlyActivePanel = settingsPanel; 
+            ActivePanel = settingsPanel; 
         }
     }
 
@@ -99,15 +99,15 @@ public class MainMenu : MonoBehaviour
     {
         if (playGameButton != null) 
             playGameButton.gameObject.SetActive(false);
-        currentlySelectedDeckForPlay = null;
-        currentlySelectedDeckForPlay = null;
-        if (currentlySelectedDeckUIForPlay != null)
+        SelectedDeckPlay = null;
+        SelectedDeckPlay = null;
+        if (SelectedDeckUI != null)
         {
-            currentlySelectedDeckUIForPlay.SetHighlight(false);
-            currentlySelectedDeckUIForPlay = null;
+            SelectedDeckUI.SetHighlight(false);
+            SelectedDeckUI = null;
         }
 
-        foreach (Transform child in deckSelectionContainer)
+        foreach (Transform child in SelectionContainer)
         {
             Destroy(child.gameObject);
         }
@@ -117,50 +117,56 @@ public class MainMenu : MonoBehaviour
 
         foreach (var deck in playerDecks)
         {
-            GameObject deckGameObject = Instantiate(deckDisplayPrefab, deckSelectionContainer);
+            GameObject deckGameObject = Instantiate(deckDisplayPrefab, SelectionContainer);
             DeckUI deckUI = deckGameObject.GetComponent<DeckUI>();
             if (deckUI != null)
             {
-                deckUI.Initialize(deck, (selectedUI) => {
+                deckUI.Initialize
+                    (deck, (selectedUI) => 
+                {
                     SelectDeckForPlay(selectedUI);
-                });
+                }
+                );
             }
         }
     }
 
     private void SelectDeckForPlay(DeckUI selectedUI)
     {
-        if (currentlySelectedDeckUIForPlay == selectedUI)
+        if (SelectedDeckUI == selectedUI)
         {
             selectedUI.SetHighlight(false);
-            currentlySelectedDeckUIForPlay = null;
-            currentlySelectedDeckForPlay = null;
-            if (playGameButton != null) playGameButton.gameObject.SetActive(false);
+            SelectedDeckUI = null;
+            SelectedDeckPlay = null;
+            if (playGameButton != null) 
+                playGameButton.gameObject.SetActive(false);
         }
         else
         {
-            if (currentlySelectedDeckUIForPlay != null)
+            if (SelectedDeckUI != null)
             {
-                currentlySelectedDeckUIForPlay.SetHighlight(false);
+                SelectedDeckUI.SetHighlight(false);
             }
-            currentlySelectedDeckUIForPlay = selectedUI;
-            currentlySelectedDeckForPlay = selectedUI.GetAssignedDeck();
-            currentlySelectedDeckUIForPlay.SetHighlight(true);
-            if (playGameButton != null) playGameButton.gameObject.SetActive(true);
+            SelectedDeckUI = selectedUI;
+            SelectedDeckPlay = selectedUI.GetAssignedDeck();
+            SelectedDeckUI.SetHighlight(true);
+            if (playGameButton != null) 
+                playGameButton.gameObject.SetActive(true);
         }
     }
 
     public void LaunchGame()
     {
-        if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
+        if (SelectedDeckPlay != null && GameDataManager.Instance != null)
         {
-            GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
+            GameDataManager.Instance.selectedDeck = SelectedDeckPlay;
             SceneManager.LoadScene(5);
         }
-        else
+/*        else
         {
             Debug.LogError("kein deck");
         }
+*/
     }
 
     public void QuitGame()

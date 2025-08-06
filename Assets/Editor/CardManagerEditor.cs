@@ -6,59 +6,117 @@ using System.Collections.Generic;
 [CustomEditor(typeof(CardManager))]
 public class CardManagerEditor : Editor
 {
-    private CardManager manager;
-    private FieldInfo deckF;
-    private FieldInfo discardF;
-    private FieldInfo handF;
-    private FieldInfo leftF;
-    private FieldInfo rightF;
-
-    private bool showDeck = true;
-    private bool showHand = true;
-    private bool showDiscard = true;
-    private bool showLeft = true;
-    private bool showRight = true;
-    public override bool RequiresConstantRepaint() => Application.isPlaying;
-
-    private void OnEnable()
-    {
-        var t = typeof(CardManager);
-        manager = (CardManager)target;
-        deckF = t.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
-        handF = t.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
-        discardF = t.GetField("discardPile", BindingFlags.NonPublic | BindingFlags.Instance);
-        leftF = t.GetField("leftZone", BindingFlags.NonPublic | BindingFlags.Instance);
-        rightF = t.GetField("rightZone", BindingFlags.NonPublic | BindingFlags.Instance);
-    }
+    private bool showDeckList = true;
+    private bool showHandList = true;
+    private bool showDiscardPileList = true;
+    private bool showLeftZoneList = true;
+    private bool showRightZoneList = true;
 
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-        GUILayout.Space(8);
-        EditorGUILayout.LabelField("Runtime Card Lists", EditorStyles.boldLabel);
-        DrawList(deckF, ref showDeck, "Deck");
-        DrawList(handF, ref showHand, "Hand");
-        DrawList(discardF, ref showDiscard, "Discard Pile");
-        DrawList(leftF, ref showLeft, "Left Zone");
-        DrawList(rightF, ref showRight, "Right Zone");
+
+        CardManager cardManager = (CardManager)target;
+        var managerType = typeof(CardManager);
+
+        FieldInfo deckField = managerType.GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (deckField != null)
+        {
+            List<CardData> deckCardList = (List<CardData>)deckField.GetValue(cardManager);
+            if (deckCardList != null)
+            {
+                showDeckList = EditorGUILayout.Foldout(showDeckList, "Deck (" + deckCardList.Count + ")");
+                if (showDeckList)
+                {
+                    EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
+                    foreach (CardData card in deckCardList)
+                    {
+                        EditorGUILayout.LabelField("• " + card.cardName);
+                    }
+                    EditorGUI.indentLevel = EditorGUI.indentLevel - 1;
+                }
+            }
+        }
+
+        FieldInfo handField = managerType.GetField("hand", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (handField != null)
+        {
+            List<CardData> handCardList = (List<CardData>)handField.GetValue(cardManager);
+            if (handCardList != null)
+            {
+                showHandList = EditorGUILayout.Foldout(showHandList, "Hand (" + handCardList.Count + ")");
+                if (showHandList)
+                {
+                    EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
+                    foreach (CardData card in handCardList)
+                    {
+                        EditorGUILayout.LabelField("• " + card.cardName);
+                    }
+                    EditorGUI.indentLevel = EditorGUI.indentLevel - 1;
+                }
+            }
+        }
+
+        FieldInfo discardPileField = managerType.GetField("discardPile", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (discardPileField != null)
+        {
+            List<CardData> discardPileCardList = (List<CardData>)discardPileField.GetValue(cardManager);
+            if (discardPileCardList != null)
+            {
+                showDiscardPileList = EditorGUILayout.Foldout(showDiscardPileList, "Discard Pile (" + discardPileCardList.Count + ")");
+                if (showDiscardPileList)
+                {
+                    EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
+                    foreach (CardData card in discardPileCardList)
+                    {
+                        EditorGUILayout.LabelField("• " + card.cardName);
+                    }
+                    EditorGUI.indentLevel = EditorGUI.indentLevel - 1;
+                }
+            }
+        }
+
+        FieldInfo leftZoneField = managerType.GetField("leftZone", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (leftZoneField != null)
+        {
+            List<CardData> leftZoneCardList = (List<CardData>)leftZoneField.GetValue(cardManager);
+            if (leftZoneCardList != null)
+            {
+                showLeftZoneList = EditorGUILayout.Foldout(showLeftZoneList, "Left Zone (" + leftZoneCardList.Count + ")");
+                if (showLeftZoneList)
+                {
+                    EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
+                    foreach (CardData card in leftZoneCardList)
+                    {
+                        EditorGUILayout.LabelField("• " + card.cardName);
+                    }
+                    EditorGUI.indentLevel = EditorGUI.indentLevel - 1;
+                }
+            }
+        }
+
+        FieldInfo rightZoneField = managerType.GetField("rightZone", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (rightZoneField != null)
+        {
+            List<CardData> rightZoneCardList = (List<CardData>)rightZoneField.GetValue(cardManager);
+            if (rightZoneCardList != null)
+            {
+                showRightZoneList = EditorGUILayout.Foldout(showRightZoneList, "Right Zone (" + rightZoneCardList.Count + ")");
+                if (showRightZoneList)
+                {
+                    EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
+                    foreach (CardData card in rightZoneCardList)
+                    {
+                        EditorGUILayout.LabelField("• " + card.cardName);
+                    }
+                    EditorGUI.indentLevel = EditorGUI.indentLevel - 1;
+                }
+            }
+        }
 
         if (Application.isPlaying)
-            Repaint();
-    }
-
-    private void DrawList(FieldInfo fi, ref bool fold, string label)
-    {
-        var list = fi.GetValue(manager) as List<CardData>;
-        int count = list?.Count ?? 0;
-
-        fold = EditorGUILayout.Foldout(fold, $"{label} ({count})");
-
-        if (fold && list != null)
         {
-            EditorGUI.indentLevel++;
-            foreach (var c in list)
-                EditorGUILayout.LabelField("• " + c.cardName);
-            EditorGUI.indentLevel--;
+            Repaint();
         }
     }
 }

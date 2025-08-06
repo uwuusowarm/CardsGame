@@ -16,8 +16,8 @@ public class SettingsManager : MonoBehaviour
 
     private Resolution[] resolutions;
     private bool isPanelActive = false;
-    int saveResolutionIndex;
-    int currentResolutionIndex = 0;
+    public int saveResolutionIndex;
+    public int currentResolutionIndex = 0;
 
     private void Awake()
     {
@@ -98,7 +98,7 @@ public class SettingsManager : MonoBehaviour
             PlayerPrefs.SetFloat("MasterVolume", masterVolumeSlider.value);
         }
         PlayerPrefs.Save();
-        Debug.Log("Settings saved");
+//        Debug.Log("Settings saved");
     }
 
     public void LoadSettings()
@@ -134,7 +134,7 @@ public class SettingsManager : MonoBehaviour
             if (resolutions[res].width == Screen.currentResolution.width &&
                 resolutions[res].height == Screen.currentResolution.height)
             {
-                currentResolutionIndex = res;
+                currentResolutionIndex = res; 
             }
         }
         resolutionDropdown.AddOptions(options);
