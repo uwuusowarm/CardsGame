@@ -2,70 +2,104 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
-using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
-    [Header("Panel Management")]
-    [SerializeField] private GameObject mainPanel;
+    [Header("UI panels")]
     [SerializeField] private GameObject cardMenuPanel;
     [SerializeField] private GameObject creditsPanel;
     [SerializeField] private GameObject deckSelectionPanel;
-    [SerializeField] private GameObject deckEditorSlideout;
-    [SerializeField] private GameObject boostersSlideout;
 
-    [Header("Wichtige Referenzen")]
+    [Header("!references!")]
     [SerializeField] private CardMenuManager cardMenuManager;
     [SerializeField] private Transform deckSelectionContainer;
     [SerializeField] private Button playGameButton;
 
+    private GameObject settingsPanel;
+    private GameObject currentlyActivePanel;
+
     private Deck currentlySelectedDeckForPlay;
     private DeckUI currentlySelectedDeckUIForPlay;
-
-    private void Awake()
-    {
-        if (FindObjectOfType<GameDataManager>() == null)
-        {
-            new GameObject("GameDataManager").AddComponent<GameDataManager>();
-        }
-        if (FindObjectOfType<SettingsManager>() == null)
-        {
-            Debug.LogWarning("Kein SettingsManager in der Szene gefunden.");
-        }
-    }
+    bool isSettingsPanelActive = false;
+    bool isActive = false;
 
     private void Start()
     {
-        ReturnToMainMenu();
-    }
-
-    private void ShowPanel(GameObject panelToShow)
-    {
-        if (mainPanel != null) mainPanel.SetActive(false);
-        if (cardMenuPanel != null) cardMenuPanel.SetActive(false);
-        if (creditsPanel != null) creditsPanel.SetActive(false);
-        if (deckSelectionPanel != null) deckSelectionPanel.SetActive(false);
-        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(false);
-        if (boostersSlideout != null) boostersSlideout.SetActive(false);
-
-        if (panelToShow != null)
-        {
-            panelToShow.SetActive(true);
-        }
-    }
-
-    public void OpenOptionsPanel()
-    {
         if (SettingsManager.Instance != null)
         {
-            SettingsManager.Instance.ToggleOptionsPanel();
+            settingsPanel = SettingsManager.Instance.GetOptionsPanelObject();
+        }
+
+        CloseAllPanels();
+    }
+
+    private void TogglePanel(GameObject panelToToggle)
+    {
+        if (panelToToggle == null) 
+            return;
+
+        isActive = panelToToggle.activeSelf;
+
+        CloseAllPanels();
+
+        if (!isActive)
+        {
+            panelToToggle.SetActive(true);
+            currentlyActivePanel = panelToToggle;
         }
     }
 
-    public void OpenDeckSelectionScreen()
+    private void CloseAllPanels()
     {
-        ShowPanel(deckSelectionPanel);
-        if (playGameButton != null) playGameButton.gameObject.SetActive(false);
+        if (cardMenuPanel != null) 
+            cardMenuPanel.SetActive(false);
+        if (creditsPanel != null) 
+            creditsPanel.SetActive(false);
+        if (deckSelectionPanel != null) 
+            deckSelectionPanel.SetActive(false);
+        if (settingsPanel != null) 
+            settingsPanel.SetActive(false);
+
+        currentlyActivePanel = null;
+    }
+
+    public void DeckMenuButton()
+    {
+        TogglePanel(cardMenuPanel);
+    }
+
+    public void CreditsButton()
+    {
+        TogglePanel(creditsPanel);
+    }
+
+    public void SettingsButton()
+    {
+        isSettingsPanelActive = (settingsPanel != null && settingsPanel.activeSelf);
+
+        CloseAllPanels();
+
+        if (!isSettingsPanelActive && SettingsManager.Instance != null)
+        {
+            SettingsManager.Instance.ToggleOptionsPanel();
+            currentlyActivePanel = settingsPanel; 
+        }
+    }
+
+    public void StartButton()
+    {
+        TogglePanel(deckSelectionPanel);
+        if (deckSelectionPanel != null && deckSelectionPanel.activeSelf)
+        {
+            DeckSelection();
+        }
+    }
+
+    private void DeckSelection()
+    {
+        if (playGameButton != null) 
+            playGameButton.gameObject.SetActive(false);
+        currentlySelectedDeckForPlay = null;
         currentlySelectedDeckForPlay = null;
         if (currentlySelectedDeckUIForPlay != null)
         {
@@ -73,15 +107,18 @@ public class MainMenu : MonoBehaviour
             currentlySelectedDeckUIForPlay = null;
         }
 
-        foreach (Transform child in deckSelectionContainer) Destroy(child.gameObject);
+        foreach (Transform child in deckSelectionContainer)
+        {
+            Destroy(child.gameObject);
+        }
 
         List<Deck> playerDecks = cardMenuManager.GetPlayerDecks();
-        GameObject deckDisplayPrefab = cardMenuManager.deckDisplayPrefab;
+        GameObject deckDisplayPrefab = cardMenuManager.DeckDisplayPrefab;
 
         foreach (var deck in playerDecks)
         {
-            GameObject deckGO = Instantiate(deckDisplayPrefab, deckSelectionContainer);
-            DeckUI deckUI = deckGO.GetComponent<DeckUI>();
+            GameObject deckGameObject = Instantiate(deckDisplayPrefab, deckSelectionContainer);
+            DeckUI deckUI = deckGameObject.GetComponent<DeckUI>();
             if (deckUI != null)
             {
                 deckUI.Initialize(deck, (selectedUI) => {
@@ -122,19 +159,15 @@ public class MainMenu : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Kein Deck ausgewählt oder GameDataManager nicht gefunden!");
+            Debug.LogError("kein deck");
         }
     }
 
-    public void ReturnToMainMenu() { ShowPanel(mainPanel); }
-    public void OpenCardMenuPanel() { ShowPanel(cardMenuPanel); }
-    public void OpenCreditsPanel() { ShowPanel(creditsPanel); }
-    public void StartButton() { OpenDeckSelectionScreen(); }
     public void QuitGame()
     {
-        Application.Quit(); 
-        #if UNITY_EDITOR 
-        UnityEditor.EditorApplication.isPlaying = false; 
-        #endif 
+        Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }

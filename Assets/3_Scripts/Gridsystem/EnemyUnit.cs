@@ -21,7 +21,7 @@ public class EnemyUnit : MonoBehaviour
     public List<CardData> deck = new List<CardData>();
     public List<CardData> hand = new List<CardData>();
     public int handSize = 3;
-    public int playerDetectRange = 1; 
+    public int playerDetectRange = 1;
 
     private void Awake()
     {
@@ -40,6 +40,8 @@ public class EnemyUnit : MonoBehaviour
             Debug.LogWarning("UnitManager.Instance ist noch nicht gesetzt beim EnemyUnit Awake.");
         }
         EnemyActivator.Instance?.RegisterEnemy(this);
+        int distance = GetDistanceToPlayer();
+        Debug.Log($"{name}: Distanz zum Spieler beim Awake = {distance}");
     }
 
     private void Start()
@@ -67,12 +69,24 @@ public class EnemyUnit : MonoBehaviour
 
     private void OnMouseDown()
     {
+        Debug.Log($"=== ENEMY CLICK DEBUG ===");
+        Debug.Log($"Enemy clicked: {name}");
+        Debug.Log($"Is highlighted: {isHighlighted}");
+        Debug.Log($"UnitManager exists: {UnitManager.Instance != null}");
+        Debug.Log($"PlayersTurn: {UnitManager.Instance?.PlayersTurn}");
+        Debug.Log($"AttackManager exists: {AttackManager.Instance != null}");
+        Debug.Log($"========================");
+    
         if (UnitManager.Instance.PlayersTurn && isHighlighted)
         {
+            Debug.Log("🎯 Calling AttackManager.HandleEnemyClick!");
             AttackManager.Instance?.HandleEnemyClick(this);
         }
+        else
+        {
+            Debug.LogWarning("Click ignored - wrong turn or not highlighted");
+        }
     }
-
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
@@ -93,13 +107,12 @@ public class EnemyUnit : MonoBehaviour
         if (currentHex == null)
             Debug.LogError($"Enemy '{name}' not on grid! ");
         else
+        {
             Debug.Log($"Enemy registered at {hexCoords}");
             currentHex.SetEnemyUnit(this);
-    }
-
-    public void AttackPlayer()
-    {
-
+            int distance = GetDistanceToPlayer();
+            Debug.Log($"{name}: Distanz zum Spieler nach Platzierung = {distance}");
+        }
     }
 
     private void AttackPlayer(int damage)
@@ -284,78 +297,45 @@ public class EnemyUnit : MonoBehaviour
         Debug.Log($"{name} behält die Karte '{card.cardName}' in der Hand");
     }
     
-    private bool MoveTowardsPlayer(int steps)
-{
-    var playerGO = GameObject.FindGameObjectWithTag("Player");
-    if (playerGO == null) {
-        Debug.LogError("AI Error: Player object with tag 'Player' not found.");
-        return false;
-    }
-    var playerUnit = playerGO.GetComponent<Unit>();
-    if (playerUnit == null) {
-        Debug.LogError("AI Error: Player object does not have a Unit component.");
-        return false;
-    }
-
-    Hex playerHexObject = playerUnit.GetCurrentHex();
-    if (playerHexObject == null)
+    public bool MoveTowardsPlayer(int steps)
     {
-        Debug.LogWarning("Player is not on a valid hex (playerUnit.GetCurrentHex() is null). Cannot move towards them.");
-        return false;
-    }
+        var playerGO = GameObject.FindGameObjectWithTag("Player");
+        if (playerGO == null) return false;
+        var playerUnit = playerGO.GetComponent<Unit>();
+        if (playerUnit == null || playerUnit.currentHex == null || this.currentHex == null) return false;
 
-    if (this.currentHex == null)
-    {
-        Debug.LogWarning($"{name} is not on a valid hex (this.currentHex is null). Cannot calculate movement path.");
-        return false;
-    }
-    
-    Vector3Int myHexCoords = this.currentHex.hexCoords;
+        Vector3Int start = this.currentHex.hexCoords;
+        Vector3Int target = playerUnit.currentHex.hexCoords;
 
-    var bfsResult = GraphSearch.BFSGetRange(HexGrid.Instance, myHexCoords, steps);
-    var availablePositions = bfsResult.GetRangePositions().ToList();
+        // BFS für Pfadfindung
+        var bfsResult = GraphSearch.BFSGetPath(HexGrid.Instance, start, target, steps);
+        var path = bfsResult; // path ist eine List<Vector3Int> vom Start bis zum Ziel (oder so weit wie möglich)
 
-    if (availablePositions.Count <= 1)
-    {
-        Debug.Log($"{name} has no available hexes to move to.");
-        return false;
-    }
-
-    Vector3Int bestPosition = myHexCoords;
-    int shortestDistance = HexGrid.Instance.GetDistance(this.currentHex, playerHexObject);
-
-    foreach (var pos in availablePositions)
-    {
-        if (pos == myHexCoords) continue;
-
-        var hex = HexGrid.Instance.GetTileAt(pos);
-        if (hex != null && !hex.IsObstacle() && (!hex.HasEnemyUnit() || hex.EnemyUnitOnHex == this))
+        if (path == null || path.Count <= 1)
         {
-            int distance = HexGrid.Instance.GetDistance(hex, playerHexObject);
-            if (distance < shortestDistance)
-            {
-                shortestDistance = distance;
-                bestPosition = pos;
-            }
+            Debug.Log($"{name} kann sich nicht näher zum Spieler bewegen.");
+            return false;
         }
+
+        // Gehe maximal 'steps' Felder weit (ohne Startfeld)
+        int moveCount = Mathf.Min(steps, path.Count - 1);
+        Vector3Int nextHexCoords = path[moveCount];
+        Hex nextHex = HexGrid.Instance.GetTileAt(nextHexCoords);
+
+        if (nextHex == null || nextHex.IsObstacle() || nextHex.IsOccupied())
+        {
+            Debug.Log($"{name} kann sich nicht bewegen, Zielhex blockiert.");
+            return false;
+        }
+
+        StartCoroutine(MoveToHexSmooth(nextHex));
+        currentHex.ClearEnemyUnit();
+        currentHex = nextHex;
+        currentHex.SetEnemyUnit(this);
+
+        Debug.Log($"{name} bewegt sich zu {nextHex.hexCoords} (Distanz zum Spieler: {HexGrid.Instance.GetDistance(currentHex, playerUnit.currentHex)})");
+        return true;
     }
-
-    if (bestPosition == myHexCoords)
-    {
-        Debug.Log($"{name} is already at the best possible position or cannot get closer.");
-        return false;
-    }
-
-    var targetHex = HexGrid.Instance.GetTileAt(bestPosition);
-    
-    currentHex?.ClearEnemyUnit();
-    StartCoroutine(MoveToHexSmooth(targetHex));
-    currentHex = targetHex;
-    currentHex.SetEnemyUnit(this);
-
-    Debug.Log($"{name} moves towards player to position {bestPosition}");
-    return true;
-}
 
     private IEnumerator MoveToHexSmooth(Hex targetHex, float duration = 0.3f)
     {
@@ -368,17 +348,25 @@ public class EnemyUnit : MonoBehaviour
 
         Vector3 start = transform.position;
         Vector3 end = propsTransform.TransformPoint(new Vector3(0.03f, 0.4f, 0.54f));
+        float originalY = start.y;
+        end.y = originalY;
+
         float elapsed = 0f;
 
         while (elapsed < duration)
         {
-            transform.position = Vector3.Lerp(start, end, elapsed / duration);
+            Vector3 lerp = Vector3.Lerp(start, end, elapsed / duration);
+            lerp.y = originalY;
+            transform.position = lerp;
             elapsed += Time.deltaTime;
             yield return null;
         }
+        end.y = originalY;
         transform.position = end;
+
         transform.SetParent(propsTransform);
-        transform.localPosition = new Vector3(0.03f, 0.4f, 0.54f);
+        Vector3 local = transform.localPosition;
+        transform.localPosition = new Vector3(0.03f, local.y, 0.54f);
     }
 
     private List<Vector3Int> GetPathToTarget(BFSResult bfsResult, Vector3Int start, Vector3Int target)
@@ -392,5 +380,24 @@ public class EnemyUnit : MonoBehaviour
         }
         path.Insert(0, start);
         return path;
+    }
+
+    public int GetDistanceToPlayer()
+    {
+        var playerGO = GameObject.FindGameObjectWithTag("Player");
+        if (playerGO == null) 
+        {
+            Debug.LogWarning("Kein Spieler gefunden!");
+            return -1;
+        }
+        var playerUnit = playerGO.GetComponent<Unit>();
+        if (playerUnit == null || playerUnit.currentHex == null || this.currentHex == null)
+        {
+            Debug.LogWarning("Spieler oder Gegner nicht auf einem gültigen Hex!");
+            return -1;
+        }
+        int dist = HexGrid.Instance.GetDistance(this.currentHex, playerUnit.currentHex);
+        Debug.Log($"{name}: Distanz zum Spieler = {dist} Felder");
+        return dist;
     }
 }
