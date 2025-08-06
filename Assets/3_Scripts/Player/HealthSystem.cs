@@ -7,6 +7,9 @@ public class HealthSystem : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private int maxBaseHealth = 5;
     [SerializeField] private int maxExtraHealth = 10;
+    [SerializeField] private GameObject healVFXPrefab;
+    [SerializeField] private float vfxDuration;
+    [SerializeField] private Vector3 healVFXOffset = new Vector3(0, -1, 0); // Offset for VFX position  
 
     [Header("Assigned UI Images")]
     [SerializeField] private List<Image> healthIcons = new List<Image>();
@@ -123,7 +126,7 @@ public class HealthSystem : MonoBehaviour
     public void Heal(int amount)
     {
         int maxPossibleHealth = GetMaxHealth();
-
+        HealVFX(GameObject.FindGameObjectWithTag("Player").transform.position);
         if (currentHealth < maxPossibleHealth)
         {
             int healAmount = Mathf.Min(amount, maxPossibleHealth - currentHealth);
@@ -141,6 +144,17 @@ public class HealthSystem : MonoBehaviour
         else
         {
             Debug.Log("Full!");
+        }
+        
+    }
+
+    public void HealVFX(Vector3 playerPos)
+    {
+        if (healVFXPrefab != null)
+        {
+            GameObject vfxInstance = Instantiate(healVFXPrefab, playerPos + healVFXOffset, Quaternion.identity);
+            Destroy(vfxInstance, vfxDuration); // Destroy after a set duration
+            
         }
     }
 

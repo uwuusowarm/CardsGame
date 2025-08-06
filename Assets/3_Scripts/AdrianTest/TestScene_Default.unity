@@ -14306,6 +14306,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 535550668167897991, guid: fb1777b635d412846b6b952713dc8b9d,
         type: 3}
+      propertyPath: vfxDuration
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 535550668167897991, guid: fb1777b635d412846b6b952713dc8b9d,
+        type: 3}
+      propertyPath: healVFXPrefab
+      value: 
+      objectReference: {fileID: 6583513024389107550, guid: e67aa726203900e43acf418ed2c3c2df,
+        type: 3}
+    - target: {fileID: 535550668167897991, guid: fb1777b635d412846b6b952713dc8b9d,
+        type: 3}
+      propertyPath: healVFXOffset.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 535550668167897991, guid: fb1777b635d412846b6b952713dc8b9d,
+        type: 3}
       propertyPath: healthIcons.Array.data[0]
       value: 
       objectReference: {fileID: 633418862}
@@ -14429,6 +14445,12 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4824933246665636129, guid: fb1777b635d412846b6b952713dc8b9d,
+        type: 3}
+      propertyPath: shieldVFXPrefab
+      value: 
+      objectReference: {fileID: 1390259560796018554, guid: 922e8ab98a37fe840b36fd4bd854d77d,
+        type: 3}
     - target: {fileID: 4824933246665636129, guid: fb1777b635d412846b6b952713dc8b9d,
         type: 3}
       propertyPath: shieldIcons.Array.data[0]
