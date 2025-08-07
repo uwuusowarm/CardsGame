@@ -30,9 +30,9 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         if (CardManager.Instance != null)
         {
-            leftZone = CardManager.Instance.LeftGridRect;
-            rightZone = CardManager.Instance.RightGridRect;
-            discardZone = CardManager.Instance.DiscardGridRect;
+            leftZone = CardManager.Instance.LeftGrid;
+            rightZone = CardManager.Instance.RightGrid;
+            discardZone = CardManager.Instance.DiscardGrid;
         }
     }
 

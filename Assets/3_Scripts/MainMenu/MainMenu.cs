@@ -1,3 +1,4 @@
+// Dateiname: MainMenu.cs
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -5,23 +6,35 @@ using System.Collections.Generic;
 
 public class MainMenu : MonoBehaviour
 {
-    [Header("UI panels")]
+    public static MainMenu Instance { get; private set; }
+
+    [Header("UI Panels")]
     [SerializeField] private GameObject cardMenuPanel;
     [SerializeField] private GameObject creditsPanel;
     [SerializeField] private GameObject deckSelectionPanel;
 
-    [Header("!references!")]
+    [Header("Main Buttons")]
+    [SerializeField] private Button startButton;
+    [SerializeField] private Button deckMenuButton;
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private Button creditsButton;
+    [SerializeField] private Button quitButton;
+
+    [Header("Wichtige Referenzen")]
     [SerializeField] private CardMenuManager cardMenuManager;
-    [SerializeField] private Transform deckSelectionContainer;
+    [SerializeField] private Transform deckSelectionContainer; 
     [SerializeField] private Button playGameButton;
 
     private GameObject settingsPanel;
     private GameObject currentlyActivePanel;
-
     private Deck currentlySelectedDeckForPlay;
     private DeckUI currentlySelectedDeckUIForPlay;
-    bool isSettingsPanelActive = false;
-    bool isActive = false;
+
+    private void Awake()
+    {
+        if (Instance == null) { Instance = this; }
+        else { Destroy(gameObject); }
+    }
 
     private void Start()
     {
@@ -29,88 +42,33 @@ public class MainMenu : MonoBehaviour
         {
             settingsPanel = SettingsManager.Instance.GetOptionsPanelObject();
         }
-
         CloseAllPanels();
     }
 
-    private void TogglePanel(GameObject panelToToggle)
-    {
-        if (panelToToggle == null) 
-            return;
-
-        isActive = panelToToggle.activeSelf;
-
-        CloseAllPanels();
-
-        if (!isActive)
-        {
-            panelToToggle.SetActive(true);
-            currentlyActivePanel = panelToToggle;
-        }
-    }
-
-    private void CloseAllPanels()
-    {
-        if (cardMenuPanel != null) 
-            cardMenuPanel.SetActive(false);
-        if (creditsPanel != null) 
-            creditsPanel.SetActive(false);
-        if (deckSelectionPanel != null) 
-            deckSelectionPanel.SetActive(false);
-        if (settingsPanel != null) 
-            settingsPanel.SetActive(false);
-
-        currentlyActivePanel = null;
-    }
-
-    public void DeckMenuButton()
-    {
-        TogglePanel(cardMenuPanel);
-    }
-
-    public void CreditsButton()
-    {
-        TogglePanel(creditsPanel);
-    }
-
-    public void SettingsButton()
-    {
-        isSettingsPanelActive = (settingsPanel != null && settingsPanel.activeSelf);
-
-        CloseAllPanels();
-
-        if (!isSettingsPanelActive && SettingsManager.Instance != null)
-        {
-            SettingsManager.Instance.ToggleOptionsPanel();
-            currentlyActivePanel = settingsPanel; 
-        }
-    }
-
-    public void StartButton()
+    public void OnStartButtonPressed()
     {
         TogglePanel(deckSelectionPanel);
         if (deckSelectionPanel != null && deckSelectionPanel.activeSelf)
         {
-            DeckSelection();
+            PopulateDeckSelection();
         }
     }
 
-    private void DeckSelection()
+    private void PopulateDeckSelection()
     {
-        if (playGameButton != null) 
-            playGameButton.gameObject.SetActive(false);
-        currentlySelectedDeckForPlay = null;
+        if (playGameButton != null) playGameButton.gameObject.SetActive(false);
         currentlySelectedDeckForPlay = null;
         if (currentlySelectedDeckUIForPlay != null)
         {
             currentlySelectedDeckUIForPlay.SetHighlight(false);
             currentlySelectedDeckUIForPlay = null;
         }
-
         foreach (Transform child in deckSelectionContainer)
         {
             Destroy(child.gameObject);
         }
+
+        cardMenuManager.ReloadDecksFromFile();
 
         List<Deck> playerDecks = cardMenuManager.GetPlayerDecks();
         GameObject deckDisplayPrefab = cardMenuManager.DeckDisplayPrefab;
@@ -125,6 +83,59 @@ public class MainMenu : MonoBehaviour
                     SelectDeckForPlay(selectedUI);
                 });
             }
+        }
+    }
+
+    #region Unchanged Code
+    public void SetMainMenuButtonsInteractable(bool isInteractable)
+    {
+        if (startButton != null) startButton.interactable = isInteractable;
+        if (deckMenuButton != null) deckMenuButton.interactable = isInteractable;
+        if (settingsButton != null) settingsButton.interactable = isInteractable;
+        if (creditsButton != null) creditsButton.interactable = isInteractable;
+        if (quitButton != null) quitButton.interactable = isInteractable;
+    }
+
+    private void TogglePanel(GameObject panelToToggle)
+    {
+        if (panelToToggle == null) return;
+        bool isAlreadyActive = panelToToggle.activeSelf;
+        CloseAllPanels();
+
+        if (!isAlreadyActive)
+        {
+            panelToToggle.SetActive(true);
+            currentlyActivePanel = panelToToggle;
+        }
+    }
+
+    private void CloseAllPanels()
+    {
+        if (cardMenuPanel != null) cardMenuPanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (deckSelectionPanel != null) deckSelectionPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+        currentlyActivePanel = null;
+    }
+
+    public void OnDeckMenuButtonPressed()
+    {
+        TogglePanel(cardMenuPanel);
+    }
+
+    public void OnCreditsButtonPressed()
+    {
+        TogglePanel(creditsPanel);
+    }
+
+    public void OnSettingsButtonPressed()
+    {
+        bool isSettingsPanelActive = (settingsPanel != null && settingsPanel.activeSelf);
+        CloseAllPanels();
+        if (!isSettingsPanelActive && SettingsManager.Instance != null)
+        {
+            SettingsManager.Instance.ToggleOptionsPanel();
+            currentlyActivePanel = settingsPanel;
         }
     }
 
@@ -157,10 +168,6 @@ public class MainMenu : MonoBehaviour
             GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
             SceneManager.LoadScene(5);
         }
-        else
-        {
-            Debug.LogError("kein deck");
-        }
     }
 
     public void QuitGame()
@@ -170,4 +177,5 @@ public class MainMenu : MonoBehaviour
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
     }
+    #endregion
 }
