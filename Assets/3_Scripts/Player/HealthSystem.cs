@@ -139,8 +139,12 @@ public class HealthSystem : MonoBehaviour
             if (playerObj != null && playerObj.TryGetComponent<Unit>(out var playerUnit))
             {
                 playerUnit.currentHealth = currentHealth;
+
+                if (VFXManager.Instance != null)
+                {
+                    VFXManager.Instance.PlayHealVFX(playerObj.transform);
+                }
             }
-        
             UpdateHealthDisplay();
             Debug.Log($"Heal {healAmount}. Now: {currentHealth}/{maxPossibleHealth}");
         }
