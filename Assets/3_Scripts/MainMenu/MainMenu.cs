@@ -1,27 +1,24 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using TMPro;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
+    [Header("Panel Management")]
     [SerializeField] private GameObject mainPanel;
-    [SerializeField] private GameObject optionsPanel;
     [SerializeField] private GameObject cardMenuPanel;
     [SerializeField] private GameObject creditsPanel;
     [SerializeField] private GameObject deckSelectionPanel;
     [SerializeField] private GameObject deckEditorSlideout;
     [SerializeField] private GameObject boostersSlideout;
-    [SerializeField] private TMP_Dropdown resolutionDropdown;
-    [SerializeField] private Text selectedFPS;
+
+    [Header("Wichtige Referenzen")]
     [SerializeField] private CardMenuManager cardMenuManager;
     [SerializeField] private Transform deckSelectionContainer;
     [SerializeField] private Button playGameButton;
 
-    public int targetFPS;
-
-    private Resolution[] resolutions;
     private Deck currentlySelectedDeckForPlay;
     private DeckUI currentlySelectedDeckUIForPlay;
 
@@ -31,50 +28,20 @@ public class MainMenu : MonoBehaviour
         {
             new GameObject("GameDataManager").AddComponent<GameDataManager>();
         }
+        if (FindObjectOfType<SettingsManager>() == null)
+        {
+            Debug.LogWarning("Kein SettingsManager in der Szene gefunden.");
+        }
     }
 
     private void Start()
     {
         ReturnToMainMenu();
-
-        if (resolutionDropdown != null)
-        {
-            resolutionDropdown.ClearOptions();
-            var options = new List<string>();
-            resolutions = Screen.resolutions;
-            var currentResolutionIndex = 0;
-            for (var index = 0; index < resolutions.Length; index++)
-            {
-                var option = resolutions[index].width + " x " + resolutions[index].height;
-                options.Add(option);
-                if (resolutions[index].width == Screen.currentResolution.width && resolutions[index].height == Screen.currentResolution.height)
-                {
-                    currentResolutionIndex = index;
-                }
-            }
-            resolutionDropdown.AddOptions(options);
-            resolutionDropdown.RefreshShownValue();
-            LoadSettings(currentResolutionIndex);
-        }
-    }
-
-    void Update()
-    {
-        if (selectedFPS != null && int.TryParse(selectedFPS.text, out int fps) && fps >= 30)
-        {
-            targetFPS = fps;
-        }
-        else
-        {
-            targetFPS = 30;
-        }
-        Application.targetFrameRate = targetFPS;
     }
 
     private void ShowPanel(GameObject panelToShow)
     {
         if (mainPanel != null) mainPanel.SetActive(false);
-        if (optionsPanel != null) optionsPanel.SetActive(false);
         if (cardMenuPanel != null) cardMenuPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(false);
         if (deckSelectionPanel != null) deckSelectionPanel.SetActive(false);
@@ -84,6 +51,14 @@ public class MainMenu : MonoBehaviour
         if (panelToShow != null)
         {
             panelToShow.SetActive(true);
+        }
+    }
+
+    public void OpenOptionsPanel()
+    {
+        if (SettingsManager.Instance != null)
+        {
+            SettingsManager.Instance.ToggleOptionsPanel();
         }
     }
 
@@ -101,12 +76,12 @@ public class MainMenu : MonoBehaviour
         foreach (Transform child in deckSelectionContainer) Destroy(child.gameObject);
 
         List<Deck> playerDecks = cardMenuManager.GetPlayerDecks();
-        GameObject deckDisplayPrefab = cardMenuManager.DeckDisplayPrefab;
+        GameObject deckDisplayPrefab = cardMenuManager.deckDisplayPrefab;
 
         foreach (var deck in playerDecks)
         {
-            GameObject deckGameObject = Instantiate(deckDisplayPrefab, deckSelectionContainer);
-            DeckUI deckUI = deckGameObject.GetComponent<DeckUI>();
+            GameObject deckGO = Instantiate(deckDisplayPrefab, deckSelectionContainer);
+            DeckUI deckUI = deckGO.GetComponent<DeckUI>();
             if (deckUI != null)
             {
                 deckUI.Initialize(deck, (selectedUI) => {
@@ -143,53 +118,23 @@ public class MainMenu : MonoBehaviour
         if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
         {
             GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
-            SceneManager.LoadScene(2);
+            SceneManager.LoadScene(5);
         }
         else
         {
-            Debug.LogError("No deck selected or GameDataManager not found!");
+            Debug.LogError("Kein Deck ausgewählt oder GameDataManager nicht gefunden!");
         }
     }
 
-    public void ReturnToMainMenu()
-    {
-        ShowPanel(mainPanel);
-    }
-
-    public void OpenOptionsPanel()
-    {
-        ShowPanel(optionsPanel);
-    }
-
-    public void OpenCardMenuPanel()
-    {
-        ShowPanel(cardMenuPanel);
-    }
-
-    public void OpenCreditsPanel()
-    {
-        ShowPanel(creditsPanel);
-    }
-
-    public void StartButton()
-    {
-        OpenDeckSelectionScreen();
-    }
-
+    public void ReturnToMainMenu() { ShowPanel(mainPanel); }
+    public void OpenCardMenuPanel() { ShowPanel(cardMenuPanel); }
+    public void OpenCreditsPanel() { ShowPanel(creditsPanel); }
+    public void StartButton() { OpenDeckSelectionScreen(); }
     public void QuitGame()
     {
-        Application.Quit();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#endif
-    }
-
-
-    public void LoadSettings(int currentResolutionIndex)
-    {
-        if (resolutionDropdown != null)
-        {
-            resolutionDropdown.value = PlayerPrefs.HasKey("ResolutionPreference") ? PlayerPrefs.GetInt("ResolutionPreference") : currentResolutionIndex;
-        }
+        Application.Quit(); 
+        #if UNITY_EDITOR 
+        UnityEditor.EditorApplication.isPlaying = false; 
+        #endif 
     }
 }

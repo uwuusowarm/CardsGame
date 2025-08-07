@@ -93,6 +93,8 @@ public class EquipmentManager : MonoBehaviour
         ShowStatsTemporarily(item);
 
         OnEquipmentChanged?.Invoke(item.itemSlot);
+        
+        HealthSystem.Instance.UpdateMaxHealth();
     }
 
     private void ShowStatsTemporarily(ItemData item)
@@ -160,6 +162,8 @@ public class EquipmentManager : MonoBehaviour
             equippedItems[slot] = null;
             
             OnEquipmentChanged?.Invoke(slot);
+            
+            HealthSystem.Instance.UpdateMaxHealth();
         }
     }
     

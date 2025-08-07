@@ -13,7 +13,7 @@ public class CardMenuManager : MonoBehaviour
     [SerializeField] private GameObject cardInListPrefab;
     [SerializeField] private Button saveDeckButton;
     [SerializeField] private Transform decksDisplayContainer;
-    [SerializeField] private GameObject deckDisplayPrefab;
+    [SerializeField] public GameObject deckDisplayPrefab;
     [SerializeField] private CardDatabaseSO cardDatabase;
 
     private List<Deck> allPlayerDecks = new List<Deck>();

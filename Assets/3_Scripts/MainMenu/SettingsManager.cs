@@ -7,7 +7,10 @@ public class SettingsManager : MonoBehaviour
 {
     public static SettingsManager Instance { get; private set; }
 
+    [Header("Options-Panel")]
     [SerializeField] private GameObject optionsPanel;
+
+    [Header("UI-Elemente")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
     [SerializeField] private Slider masterVolumeSlider;
 
@@ -39,7 +42,10 @@ public class SettingsManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            ToggleOptionsPanel();
+            if (isPanelActive)
+            {
+                ToggleOptionsPanel();
+            }
         }
     }
 
@@ -47,49 +53,28 @@ public class SettingsManager : MonoBehaviour
     {
         isPanelActive = !isPanelActive;
         optionsPanel.SetActive(isPanelActive);
-
         Time.timeScale = isPanelActive ? 0f : 1f;
     }
 
-    private void SetupResolutions()
+    public void SaveAndCloseOptions()
     {
-        if (resolutionDropdown == null)
+        SaveSettings();
+        if (isPanelActive)
         {
-            return;
+            ToggleOptionsPanel();
         }
-
-        resolutions = Screen.resolutions;
-        resolutionDropdown.ClearOptions();
-
-        List<string> options = new List<string>();
-        int currentResolutionIndex = 0;
-        for (int index = 0; index < resolutions.Length; index++)
-        {
-            string option = resolutions[index].width + " x " + resolutions[index].height;
-            options.Add(option);
-
-            if (resolutions[index].width == Screen.currentResolution.width &&
-                resolutions[index].height == Screen.currentResolution.height)
-            {
-                currentResolutionIndex = index;
-            }
-        }
-        resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = currentResolutionIndex;
-        resolutionDropdown.RefreshShownValue();
     }
 
     public void SetMasterVolume(float volume)
     {
         AudioListener.volume = volume;
-        Debug.Log("Master Volume set to: " + volume);
     }
 
     public void SetResolution(int resolutionIndex)
     {
+        if (resolutions == null || resolutionIndex >= resolutions.Length) return;
         Resolution resolution = resolutions[resolutionIndex];
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
-        Debug.Log("Resolution set to: " + resolution.width + "x" + resolution.height);
     }
 
     public void SaveSettings()
@@ -102,7 +87,6 @@ public class SettingsManager : MonoBehaviour
         {
             PlayerPrefs.SetFloat("MasterVolumePreference", masterVolumeSlider.value);
         }
-
         PlayerPrefs.Save();
         Debug.Log("Settings saved!");
     }
@@ -118,6 +102,27 @@ public class SettingsManager : MonoBehaviour
             masterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolumePreference", 1f);
             SetMasterVolume(masterVolumeSlider.value);
         }
-        Debug.Log("Settings loaded!");
+    }
+
+    private void SetupResolutions()
+    {
+        if (resolutionDropdown == null) return;
+        resolutions = Screen.resolutions;
+        resolutionDropdown.ClearOptions();
+        List<string> options = new List<string>();
+        int currentResolutionIndex = 0;
+        for (int i = 0; i < resolutions.Length; i++)
+        {
+            string option = resolutions[i].width + " x " + resolutions[i].height;
+            options.Add(option);
+            if (resolutions[i].width == Screen.currentResolution.width &&
+                resolutions[i].height == Screen.currentResolution.height)
+            {
+                currentResolutionIndex = i;
+            }
+        }
+        resolutionDropdown.AddOptions(options);
+        resolutionDropdown.value = currentResolutionIndex;
+        resolutionDropdown.RefreshShownValue();
     }
 }

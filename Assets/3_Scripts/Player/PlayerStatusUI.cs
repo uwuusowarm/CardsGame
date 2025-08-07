@@ -31,7 +31,7 @@ public class PlayerStatusUI : MonoBehaviour
     {
         if (movementPointsText != null)
         {
-            movementPointsText.text = $"Movement: {points}";
+            movementPointsText.text = $"{points}";
         }
     }
     
@@ -39,7 +39,7 @@ public class PlayerStatusUI : MonoBehaviour
     {
         if (attackInfoText != null)
         {
-            attackInfoText.text = $"Attack: {damage}";
+            attackInfoText.text = $"{damage}";
         }
     }
     
@@ -47,7 +47,7 @@ public class PlayerStatusUI : MonoBehaviour
     {
         if (attackInfoText != null)
         {
-            attackInfoText.text = "Attack: -";
+            attackInfoText.text = " ";
         }
     }
     
