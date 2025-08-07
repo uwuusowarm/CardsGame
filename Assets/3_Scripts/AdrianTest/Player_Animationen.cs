@@ -32,14 +32,16 @@ public class Player_Animationen : MonoBehaviour
         bool isWalking = agent.velocity.magnitude > 0f;
         anim.SetBool("IsWalking", isWalking);
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButton(1))
         {
             anim.SetBool("IsBoxing", true);
         }
+
+        if (Input.GetMouseButton(0))
+        {
+            anim.SetBool("IsBoxing", false);
+        }
     }
 
-    public void StopBoxing()
-    {
-        anim.SetBool("IsBoxing", false);
-    }
+    
 } // Added this closing brace to fix the CS1513 error

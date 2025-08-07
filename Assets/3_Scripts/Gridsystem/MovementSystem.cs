@@ -165,6 +165,11 @@ public class MovementSystem : MonoBehaviour
         selectedUnit.MovementFinished += OnMovementFinished;
         selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
 
+        if (animator != null)
+        {
+            animator.SetBool("IsWalking",true);
+        }
+
         selectedHex.SetUnit(selectedUnit);
         selectedUnit.currentHex = selectedHex;
 
@@ -190,6 +195,11 @@ public class MovementSystem : MonoBehaviour
     {
         unit.MovementFinished -= OnMovementFinished;
         isMoving = false;
+
+        if (animator != null)
+        {
+            animator.SetBool("IsWalking", false);
+        }
 
         Debug.Log($"Movement finished. New position: {currentUnitHex}");
 
