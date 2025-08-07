@@ -113,6 +113,8 @@ public class OpenDoor : MonoBehaviour
         myHex.HexType = HexType.Obstacle;
         if (türGeschlossenObjekt != null) türGeschlossenObjekt.SetActive(true);
         if (türOffenObjekt != null) türOffenObjekt.SetActive(false);
+
+        gameObject.layer = LayerMask.NameToLayer("Default");
     }
 
     private void SetOpen()
@@ -120,6 +122,8 @@ public class OpenDoor : MonoBehaviour
         myHex.HexType = HexType.Road;
         if (türGeschlossenObjekt != null) türGeschlossenObjekt.SetActive(false);
         if (türOffenObjekt != null) türOffenObjekt.SetActive(true);
+
+        gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
     }
 
     private Hex GetHexBelow()
