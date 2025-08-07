@@ -19,7 +19,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Button creditsButton;
     [SerializeField] private Button quitButton;
 
-    [Header("Wichtige Referenzen")]
+    [Header("Referenzen")]
     [SerializeField] private CardMenuManager cardMenuManager;
     [SerializeField] private Transform deckSelectionContainer; 
     [SerializeField] private Button playGameButton;
@@ -31,8 +31,14 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) { Instance = this; }
-        else { Destroy(gameObject); }
+        if (Instance == null) 
+        { 
+            Instance = this; 
+        }
+        else 
+        { 
+            Destroy(gameObject); 
+        }
     }
 
     private void Start()
@@ -55,7 +61,8 @@ public class MainMenu : MonoBehaviour
 
     private void PopulateDeckSelection()
     {
-        if (playGameButton != null) playGameButton.gameObject.SetActive(false);
+        if (playGameButton != null) 
+            playGameButton.gameObject.SetActive(false);
         currentlySelectedDeckForPlay = null;
         if (currentlySelectedDeckUIForPlay != null)
         {
@@ -88,16 +95,22 @@ public class MainMenu : MonoBehaviour
     #region Unchanged Code
     public void SetMainMenuButtonsInteractable(bool isInteractable)
     {
-        if (startButton != null) startButton.interactable = isInteractable;
-        if (deckMenuButton != null) deckMenuButton.interactable = isInteractable;
-        if (settingsButton != null) settingsButton.interactable = isInteractable;
-        if (creditsButton != null) creditsButton.interactable = isInteractable;
-        if (quitButton != null) quitButton.interactable = isInteractable;
+        if (startButton != null) 
+            startButton.interactable = isInteractable;
+        if (deckMenuButton != null) 
+            deckMenuButton.interactable = isInteractable;
+        if (settingsButton != null) 
+            settingsButton.interactable = isInteractable;
+        if (creditsButton != null) 
+            creditsButton.interactable = isInteractable;
+        if (quitButton != null) 
+            quitButton.interactable = isInteractable;
     }
 
     private void TogglePanel(GameObject panelToToggle)
     {
-        if (panelToToggle == null) return;
+        if (panelToToggle == null) 
+            return;
         bool isAlreadyActive = panelToToggle.activeSelf;
         CloseAllPanels();
 
@@ -110,10 +123,14 @@ public class MainMenu : MonoBehaviour
 
     private void CloseAllPanels()
     {
-        if (cardMenuPanel != null) cardMenuPanel.SetActive(false);
-        if (creditsPanel != null) creditsPanel.SetActive(false);
-        if (deckSelectionPanel != null) deckSelectionPanel.SetActive(false);
-        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (cardMenuPanel != null) 
+            cardMenuPanel.SetActive(false);
+        if (creditsPanel != null) 
+            creditsPanel.SetActive(false);
+        if (deckSelectionPanel != null) 
+            deckSelectionPanel.SetActive(false);
+        if (settingsPanel != null) 
+            settingsPanel.SetActive(false);
         currentlyActivePanel = null;
     }
 
@@ -145,7 +162,8 @@ public class MainMenu : MonoBehaviour
             selectedUI.SetHighlight(false);
             currentlySelectedDeckUIForPlay = null;
             currentlySelectedDeckForPlay = null;
-            if (playGameButton != null) playGameButton.gameObject.SetActive(false);
+            if (playGameButton != null) 
+                playGameButton.gameObject.SetActive(false);
         }
         else
         {
@@ -156,7 +174,8 @@ public class MainMenu : MonoBehaviour
             currentlySelectedDeckUIForPlay = selectedUI;
             currentlySelectedDeckForPlay = selectedUI.GetAssignedDeck();
             currentlySelectedDeckUIForPlay.SetHighlight(true);
-            if (playGameButton != null) playGameButton.gameObject.SetActive(true);
+            if (playGameButton != null) 
+                playGameButton.gameObject.SetActive(true);
         }
     }
 
