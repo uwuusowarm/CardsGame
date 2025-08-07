@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CanvasGroup gameOverCanvasGroup;
     [SerializeField] private float gameOverFadeDuration = 1.5f;
     [SerializeField] private string mainMenuSceneName = "MainMenu";
+    public Animator animDead;
 
     private bool isFirstTurn = true;
     public bool IsPlayerTurn { get; private set; } = false;
@@ -484,10 +485,20 @@ public class GameManager : MonoBehaviour
         IsPlayerTurn = false;
         Debug.Log("Game Over sequence initiated.");
 
+        if (animDead != null)
+        {
+            animDead.SetBool("Dead", true);
+        }
+        else
+        {
+            Debug.LogWarning("animDead is not assigned in the GameManager inspector!");
+        }
+
         if (UnitManager.Instance?.SelectedUnit != null)
         {
             UnitManager.Instance.ClearOldSelection();
         }
+        
 
         StopAllCoroutines();
 

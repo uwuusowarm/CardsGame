@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
 public class HealthSystem : MonoBehaviour
 {
@@ -9,7 +10,9 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] private int maxExtraHealth = 10;
     [SerializeField] private GameObject healVFXPrefab;
     [SerializeField] private float vfxDuration;
-    [SerializeField] private Vector3 healVFXOffset = new Vector3(0, -1, 0); // Offset for VFX position  
+    [SerializeField] private Vector3 healVFXOffset = new Vector3(0, -1, 0); // Offset for VFX position
+    public Animator animDamage;
+    
 
     [Header("Assigned UI Images")]
     [SerializeField] private List<Image> healthIcons = new List<Image>();
@@ -209,6 +212,13 @@ public class HealthSystem : MonoBehaviour
         currentHealth = Mathf.Max(currentHealth - amount, 0);
         UpdateHealthDisplay();
 
+        if (animDamage != null)
+        {
+            animDamage.SetBool("Take Damage", true);
+            StartCoroutine(ResetDamageAnimation());
+        }
+        
+
         if (currentHealth <= 0)
         {
             Debug.Log("Player health depleted. Signaling game over.");
@@ -217,7 +227,17 @@ public class HealthSystem : MonoBehaviour
                 GameManager.Instance.HandlePlayerDeath();
             }
         }
+
     }
+    private IEnumerator ResetDamageAnimation()
+    {
+        yield return new WaitForSeconds(0.5f); // Adjust the duration as needed
+        if (animDamage != null)
+        {
+            animDamage.SetBool("Take Damage", false);
+        }
+    }
+
 
     private void UpdateHealthDisplay()
     {
