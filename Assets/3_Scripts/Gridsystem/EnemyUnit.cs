@@ -306,18 +306,14 @@ public class EnemyUnit : MonoBehaviour
 
         Vector3Int start = this.currentHex.hexCoords;
         Vector3Int target = playerUnit.currentHex.hexCoords;
-
-        // BFS für Pfadfindung
         var bfsResult = GraphSearch.BFSGetPath(HexGrid.Instance, start, target, steps);
-        var path = bfsResult; // path ist eine List<Vector3Int> vom Start bis zum Ziel (oder so weit wie möglich)
+        var path = bfsResult; 
 
         if (path == null || path.Count <= 1)
         {
             Debug.Log($"{name} kann sich nicht näher zum Spieler bewegen.");
             return false;
         }
-
-        // Gehe maximal 'steps' Felder weit (ohne Startfeld)
         int moveCount = Mathf.Min(steps, path.Count - 1);
         Vector3Int nextHexCoords = path[moveCount];
         Hex nextHex = HexGrid.Instance.GetTileAt(nextHexCoords);
