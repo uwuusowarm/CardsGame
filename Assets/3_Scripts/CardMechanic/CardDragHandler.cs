@@ -97,7 +97,8 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
     }
     public void OnPointerExit(PointerEventData eventData) 
     { 
-        if (isDragging) return; 
+        if (isDragging) 
+            return; 
         isHovered = false; 
         rectTransform.SetSiblingIndex(defaultSortOrder); 
     }
