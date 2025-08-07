@@ -17,14 +17,14 @@ public class CardManager : MonoBehaviour
 {
     public static CardManager Instance { get; private set; }
 
-    [Header("Zentrale Kartendatenbank")]
+    [Header("Databese")]
     [SerializeField] private CardDatabaseSO cardDatabase;
 
-    [Header("Einstellungen")]
+    [Header("Settings")]
     [SerializeField, Min(1)] private int drawCount = 4;
     public int DrawCount => drawCount;
 
-    [Header("Hand Layout Einstellungen")]
+    [Header("Hand Layout Settings")]
     [SerializeField] private Transform handTransform;
 
     [SerializeField] private HandLayoutSettings layout4Cards;
@@ -32,7 +32,7 @@ public class CardManager : MonoBehaviour
     [SerializeField] private HandLayoutSettings layout2Cards;
     [SerializeField] private HandLayoutSettings layout1Card;
 
-    [Header("Spielzonen Referenzen")]
+    [Header("Playzones")]
     [SerializeField] private Transform leftGrid;
     [SerializeField] private Transform rightGrid;
     [SerializeField] private Transform discardGrid;
@@ -75,7 +75,7 @@ public class CardManager : MonoBehaviour
         {
             if (cardDatabase == null) 
             {
-                Debug.LogError(" CardDatabaseSO wurde nicht im CardManager zugewiesen!"); 
+//                Debug.LogError(" CardDatabaseSO ist nicht zugewiesen"); 
                 return; 
             }
             deck.Clear();
@@ -144,7 +144,8 @@ public class CardManager : MonoBehaviour
             return;
 
         CardDragHandler handlerToRemove = handCardObjects.FirstOrDefault(h => h.Card == card);
-        if (handlerToRemove == null) return;
+        if (handlerToRemove == null) 
+            return;
 
         hand.Remove(card);
         handCardObjects.Remove(handlerToRemove);
