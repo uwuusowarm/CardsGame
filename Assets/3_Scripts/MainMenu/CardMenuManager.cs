@@ -13,7 +13,7 @@ public class CardMenuManager : MonoBehaviour
     [SerializeField] private Transform decksDisplayContainer;
     [SerializeField] public GameObject deckDisplayPrefab;
     [SerializeField] private Button newDeckButton;
-    [SerializeField] private TextMeshProUGUI deckCounterText; // NEU: Referenz für den Deck-Zähler
+    [SerializeField] private TextMeshProUGUI deckCounterText;
 
     [Header("Deck Editor")]
     [SerializeField] private Transform allCardsContainer;
@@ -30,7 +30,7 @@ public class CardMenuManager : MonoBehaviour
     private DeckUI currentlySelectedDeckUI;
     private List<CardSelectorUI> spawnedCardUIs = new List<CardSelectorUI>();
 
-    private const int MAX_DECK_COUNT = 12; // NEU: Dein Deck-Limit
+    private const int MAX_DECK_COUNT = 12; 
 
     void Start()
     {
@@ -55,10 +55,10 @@ public class CardMenuManager : MonoBehaviour
         }
         else
         {
-            if (allPlayerDecks.Count >= MAX_DECK_COUNT) return; // Sicherheitsabfrage
+            if (allPlayerDecks.Count >= MAX_DECK_COUNT) return; 
 
             Deck newDeck = new Deck();
-            newDeck.DeckName = "New Deck " + (allPlayerDecks.Count + 1);
+            newDeck.DeckName = "" + (allPlayerDecks.Count + 1);
             newDeck.Cards = new List<CardData>(currentlySelectedCards);
             allPlayerDecks.Add(newDeck);
         }
@@ -94,11 +94,9 @@ public class CardMenuManager : MonoBehaviour
             }
         }
 
-        // NEU: Zähler und Button nach jeder Änderung an der Deck-Liste aktualisieren
         UpdateDeckCounterAndNewButton();
     }
 
-    // NEUE METHODE: Aktualisiert den Zählertext und den "New Deck"-Button
     private void UpdateDeckCounterAndNewButton()
     {
         int currentDeckCount = allPlayerDecks.Count;
@@ -110,7 +108,6 @@ public class CardMenuManager : MonoBehaviour
 
         if (newDeckButton != null)
         {
-            // Deaktiviere den Button, wenn die maximale Anzahl erreicht ist
             newDeckButton.interactable = (currentDeckCount < MAX_DECK_COUNT);
         }
     }
