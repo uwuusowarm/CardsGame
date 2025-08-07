@@ -1,4 +1,3 @@
-// Dateiname: CardMenuManager.cs
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -30,7 +29,7 @@ public class CardMenuManager : MonoBehaviour
     private DeckUI currentlySelectedDeckUI;
     private List<CardSelectorUI> spawnedCardUIs = new List<CardSelectorUI>();
 
-    private const int MAX_DECK_COUNT = 12; 
+    private const int MAX_DECK_COUNT = 12;
 
     void Start()
     {
@@ -47,6 +46,48 @@ public class CardMenuManager : MonoBehaviour
         }
     }
 
+    public void OpenEditDeckEditor()
+    {
+        if (currentlyEditingDeck == null) return;
+        SetMainMenuButtonsInteractable(false);
+        currentlySelectedCards = new List<CardData>(currentlyEditingDeck.Cards);
+        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
+        PopulateAllCardsList();
+        UpdateSaveButtonState(); 
+        UpdateCardCounter();
+    }
+
+    public void OpenNewDeckEditor()
+    {
+        currentlyEditingDeck = null;
+        SetMainMenuButtonsInteractable(false);
+        currentlySelectedCards.Clear();
+        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
+        PopulateAllCardsList();
+        UpdateSaveButtonState();
+        UpdateCardCounter();
+    }
+
+
+    private void UpdateSaveButtonState()
+    {
+        if (saveDeckButton != null)
+        {
+            saveDeckButton.interactable = (currentlySelectedCards.Count == 15);
+        }
+    }
+
+    #region Unchanged Code
+    private void SetMainMenuButtonsInteractable(bool isInteractable)
+    {
+        if (MainMenu.Instance != null)
+        {
+            MainMenu.Instance.SetMainMenuButtonsInteractable(isInteractable);
+        }
+        if (newDeckButton != null) newDeckButton.interactable = isInteractable;
+        if (saveDeckButton != null) saveDeckButton.interactable = false;
+    }
+
     public void SaveDeckAndCloseEditor()
     {
         if (currentlyEditingDeck != null)
@@ -55,7 +96,7 @@ public class CardMenuManager : MonoBehaviour
         }
         else
         {
-            if (allPlayerDecks.Count >= MAX_DECK_COUNT) return; 
+            if (allPlayerDecks.Count >= MAX_DECK_COUNT) return;
 
             Deck newDeck = new Deck();
             newDeck.DeckName = "" + (allPlayerDecks.Count + 1);
@@ -112,39 +153,6 @@ public class CardMenuManager : MonoBehaviour
         }
     }
 
-    #region Unchanged Code
-    public void OpenEditDeckEditor()
-    {
-        if (currentlyEditingDeck == null) return;
-        SetMainMenuButtonsInteractable(false);
-        currentlySelectedCards = new List<CardData>(currentlyEditingDeck.Cards);
-        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
-        PopulateAllCardsList();
-        UpdateSaveButtonState();
-        UpdateCardCounter();
-    }
-
-    public void OpenNewDeckEditor()
-    {
-        currentlyEditingDeck = null;
-        SetMainMenuButtonsInteractable(false);
-        currentlySelectedCards.Clear();
-        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
-        PopulateAllCardsList();
-        UpdateSaveButtonState();
-        UpdateCardCounter();
-    }
-
-    private void SetMainMenuButtonsInteractable(bool isInteractable)
-    {
-        if (MainMenu.Instance != null)
-        {
-            MainMenu.Instance.SetMainMenuButtonsInteractable(isInteractable);
-        }
-        if (newDeckButton != null) newDeckButton.interactable = isInteractable;
-        if (saveDeckButton != null) saveDeckButton.interactable = false;
-    }
-
     public void ToggleCardSelection(CardData card)
     {
         if (currentlySelectedCards.Contains(card))
@@ -168,14 +176,6 @@ public class CardMenuManager : MonoBehaviour
         if (cardCounterText != null)
         {
             cardCounterText.text = currentlySelectedCards.Count + "/15 Cards";
-        }
-    }
-
-    private void UpdateSaveButtonState()
-    {
-        if (saveDeckButton != null)
-        {
-            saveDeckButton.interactable = currentlySelectedCards.Count == 15;
         }
     }
 
