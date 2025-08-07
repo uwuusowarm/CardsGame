@@ -1,36 +1,32 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class OpenDoor : MonoBehaviour
 {
     public int roomID;
     public bool isOpen = false;
-
-    private Hex myHex;
-    private Renderer rend;
-    private bool isInitialized = false;
-    private Vector3Int oppositeHexCoords;
+    
+    //[Header("Verlinkte Hex-Felder")]
+    //[SerializeField] private List<Hex> linkedHexes;
 
     [Header("Tür Visuals")]
     [SerializeField] private GameObject türGeschlossenObjekt;
     [SerializeField] private GameObject türOffenObjekt;
 
+    private Hex myHex;
+    private bool isInitialized = false;
+
     private IEnumerator Start()
     {
         yield return new WaitUntil(() => HexGrid.Instance != null);
-        yield return new WaitForSeconds(0.1f); 
+        yield return new WaitForSeconds(0.1f);
 
         myHex = GetHexBelow();
 
         if (myHex != null)
         {
             roomID = myHex.RoomID;
-            rend = GetComponentInChildren<Renderer>();
-            
-            yield return new WaitUntil(() => HexGrid.Instance.GetTileAt(myHex.hexCoords) != null);
-            
-            CalculateOppositeHex();
-
             if (!isOpen)
                 SetClosed();
             else
@@ -44,72 +40,48 @@ public class OpenDoor : MonoBehaviour
             enabled = false;
         }
     }
-
-    private void CalculateOppositeHex()
+    private void Update()
     {
-        if (myHex == null || HexGrid.Instance == null) return;
-        Vector3 localForward = transform.forward;
-        
-        Vector3Int bestDirection = Vector3Int.zero;
-        float bestDot = -1f;
-
-        var directions = Direction.GetDirectionList(myHex.hexCoords.z);
-        foreach (var dir in directions)
+        if (Input.GetMouseButtonDown(0))
         {
-            Hex neighborHex = HexGrid.Instance.GetTileAt(myHex.hexCoords + dir);
-            if (neighborHex == null) continue;
-
-            Vector3 toNeighbor = (neighborHex.transform.position - myHex.transform.position).normalized;
-            float dot = Vector3.Dot(localForward, toNeighbor);
-            
-            if (dot > bestDot)
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                bestDot = dot;
-                bestDirection = dir;
-            }
-        }
-        if (bestDirection != Vector3Int.zero)
-        {
-            oppositeHexCoords = myHex.hexCoords + bestDirection;
-            Hex oppositeHex = HexGrid.Instance.GetTileAt(oppositeHexCoords);
-            if (oppositeHex == null || oppositeHex.IsOccupied())
-            {
-                foreach (var dir in directions)
+                if (hit.collider.gameObject == gameObject)
                 {
-                    Vector3Int testCoords = myHex.hexCoords + dir;
-                    Hex testHex = HexGrid.Instance.GetTileAt(testCoords);
-                    if (testHex != null && !testHex.IsOccupied())
-                    {
-                        oppositeHexCoords = testCoords;
-                        break;
-                    }
+                    HandleDoorClick();
                 }
             }
         }
-        else
-        {
-            Debug.LogWarning("Could not determine opposite hex direction");
-            oppositeHexCoords = myHex.hexCoords;
-        }
     }
-
-    private void OnMouseDown()
+    private void HandleDoorClick()
     {
-        if (!isInitialized || myHex == null)
+        if (!isInitialized || myHex == null) return;
+
+        Debug.Log("Door clicked via raycast");
+
+        if (!IsPlayerAdjacent())
         {
-            Debug.LogError("Door not initialized.");
+            Debug.Log("Player not adjacent");
             return;
         }
-
-        if (!IsPlayerAdjacent()) return;
 
         if (!isOpen)
         {
             Open();
         }
-        
-        TeleportPlayer();
     }
+
+    /*private void OnMouseDown()
+    {
+        Debug.Log("Mouse click detected");
+        if (!isInitialized || myHex == null || isOpen) return;
+
+        if (IsPlayerAdjacent())
+        {
+            Open();
+        }
+    }*/
 
     private bool IsPlayerAdjacent()
     {
@@ -124,33 +96,6 @@ public class OpenDoor : MonoBehaviour
         return neighbors.Contains(playerHex);
     }
 
-    private void TeleportPlayer()
-{
-    var player = GameObject.FindGameObjectWithTag("Player");
-    if (player == null) return;
-
-    Unit playerUnit = player.GetComponent<Unit>();
-    if (playerUnit == null) return;
-
-    Hex targetHex = HexGrid.Instance.GetTileAt(oppositeHexCoords);
-    if (targetHex == null || targetHex.IsOccupied())
-    {
-        Debug.LogWarning("Target hex is occupied or doesn't exist!");
-        return;
-    }
-    float currentY = player.transform.position.y;
-    Hex currentPlayerHex = HexGrid.Instance.GetTileAt(HexGrid.Instance.GetClosestHex(player.transform.position));
-    if (currentPlayerHex != null) currentPlayerHex.ClearUnit();
-    Vector3 targetPosition = targetHex.transform.position;
-    targetPosition.y = currentY; 
-    player.transform.position = targetPosition;
-    
-    playerUnit.currentHex = targetHex;
-    targetHex.SetUnit(playerUnit);
-
-    Debug.Log($"Player teleported to {oppositeHexCoords} (Y-position preserved: {currentY})");
-}
-
     public void Open()
     {
         isOpen = true;
@@ -161,28 +106,24 @@ public class OpenDoor : MonoBehaviour
         {
             EnemyActivator.Instance.ActivateEnemiesInRoom(roomID);
         }
-        else
-        {
-            Debug.LogWarning("EnemyActivator not found.");
-        }
     }
 
     private void SetClosed()
     {
         myHex.HexType = HexType.Obstacle;
-        if (rend != null) rend.material.color = Color.red;
-
         if (türGeschlossenObjekt != null) türGeschlossenObjekt.SetActive(true);
         if (türOffenObjekt != null) türOffenObjekt.SetActive(false);
+
+        gameObject.layer = LayerMask.NameToLayer("Default");
     }
 
     private void SetOpen()
     {
-        myHex.HexType = HexType.Default;
-        if (rend != null) rend.material.color = Color.green;
-
+        myHex.HexType = HexType.Road;
         if (türGeschlossenObjekt != null) türGeschlossenObjekt.SetActive(false);
         if (türOffenObjekt != null) türOffenObjekt.SetActive(true);
+
+        gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
     }
 
     private Hex GetHexBelow()
@@ -199,25 +140,5 @@ public class OpenDoor : MonoBehaviour
         }
         Vector3Int coords = HexGrid.Instance.GetClosestHex(transform.position);
         return HexGrid.Instance.GetTileAt(coords);
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        if (myHex != null)
-        {
-            Gizmos.color = isOpen ? Color.green : Color.red;
-            Gizmos.DrawWireCube(myHex.transform.position + Vector3.up * 0.5f, Vector3.one * 0.9f);
-
-            if (HexGrid.Instance != null && isInitialized)
-            {
-                Gizmos.color = Color.blue;
-                Hex oppositeHex = HexGrid.Instance.GetTileAt(oppositeHexCoords);
-                if (oppositeHex != null)
-                {
-                    Gizmos.DrawWireCube(oppositeHex.transform.position + Vector3.up * 0.5f, Vector3.one * 0.9f);
-                    Gizmos.DrawLine(myHex.transform.position, oppositeHex.transform.position);
-                }
-            }
-        }
     }
 }
