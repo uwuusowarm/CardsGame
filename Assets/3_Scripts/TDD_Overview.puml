@@ -1,0 +1,229 @@
+﻿@startuml
+!theme plain
+title Cards against Dungeon - Managers and Systems
+
+package "Core Managers" {
+    class GameManager {
+        + static Instance : GameManager
+        + PlayerEndsTurn()
+        + HandlePlayerDeath()
+    }
+    
+    class UnitManager {
+        + static Instance : UnitManager
+        + RegisterUnit()
+        + GetUnitsInRange()
+    }
+    
+    class CardManager {
+        + static Instance : CardManager
+        + PlayCard()
+        + DrawCards()
+        + ManageDeck()
+    }
+    
+    class CardMenuManager {
+        - allPlayerDecks : List<Deck>
+        - currentlyEditingDeck : Deck
+        + PopulateDeckDisplay()
+        + SaveDeck()
+        + LoadDecks()
+    }
+    
+    class AttackManager {
+        + static Instance : AttackManager
+        + ProcessAttack()
+        + CalculateDamage()
+    }
+}
+
+package "Player Systems" {
+    class HealthSystem {
+        + static Instance : HealthSystem
+        - maxBaseHealth : int
+        - currentHealth : int
+        - extraHealthUnlocked : bool[]
+        + Heal(int)
+        + LoseHealth(int)
+        + UnlockExtraHealth(int)
+        + UpdateHealthDisplay()
+    }
+    
+    class ShieldSystem {
+        + static Instance : ShieldSystem
+        - maxShields : int
+        - currentShields : int
+        - shieldsUnlocked : bool[]
+        + AddShields(int)
+        + LoseShields(int)
+        + UpdateShieldDisplay()
+    }
+    
+    class ActionPointSystem {
+        + static Instance : ActionPointSystem
+        - maxActionPoints : int
+        - currentActionPoints : int
+        - pointsUnlocked : bool[]
+        + UseActionPoints(int)
+        + RefreshActionPoints()
+    }
+    
+    class ExhaustionSystem {
+        + static Instance : ExhaustionSystem
+        - exhaustionStacks : int
+        + AddExhaustionStack()
+        + ClearExhaustion()
+    }
+    
+    class MovementSystem {
+        + static Instance : MovementSystem
+        + MoveUnit(Unit, Hex)
+        + CalculatePath()
+    }
+}
+
+package "Equipment & Items" {
+    class EquipmentManager {
+        + static Instance : EquipmentManager
+        - equippedItems : Dictionary<ItemSlot, ItemData>
+        + playerClass : ItemClassType
+        + EquipItem(ItemData)
+        + GetTotalMaxHPBonus() : int
+        + GetStatBonus(StatBonusType) : int
+    }
+    
+    class ItemDatabase {
+        + allItems : List<ItemData>
+        + GetRandomItem() : ItemData
+    }
+}
+
+package "Data Management" {
+    class PlayerDataManager {
+        + static Instance : PlayerDataManager
+        - playerData : PlayerDataSO
+        + IsDataLoaded : bool
+        + ResetPlayerData()
+    }
+    
+    class GameDataManager {
+        + static Instance : GameDataManager
+        + selectedDeck : Deck
+    }
+    
+    class SaveSystem {
+        + SaveDecks(List<Deck>)
+        + LoadDecks() : List<Deck>
+    }
+}
+
+package "Audio Systems" {
+    class Sound_Manager {
+        + static instance : Sound_Manager
+        + Play(string)
+        + Stop(string)
+        + sounds : SoundMusic[]
+    }
+    
+    class BackgroundMusic {
+        - audioSource : AudioSource
+        + clip : AudioClip
+    }
+}
+
+package "UI Systems" {
+    class SettingsManager {
+        + static Instance : SettingsManager
+        + ToggleOptionsPanel()
+        + ApplySettings()
+    }
+    
+    class InGameUI {
+        + ToggleOptionsMenu()
+    }
+    
+    class PlayerStatusUI {
+        + UpdateHealthDisplay()
+        + UpdateShieldDisplay()
+        + UpdateActionPointDisplay()
+    }
+}
+
+package "Enemy Systems" {
+    class EnemyActivator {
+        + static Instance : EnemyActivator
+        - allEnemies : List<EnemyUnit>
+        + RegisterEnemy(EnemyUnit)
+        + ActivateEnemiesInRoom(int)
+    }
+    
+    class EnemyCardManager {
+        - deck : List<CardData>
+        - hand : List<CardData>
+        + InitializeDeck(List<CardData>)
+        + DrawCards(int)
+    }
+}
+
+package "Game Grid" {
+    class HexGrid {
+        + GetHexAt(Vector3Int) : Hex
+        + GetNeighbors(Hex) : List<Hex>
+    }
+    
+    class Hex {
+        + UnitOnHex : Unit
+        + EnemyUnitOnHex : EnemyUnit
+        + PlacedObject : GameObject
+        + IsObstacle() : bool
+        + SetUnit(Unit)
+    }
+    
+    class SelectionManager {
+        + static Instance : SelectionManager
+        + selectedHex : Hex
+        + HandleSelection()
+    }
+}
+
+package "Card Effects" {
+    class PlayedCardEffectCache {
+        + static Instance : PlayedCardEffectCache
+        + PendingDamage : int
+        + PendingRange : int
+        + PendingMovement : int
+        + HasPendingEffects : bool
+        + CacheCardEffects()
+    }
+}
+
+
+GameManager --> HealthSystem : uses
+GameManager --> ShieldSystem : uses
+GameManager --> ActionPointSystem : uses
+
+HealthSystem --> EquipmentManager : queries bonuses
+ShieldSystem --> PlayerStatusUI : updates display
+HealthSystem --> PlayerStatusUI : updates display
+
+EquipmentManager --> ItemDatabase : uses
+PlayerDataManager --> SaveSystem : uses
+CardMenuManager --> SaveSystem : uses
+
+EnemyActivator --> EnemyCardManager : uses
+AttackManager --> HealthSystem : applies damage
+AttackManager --> ShieldSystem : applies damage
+
+CardManager --> PlayedCardEffectCache : caches effects
+MovementSystem --> HexGrid : uses
+SelectionManager --> HexGrid : uses
+
+Sound_Manager --> BackgroundMusic : manages
+InGameUI --> SettingsManager : uses
+
+note top of GameManager : Main game coordinator\nManages turns and states
+note top of HealthSystem : Singleton pattern\nManages HP with equipment bonuses
+note top of EquipmentManager : Persistent across scenes\nManages item bonuses
+note top of SaveSystem : Static utility class\nHandles persistence
+
+@enduml

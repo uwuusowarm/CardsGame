@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic; 
 using UnityEngine;
@@ -27,6 +28,61 @@ public class ChestController : MonoBehaviour
         StartCoroutine(InitializeHexPosition());
     }
 
+    public void OnChestClicked()
+    {
+        if (isOpen) return;
+        
+        if (testMode)
+        {
+            Debug.LogWarning("CHEST IN TEST MODE: Bypassing all checks and opening immediately.");
+            OpenChestAndGiveLoot();
+            return; 
+        }
+        
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance is null!");
+            return;
+        }
+        
+        if (!GameManager.Instance.IsPlayerTurn)
+        {
+            Debug.Log("Cannot open chest, it is not the player's turn.");
+            return;
+        }
+
+        if (ActionPointSystem.Instance == null)
+        {
+            Debug.LogError("ActionPointSystem.Instance is null!");
+            return;
+        }
+
+        if (ActionPointSystem.Instance.GetCurrentActionPoints() < 1)
+        {
+            Debug.Log("Not enough Action Points to open the chest.");
+            return;
+        }
+
+        Unit playerUnit = GameManager.Instance.PlayerUnit;
+        if (playerUnit == null)
+        {
+            Debug.LogError("Player unit not found in GameManager!");
+            return;
+        }
+
+        if (!IsPlayerAdjacentToChest())
+        {
+            Debug.Log("Player must be adjacent to the chest to open it.");
+            return;
+        }
+
+        Debug.Log("Opening chest!");
+
+        ActionPointSystem.Instance.UseActionPoints(1);
+
+        OpenChestAndGiveLoot();
+    }
+
     private IEnumerator InitializeHexPosition()
     {
         yield return new WaitUntil(() => HexGrid.Instance != null);
@@ -46,56 +102,95 @@ public class ChestController : MonoBehaviour
         }
     }
     
-    private void OnMouseDown()
+    private bool IsPlayerAdjacentToChest()
     {
-        if (isOpen) return;
+        Debug.Log("=== CHEST ADJACENCY DEBUG ===");
         
-        if (testMode)
+        if (currentHex == null)
         {
-            Debug.LogWarning("CHEST IN TEST MODE: Bypassing all checks and opening immediately.");
-            OpenChestAndGiveLoot();
-            return; 
+            Debug.LogError("Chest hex not initialized!");
+            return false;
         }
-        
-        if (!GameManager.Instance.IsPlayerTurn)
-        {
-            Debug.Log("Cannot open chest, it is not the player's turn.");
-            return;
-        }
+        Debug.Log($"Chest is at hex: {currentHex.HexCoords}");
 
-        if (ActionPointSystem.Instance.GetCurrentActionPoints() < 1)
+        if (GameManager.Instance == null)
         {
-            Debug.Log("Not enough Action Points to open the chest.");
-            return;
+            Debug.LogError("GameManager.Instance is null in IsPlayerAdjacentToChest!");
+            return false;
         }
 
         Unit playerUnit = GameManager.Instance.PlayerUnit;
         if (playerUnit == null)
         {
-            Debug.LogError("Player unit not found in GameManager!");
-            return;
+            Debug.LogError("Player unit not found!");
+            return false;
         }
 
-        float distance = HexGrid.Instance.GetDistance(playerUnit.GetCurrentHex(), this.currentHex);
-
-        if (distance > 1) 
+        if (HexGrid.Instance == null)
         {
-            Debug.Log("Player is too far away to open the chest.");
-            return;
+            Debug.LogError("HexGrid.Instance is null!");
+            return false;
         }
 
-        Debug.Log("Opening chest!");
+        Debug.Log($"Player world position: {playerUnit.transform.position}");
+        Debug.Log($"Chest world position: {transform.position}");
 
-        ActionPointSystem.Instance.UseActionPoints(1);
+        float worldDistance = Vector3.Distance(playerUnit.transform.position, transform.position);
+        Debug.Log($"World distance between player and chest: {worldDistance:F2}");
 
-        OpenChestAndGiveLoot();
+        if (worldDistance <= 3.0f) 
+        {
+            Debug.Log("WORLD DISTANCE CHECK: Player is close enough - ADJACENT!");
+            return true;
+        }
+
+        Vector3Int playerHexCoords = CalculateHexFromWorldPos(playerUnit.transform.position);
+        Vector3Int chestHexCoords = CalculateHexFromWorldPos(transform.position);
+        
+        Debug.Log($"Manual calculation - Player hex: {playerHexCoords}, Chest hex: {chestHexCoords}");
+
+        int hexDistance = Mathf.Abs(playerHexCoords.x - chestHexCoords.x) + 
+                         Mathf.Abs(playerHexCoords.z - chestHexCoords.z);
+        Debug.Log($"Manual hex distance: {hexDistance}");
+
+        if (hexDistance == 1)
+        {
+            Debug.Log("MANUAL HEX DISTANCE CHECK: Player is 1 hex away - ADJACENT!");
+            return true;
+        }
+
+        Debug.Log("Player is NOT adjacent to chest.");
+        Debug.Log("============================");
+        return false;
     }
+
+    private Vector3Int CalculateHexFromWorldPos(Vector3 worldPos)
+    {
+        float hexWidth = HexGrid.Instance.hexWidth;
+        float hexHeight = HexGrid.Instance.hexHeight;
+        float zSpacing = hexHeight * 0.75f;
+
+        int z = Mathf.RoundToInt(worldPos.z / zSpacing);
+        float xOffset = (z % 2 != 0) ? hexWidth / 2f : 0;
+        int x = Mathf.RoundToInt((worldPos.x - xOffset) / hexWidth);
+
+        return new Vector3Int(x, 0, z);
+    }
+    
     
     private void OpenChestAndGiveLoot()
     {
         if (isOpen) return;
         isOpen = true;
-        Sound_Manager.instance.Play("Chest_Open");
+        
+        if (Sound_Manager.instance != null)
+        {
+            Sound_Manager.instance.Play("Chest_Open");
+        }
+        else
+        {
+            Debug.LogWarning("Sound_Manager.instance is null - skipping sound");
+        }
 
         ItemData randomItem = itemDatabase.GetRandomItem();
         if (randomItem != null && EquipmentManager.Instance != null)

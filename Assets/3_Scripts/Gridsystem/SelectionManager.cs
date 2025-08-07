@@ -35,6 +35,20 @@ public class SelectionManager : MonoBehaviour
         GameObject result;
         if (FindTarget(mousePosition, out result))
         {
+            ChestController chest = result.GetComponent<ChestController>();
+            if (chest != null)
+            {
+                chest.OnChestClicked();
+                return;
+            }
+            
+            EnemyUnit enemy = result.GetComponent<EnemyUnit>();
+            if (enemy != null)
+            {
+                AttackManager.Instance.HandleEnemyClick(enemy);
+                return;
+            }
+        
             if (!IsUnit(result) && !IsEnemy(result))
             {
                 TerrainSelected.Invoke(result);
@@ -42,10 +56,11 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
+
     private bool UnitySelected(GameObject result)
     {
         return result.GetComponent<Unit>() != null &&
-           result.GetComponent<EnemyUnit>() == null;
+               result.GetComponent<EnemyUnit>() == null;
     }
 
     private bool FindTarget(Vector3 mousePosition, out GameObject result)
