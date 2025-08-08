@@ -28,6 +28,10 @@ public class GameManager : MonoBehaviour
 
     private bool poisonAttackActive = false;
     private int pendingPoisonDuration = 0;
+    
+    private bool stunAttackActive = false; 
+    private int pendingStunDuration = 0;
+
 
     public Animator animDead;
     
@@ -282,6 +286,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public bool IsStunAttackActive()
+    {
+        return stunAttackActive;
+    }
+
+    public int GetPendingStunDuration()
+    {
+        return pendingStunDuration;
+    }
+
+    public void ClearStunAttack()
+    {
+        stunAttackActive = false;
+        pendingStunDuration = 0;
+        Debug.Log("Stun attack effect cleared");
+    }
+
     private void ApplyCachedEffects()
     {
         if (PlayedCardEffectCache.Instance == null || !PlayedCardEffectCache.Instance.HasPendingEffects) return;
@@ -407,7 +428,9 @@ public class GameManager : MonoBehaviour
                 return;
 
             case CardEffect.EffectType.Stun:
-                ApplyStunEffect(effect.value);
+                stunAttackActive = true;
+                pendingStunDuration = effect.value;
+                Debug.Log($"Next attack will stun the target for {effect.value} turns");
                 return;
 
             case CardEffect.EffectType.Poison:
@@ -828,6 +851,8 @@ public class GameManager : MonoBehaviour
         }
 
         ClearPoisonAttack();
+        ClearStunAttack();
+
         ResetAttackAvailability();
 
         if (isWaitingForPlayerActionResolution)
