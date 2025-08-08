@@ -184,7 +184,7 @@ public class MainMenu : MonoBehaviour
         if (currentlySelectedDeckForPlay != null && GameDataManager.Instance != null)
         {
             GameDataManager.Instance.selectedDeck = currentlySelectedDeckForPlay;
-            SceneManager.LoadScene(5);
+            SceneManager.LoadScene(1);
         }
     }
 

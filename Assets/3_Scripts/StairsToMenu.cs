@@ -25,23 +25,19 @@ public class StairsToMenu : MonoBehaviour
         }
     }
 
-    private void OnMouseDown()
+    public void OnStairsClicked()
     {
+        Debug.Log("StairsToMenu.OnStairsClicked() called!");
+    
         if (!isInitialized)
         {
+            Debug.Log("StairsToMenu not initialized yet!");
             return;
         }
-
-        if (IsPlayerAdjacent())
-        {
-            Debug.Log("Player is close enough and clicked the exit. Loading scene: " + scene);
-            PlayerDataManager.Instance.SavePlayerState();
-            SceneManager.LoadScene(scene);
-        }
-        else
-        {
-            Debug.Log("Player clicked the exit, but is not close enough.");
-        }
+        
+        Debug.Log("Player is close enough and clicked the exit. Loading scene: " + scene);
+        PlayerDataManager.Instance.SavePlayerState();
+        SceneManager.LoadScene(scene);
     }
 
     private bool IsPlayerAdjacent()

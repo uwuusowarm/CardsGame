@@ -35,6 +35,15 @@ public class SelectionManager : MonoBehaviour
         GameObject result;
         if (FindTarget(mousePosition, out result))
         {
+            StairsToMenu stairs = result.GetComponent<StairsToMenu>();
+            if (stairs != null)
+            {
+                Debug.Log("Clicked on stairs!");
+                // Call the stairs click logic directly
+                stairs.OnStairsClicked();
+                return;
+            }
+
             ChestController chest = result.GetComponent<ChestController>();
             if (chest != null)
             {
