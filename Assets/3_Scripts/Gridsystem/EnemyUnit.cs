@@ -9,6 +9,10 @@ public class EnemyUnit : MonoBehaviour
     public int damage = 3;
     public int maxHealth = 3;
     public int currentHealth { get; private set; }
+    
+    [Header("Status Effects")]
+    private int stunTurnsRemaining = 0;
+    private int poisonTurnsRemaining = 0;
 
     [Header("Visuals")]
     public Material normalMaterial;
@@ -87,6 +91,90 @@ public class EnemyUnit : MonoBehaviour
             Debug.LogWarning("Click ignored - wrong turn or not highlighted");
         }
     }
+
+    public void ApplyStun(int turns)
+    {
+        stunTurnsRemaining = turns;
+        Debug.Log($"{name} has been stunned for {turns} turn(s)");
+        
+        if (TryGetComponent<Renderer>(out var renderer))
+        {
+            StartCoroutine(StunVisualEffect());
+        }
+    }
+    
+    
+    public bool IsStunned()
+    {
+        return stunTurnsRemaining > 0;
+    }
+    
+    private void ReduceStunDuration()
+    {
+        if (stunTurnsRemaining > 0)
+        {
+            stunTurnsRemaining--;
+            Debug.Log($"{name} stun duration reduced. Remaining: {stunTurnsRemaining}");
+        }
+    }
+    
+    private IEnumerator StunVisualEffect()
+    {
+        Renderer renderer = GetComponent<Renderer>();
+        Color originalColor = renderer.material.color;
+        
+        for (int i = 0; i < 3; i++)
+        {
+            renderer.material.color = Color.yellow;
+            yield return new WaitForSeconds(0.2f);
+            renderer.material.color = originalColor;
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+    
+    public void ApplyPoison(int turns)
+    {
+        if (poisonTurnsRemaining <= 0)
+        {
+            poisonTurnsRemaining = turns;
+            Debug.Log($"{name} has been poisoned for {turns} turn(s)");
+        }
+        else
+        {
+            Debug.Log($"{name} is already poisoned. Poison does not stack.");
+        }
+    }
+
+    public bool IsPoisoned()
+    {
+        return poisonTurnsRemaining > 0;
+    }
+
+    private void ReducePoisonDuration()
+    {
+        if (poisonTurnsRemaining > 0)
+        {
+            poisonTurnsRemaining--;
+            Debug.Log($"{name} poison duration reduced. Remaining: {poisonTurnsRemaining}");
+        }
+    }
+
+    private void ApplyPoisonDamage()
+    {
+        if (IsPoisoned())
+        {
+            if (VFXManager.Instance != null)
+            {
+                VFXManager.Instance.PlayVFX(VFXManager.VFXType.Poison, transform);
+                Debug.Log($"Playing poison VFX for {name}");
+            }
+        
+            TakeDamage(1); 
+            Debug.Log($"{name} takes 1 poison damage. Remaining HP: {currentHealth}");
+            ReducePoisonDuration();
+        }
+    }
+
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
@@ -196,6 +284,24 @@ public class EnemyUnit : MonoBehaviour
 
     public IEnumerator EnemyTurnRoutine()
     {
+        if (IsPoisoned())
+        {
+            ApplyPoisonDamage();
+            
+            if (currentHealth <= 0)
+            {
+                Debug.Log($"{name} died from poison!");
+                yield break;
+            }
+        }
+        
+        if (IsStunned())
+        {
+            Debug.Log($"{name} is stunned and skips their turn!");
+            ReduceStunDuration();
+            yield break; 
+        }
+
         if (hand.Count == 0)
             DrawCards(2);
 
@@ -306,18 +412,14 @@ public class EnemyUnit : MonoBehaviour
 
         Vector3Int start = this.currentHex.hexCoords;
         Vector3Int target = playerUnit.currentHex.hexCoords;
-
-        // BFS für Pfadfindung
         var bfsResult = GraphSearch.BFSGetPath(HexGrid.Instance, start, target, steps);
-        var path = bfsResult; // path ist eine List<Vector3Int> vom Start bis zum Ziel (oder so weit wie möglich)
+        var path = bfsResult; 
 
         if (path == null || path.Count <= 1)
         {
             Debug.Log($"{name} kann sich nicht näher zum Spieler bewegen.");
             return false;
         }
-
-        // Gehe maximal 'steps' Felder weit (ohne Startfeld)
         int moveCount = Mathf.Min(steps, path.Count - 1);
         Vector3Int nextHexCoords = path[moveCount];
         Hex nextHex = HexGrid.Instance.GetTileAt(nextHexCoords);

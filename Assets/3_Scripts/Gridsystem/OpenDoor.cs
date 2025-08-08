@@ -6,6 +6,7 @@ public class OpenDoor : MonoBehaviour
 {
     public int roomID;
     public bool isOpen = false;
+    public int interactionRange = 10;
     
     //[Header("Verlinkte Hex-Felder")]
     //[SerializeField] private List<Hex> linkedHexes;
@@ -60,7 +61,7 @@ public class OpenDoor : MonoBehaviour
 
         Debug.Log("Door clicked via raycast");
 
-        if (!IsPlayerAdjacent())
+        if (!IsPlayerInRange())
         {
             Debug.Log("Player not adjacent");
             return;
@@ -71,29 +72,18 @@ public class OpenDoor : MonoBehaviour
             Open();
         }
     }
-
-    /*private void OnMouseDown()
+    private bool IsPlayerInRange()
     {
-        Debug.Log("Mouse click detected");
-        if (!isInitialized || myHex == null || isOpen) return;
-
-        if (IsPlayerAdjacent())
-        {
-            Open();
-        }
-    }*/
-
-    private bool IsPlayerAdjacent()
-    {
-        if (HexGrid.Instance == null) return false;
-
-        var player = GameObject.FindGameObjectWithTag("Player");
+        if (!isInitialized || myHex == null) return false;
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) return false;
+        float distance = Vector3.Distance(transform.position, player.transform.position);
+        float hexSize = 1.7f; 
+        float maxDistance = interactionRange * hexSize;
 
-        Vector3Int playerHex = HexGrid.Instance.GetClosestHex(player.transform.position);
-        var neighbors = HexGrid.Instance.GetNeighborsFor(myHex.hexCoords);
+        Debug.Log($"Player direct distance: {distance} (Max: {maxDistance})");
 
-        return neighbors.Contains(playerHex);
+        return distance <= maxDistance;
     }
 
     public void Open()
@@ -113,6 +103,8 @@ public class OpenDoor : MonoBehaviour
         myHex.HexType = HexType.Obstacle;
         if (türGeschlossenObjekt != null) türGeschlossenObjekt.SetActive(true);
         if (türOffenObjekt != null) türOffenObjekt.SetActive(false);
+
+        gameObject.layer = LayerMask.NameToLayer("Default");
     }
 
     private void SetOpen()
@@ -120,6 +112,8 @@ public class OpenDoor : MonoBehaviour
         myHex.HexType = HexType.Road;
         if (türGeschlossenObjekt != null) türGeschlossenObjekt.SetActive(false);
         if (türOffenObjekt != null) türOffenObjekt.SetActive(true);
+
+        gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
     }
 
     private Hex GetHexBelow()

@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -128,7 +129,41 @@ public class HexGrid : MonoBehaviour
         return hexTileNeighboursDict[hexCoordinates];
     }
     
-    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range = 1) { return new List<Vector3Int>(); }
+    public List<Vector3Int> GetNeighborsFor(Vector3Int hexCoordinates, int range)
+    {
+        if (range == 1)
+        {
+            return GetNeighborsFor(hexCoordinates);
+        }
+        
+        HashSet<Vector3Int> result = new HashSet<Vector3Int>();
+        Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        Dictionary<Vector3Int, int> distances = new Dictionary<Vector3Int, int>();
+
+        queue.Enqueue(hexCoordinates);
+        distances[hexCoordinates] = 0;
+
+        while (queue.Count > 0)
+        {
+            Vector3Int current = queue.Dequeue();
+            int currentDist = distances[current];
+
+            if (currentDist >= range) continue;
+
+            foreach (Vector3Int neighbor in GetNeighborsFor(current))
+            {
+                if (!distances.ContainsKey(neighbor))
+                {
+                    distances[neighbor] = currentDist + 1;
+                    queue.Enqueue(neighbor);
+                    result.Add(neighbor);
+                }
+            }
+        }
+        
+        return new List<Vector3Int>(result);
+    }
+    
     public void AddMovementPoints(int points) {  }
 
     public Dictionary<Vector3Int, Hex> GetAllHexes()
