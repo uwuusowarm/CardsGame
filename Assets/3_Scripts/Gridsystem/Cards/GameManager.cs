@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
     private int pendingStunDuration = 0;
 
 
-    public Animator animDead;
+    
     
     private Unit playerUnit;
     public Unit PlayerUnit => playerUnit;
