@@ -13,7 +13,7 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private CardData assignedCard;
     private CardMenuManager cardMenuManager;
-    private bool isCurrentlySelected = false;
+    private bool isSelected = false;
     private Vector3 originalScale;
     private Coroutine scaleCoroutine;
     private LayoutElement layoutElement;
@@ -28,7 +28,7 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         this.assignedCard = card;
         this.cardMenuManager = menuManager;
-        this.isCurrentlySelected = isSelected;
+        this.isSelected = isSelected;
 
         Graphic raycastTargetGraphic = GetComponent<Graphic>();
         if (raycastTargetGraphic != null)
@@ -71,17 +71,17 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             canvasGroup.blocksRaycasts = false;
         }
 
-        TextMeshProUGUI[] allTextComponents = cardInstance.GetComponentsInChildren<TextMeshProUGUI>(true);
-        foreach (var textComponent in allTextComponents)
+        TextMeshProUGUI[] allText = cardInstance.GetComponentsInChildren<TextMeshProUGUI>(true);
+        foreach (var text in allText)
         {
-            if (textComponent.fontMaterial.name.Contains("_Masked"))
+            if (text.fontMaterial.name.Contains("_Masked"))
             {
                 continue;
             }
 
-            Material editableMaterial = new Material(textComponent.fontMaterial);
+            Material editableMaterial = new Material(text.fontMaterial);
             editableMaterial.EnableKeyword("MASK_HARD");
-            textComponent.fontMaterial = editableMaterial;
+            text.fontMaterial = editableMaterial;
         }
     }
 
@@ -123,10 +123,10 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void SetHighlight(bool isHighlighted)
     {
-        this.isCurrentlySelected = isHighlighted;
+        this.isSelected = isHighlighted;
         if (highlightOverlay != null)
         {
-            highlightOverlay.SetActive(this.isCurrentlySelected);
+            highlightOverlay.SetActive(this.isSelected);
         }
     }
 
@@ -148,7 +148,7 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         if (highlightOverlay != null)
         {
-            highlightOverlay.SetActive(this.isCurrentlySelected);
+            highlightOverlay.SetActive(this.isSelected);
         }
         StartScaling(originalScale);
     }
