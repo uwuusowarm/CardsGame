@@ -17,7 +17,7 @@ public class CardEffect
         Heal,
         Burn,
         Block,
-        
+        Stun,
         Draw,
         Discard,
         Freeze,

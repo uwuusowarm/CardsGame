@@ -33,7 +33,18 @@ public class Hex : MonoBehaviour
 
     public bool IsObstacle()
     {
-        return this.hexType == HexType.Obstacle || UnitOnHex != null || EnemyUnitOnHex != null || PlacedObject != null;
+        //return this.hexType == HexType.Obstacle || UnitOnHex != null || EnemyUnitOnHex != null || PlacedObject != null;
+        if (this.hexType == HexType.Obstacle) 
+            return true;
+        if (UnitOnHex != null || EnemyUnitOnHex != null) 
+            return true;
+        if (PlacedObject != null)
+        {
+            OpenDoor door = PlacedObject.GetComponent<OpenDoor>();
+            return door == null || !door.isOpen;
+        }
+
+        return false;
     }
     private void Awake()
     

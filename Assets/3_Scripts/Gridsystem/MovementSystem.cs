@@ -17,7 +17,7 @@ public class MovementSystem : MonoBehaviour
         selectedUnit = unit;
         hexGrid = grid;
         remainingMovementPoints = unit.MovementPoints;
-        
+
         if (selectedUnit.currentHex != null)
         {
             currentUnitHex = selectedUnit.currentHex.hexCoords;
@@ -27,7 +27,7 @@ public class MovementSystem : MonoBehaviour
         {
             currentUnitHex = hexGrid.GetClosestHex(selectedUnit.transform.position);
             Debug.Log($"Using calculated hex: {currentUnitHex}");
-            
+
             Hex hex = hexGrid.GetTileAt(currentUnitHex);
             if (hex != null)
             {
@@ -35,7 +35,7 @@ public class MovementSystem : MonoBehaviour
                 hex.SetUnit(selectedUnit);
             }
         }
-        
+
         ShowAvailableHexes();
     }
 
@@ -64,19 +64,19 @@ public class MovementSystem : MonoBehaviour
             Debug.LogError($"Error getting neighbors: {e.Message}");
             return;
         }
-        
+
         int checkedCount = 0;
         int highlightedCount = 0;
-        
+
         foreach (Vector3Int neighborPos in neighbors)
         {
             checkedCount++;
             Debug.Log($"[{checkedCount}/{neighbors.Count}] Checking neighbor: {neighborPos}");
-            
+
             try
             {
                 Hex neighborHex = hexGrid.GetTileAt(neighborPos);
-                if (neighborHex == null) 
+                if (neighborHex == null)
                 {
                     Debug.Log($"  - No hex found at {neighborPos}");
                     continue;
@@ -91,9 +91,9 @@ public class MovementSystem : MonoBehaviour
                 bool isOccupied = neighborHex.IsOccupied();
                 bool isObstacle = neighborHex.IsObstacle();
                 int hexCost = neighborHex.GetCost();
-                
+
                 Debug.Log($"  - Hex {neighborPos}: Cost={hexCost}, Occupied={isOccupied}, Obstacle={isObstacle}");
-                
+
                 if (!isOccupied && !isObstacle)
                 {
                     if (hexCost <= remainingMovementPoints)
@@ -105,7 +105,8 @@ public class MovementSystem : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log($"  - Not highlighting {neighborPos} - cost {hexCost} > remaining {remainingMovementPoints}");
+                        Debug.Log(
+                            $"  - Not highlighting {neighborPos} - cost {hexCost} > remaining {remainingMovementPoints}");
                     }
                 }
                 else
@@ -128,21 +129,21 @@ public class MovementSystem : MonoBehaviour
     {
         Debug.Log($"AddToPath called with: {selectedHexPosition}");
         Debug.Log($"Current unit hex: {currentUnitHex}");
-        
+
         if (selectedHexPosition == currentUnitHex)
         {
             Debug.Log($"Cannot move to current hex {selectedHexPosition}");
             return;
         }
-        
-        if (isMoving || !IsHexInRange(selectedHexPosition)) 
+
+        if (isMoving || !IsHexInRange(selectedHexPosition))
         {
             Debug.Log($"Cannot move to hex: Moving={isMoving}, InRange={IsHexInRange(selectedHexPosition)}");
             return;
         }
-        
+
         ClearHighlights();
-        
+
         Hex selectedHex = hexGrid.GetTileAt(selectedHexPosition);
         int moveCost = selectedHex.GetCost();
 
@@ -164,10 +165,10 @@ public class MovementSystem : MonoBehaviour
         selectedUnit.SetIntendedEndPosition(endWorldPos);
         selectedUnit.MovementFinished += OnMovementFinished;
         selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
-
+        
         if (animator != null)
         {
-            animator.SetBool("IsWalking",true);
+            animator.SetBool("IsWalking", true);
         }
 
         selectedHex.SetUnit(selectedUnit);
@@ -185,9 +186,9 @@ public class MovementSystem : MonoBehaviour
         {
             PlayerStatusUI.Instance.UpdateMovementPoints(remainingMovementPoints);
         }
-        
+
         selectedUnit.SetMovementPoints(remainingMovementPoints);
-        
+
         Debug.Log($"Moving to {selectedHexPosition}, Cost: {moveCost}, Remaining Points: {remainingMovementPoints}");
     }
 
@@ -202,6 +203,11 @@ public class MovementSystem : MonoBehaviour
         }
 
         Debug.Log($"Movement finished. New position: {currentUnitHex}");
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CheckForEnemiesInRange();
+        }
 
         if (remainingMovementPoints > 0)
         {
@@ -223,6 +229,7 @@ public class MovementSystem : MonoBehaviour
                 hex.ResetHighlight();
             }
         }
+
         currentPath.Clear();
         ClearHighlights();
     }
@@ -239,6 +246,7 @@ public class MovementSystem : MonoBehaviour
                 hex.DisableHighlight();
             }
         }
+
         highlightedHexes.Clear();
     }
 
@@ -249,47 +257,50 @@ public class MovementSystem : MonoBehaviour
 
     public bool IsHexInRange(Vector3Int hexPosition)
     {
-        Debug.Log($"IsHexInRange called for {hexPosition} - Moving: {isMoving}, MovementPoints: {remainingMovementPoints}");
-        
-        if (remainingMovementPoints <= 0) 
+        Debug.Log(
+            $"IsHexInRange called for {hexPosition} - Moving: {isMoving}, MovementPoints: {remainingMovementPoints}");
+
+        if (remainingMovementPoints <= 0)
         {
             Debug.Log($"No movement points remaining");
             return false;
         }
-        
-        if (isMoving) 
+
+        if (isMoving)
         {
             Debug.Log($"Cannot move - already moving");
             return false;
         }
-        
+
         if (hexPosition == currentUnitHex)
         {
             Debug.Log($"Cannot move to current hex {hexPosition}");
             return false;
         }
-        
+
         if (!highlightedHexes.Contains(hexPosition))
         {
-            Debug.Log($"Hex {hexPosition} is not highlighted/available. Highlighted hexes: {string.Join(", ", highlightedHexes)}");
+            Debug.Log(
+                $"Hex {hexPosition} is not highlighted/available. Highlighted hexes: {string.Join(", ", highlightedHexes)}");
             return false;
         }
 
         Hex hex = hexGrid.GetTileAt(hexPosition);
-        if (hex == null) 
+        if (hex == null)
         {
             Debug.Log($"Hex {hexPosition} not found in grid");
             return false;
         }
-        
-        if (hex.IsOccupied() || hex.IsObstacle()) 
+
+        if (hex.IsOccupied() || hex.IsObstacle())
         {
             Debug.Log($"Hex {hexPosition} is occupied or obstacle");
             return false;
         }
 
         bool canAfford = hex.GetCost() <= remainingMovementPoints;
-        Debug.Log($"Can afford hex {hexPosition}: {canAfford} (cost: {hex.GetCost()}, remaining: {remainingMovementPoints})");
+        Debug.Log(
+            $"Can afford hex {hexPosition}: {canAfford} (cost: {hex.GetCost()}, remaining: {remainingMovementPoints})");
         return canAfford;
     }
 
@@ -313,11 +324,12 @@ public class MovementSystem : MonoBehaviour
             Debug.Log($"Highlighted hexes: {string.Join(", ", highlightedHexes)}");
             Debug.Log($"Remaining movement points: {remainingMovementPoints}");
             Debug.Log($"Is moving: {isMoving}");
-            
+
             if (selectedUnit != null)
             {
                 Debug.Log($"Unit world position: {selectedUnit.transform.position}");
-                Debug.Log($"Unit.currentHex: {(selectedUnit.currentHex != null ? selectedUnit.currentHex.hexCoords.ToString() : "null")}");
+                Debug.Log(
+                    $"Unit.currentHex: {(selectedUnit.currentHex != null ? selectedUnit.currentHex.hexCoords.ToString() : "null")}");
             }
 
             try
@@ -330,7 +342,8 @@ public class MovementSystem : MonoBehaviour
                     Hex hex = hexGrid.GetTileAt(neighbor);
                     if (hex != null)
                     {
-                        Debug.Log($"  {i + 1}. {neighbor}: Cost={hex.GetCost()}, Occupied={hex.IsOccupied()}, Obstacle={hex.IsObstacle()}, Highlighted={highlightedHexes.Contains(neighbor)}");
+                        Debug.Log(
+                            $"  {i + 1}. {neighbor}: Cost={hex.GetCost()}, Occupied={hex.IsOccupied()}, Obstacle={hex.IsObstacle()}, Highlighted={highlightedHexes.Contains(neighbor)}");
                     }
                     else
                     {
@@ -342,7 +355,7 @@ public class MovementSystem : MonoBehaviour
             {
                 Debug.LogError($"Error in debug info: {e.Message}");
             }
-            
+
             Debug.Log($"===========================");
         }
     }

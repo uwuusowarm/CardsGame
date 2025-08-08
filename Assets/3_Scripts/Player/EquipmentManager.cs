@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Text; 
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro; 
+using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class EquipmentManager : MonoBehaviour
 {
@@ -15,6 +17,11 @@ public class EquipmentManager : MonoBehaviour
     [Header("UI Feedback")]
     [SerializeField] private TextMeshProUGUI itemStatsDisplay;
     [SerializeField] private float statsDisplayDuration = 4.0f;
+    
+    [Header("3D Equipment UI Buttons")]
+    [SerializeField] private Button[] equipmentButtons = new Button[4]; 
+    [SerializeField] private ItemSlot[] equipmentSlots = new ItemSlot[4]; 
+
 
     private Dictionary<ItemSlot, ItemData> equippedItems = new Dictionary<ItemSlot, ItemData>();
     public ItemClassType playerClass = ItemClassType.Warrior; 
@@ -47,6 +54,7 @@ public class EquipmentManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         FindItemTooltipText();
+        SetupEquipmentButtons();
     }
 
     private void FindItemTooltipText()
@@ -69,6 +77,62 @@ public class EquipmentManager : MonoBehaviour
         Debug.LogWarning("ItemTooltipText component not found in the scene.");
     }
 
+    private void SetupEquipmentButtons()
+    {
+        for (int i = 0; i < equipmentButtons.Length; i++)
+        {
+            if (equipmentButtons[i] != null)
+            {
+                int slotIndex = i; 
+            
+                var trigger = equipmentButtons[i].gameObject.GetComponent<EventTrigger>();
+                if (trigger == null)
+                {
+                    trigger = equipmentButtons[i].gameObject.AddComponent<EventTrigger>();
+                }
+            
+                var pointerEnter = new EventTrigger.Entry();
+                pointerEnter.eventID = EventTriggerType.PointerEnter;
+                pointerEnter.callback.AddListener((data) => {
+                    ShowEquipmentTooltip(equipmentSlots[slotIndex]);
+                });
+                trigger.triggers.Add(pointerEnter);
+            
+                var pointerExit = new EventTrigger.Entry();
+                pointerExit.eventID = EventTriggerType.PointerExit;
+                pointerExit.callback.AddListener((data) => {
+                    HideEquipmentTooltip();
+                });
+                trigger.triggers.Add(pointerExit);
+            }
+        }
+    }
+
+    public void HideEquipmentTooltip()
+    {
+        if (itemStatsDisplay != null)
+        {
+            itemStatsDisplay.gameObject.SetActive(false);
+        }
+    }
+
+    public void ShowEquipmentTooltip(ItemSlot slot)
+    {
+        if (itemStatsDisplay == null) return;
+
+        ItemData equippedItem = GetEquippedItem(slot);
+    
+        if (equippedItem == null)
+        {
+            itemStatsDisplay.text = $"<color=#888888>No {slot} equipped</color>";
+        }
+        else
+        {
+            itemStatsDisplay.text = FormatItemStats(equippedItem);
+        }
+
+        itemStatsDisplay.gameObject.SetActive(true);
+    }
 
     private void InitializeEquipmentSlots()
     {
