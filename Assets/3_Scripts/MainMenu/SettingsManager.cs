@@ -5,21 +5,21 @@ using System.Collections.Generic;
 
 public class SettingsManager : MonoBehaviour
 {
-    public static SettingsManager Instance { get; private set; }
+    public static SettingsManager Instance { get; set; }
 
     [Header("Options panel")]
-    [SerializeField] private GameObject optionsPanel;
+    [SerializeField] GameObject optionsPanel;
 
-    [Header("UI elements")]
-    [SerializeField] private TMP_Dropdown resolutionDropdown;
-    [SerializeField] private Slider masterVolumeSlider;
+    [Header("UI")]
+    [SerializeField] TMP_Dropdown resolutionDropdown;
+    [SerializeField] Slider masterVolumeSlider;
 
-    private Resolution[] resolutions;
-    private bool isPanelActive = false;
-    public int saveResolutionIndex;
-    public int currentResolutionIndex = 0;
+    Resolution[] resolutions;
+    bool isPanelActive = false;
+    public int _saveResolutionIndex;
+    public int _currentResolutionIndex = 0;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance == null)
         {
@@ -40,7 +40,7 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-    private void Update()
+    void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -105,10 +105,10 @@ public class SettingsManager : MonoBehaviour
     {
         if (resolutionDropdown != null)
         {
-            saveResolutionIndex = PlayerPrefs.GetInt("Resolution", -1);
-            if (saveResolutionIndex != -1)
+            _saveResolutionIndex = PlayerPrefs.GetInt("Resolution", -1);
+            if (_saveResolutionIndex != -1)
             {
-                resolutionDropdown.value = saveResolutionIndex;
+                resolutionDropdown.value = _saveResolutionIndex;
             }
         }
 
@@ -120,7 +120,7 @@ public class SettingsManager : MonoBehaviour
     }
 
     //shit sollte jz gehen wenn nicht spring ich
-    private void Resolutions()
+    void Resolutions()
     {
         if (resolutionDropdown == null) 
             return;
@@ -134,13 +134,13 @@ public class SettingsManager : MonoBehaviour
             if (resolutions[res].width == Screen.currentResolution.width &&
                 resolutions[res].height == Screen.currentResolution.height)
             {
-                currentResolutionIndex = res; 
+                _currentResolutionIndex = res; 
             }
         }
         resolutionDropdown.AddOptions(options);
 
-        saveResolutionIndex = PlayerPrefs.GetInt("ResolutionPreference", currentResolutionIndex);
-        resolutionDropdown.value = saveResolutionIndex;
+        _saveResolutionIndex = PlayerPrefs.GetInt("ResolutionPreference", _currentResolutionIndex);
+        resolutionDropdown.value = _saveResolutionIndex;
         resolutionDropdown.RefreshShownValue();
     }
 }

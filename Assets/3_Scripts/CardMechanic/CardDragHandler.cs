@@ -5,23 +5,23 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
 {
     public CardData Card { get; set; }
 
-    [HideInInspector] public Vector3 targetPosition;
-    [HideInInspector] public Quaternion targetRotation;
-    [HideInInspector] public float hoverScaleMultiplier = 1.2f;
+    [HideInInspector] public Vector3 _targetPosition;
+    [HideInInspector] public Quaternion _targetRotation;
+    [HideInInspector] public float _hoverScaleMultiplier = 1.2f;
 
-    private RectTransform rectTransform;
-    private bool isHovered = false;
-    private bool isDragging = false;
-    private Vector2 dragStartPositionOffset;
-    private Canvas canvas;
-    private int defaultSortOrder;
+    RectTransform rectTransform;
+    bool isHovered = false;
+    bool isDragging = false;
+    int defaultSortOrder;
+    Vector2 dragStartPositionOffset;
+    Canvas canvas;
+    
+    RectTransform leftZone;
+    RectTransform rightZone;
+    RectTransform discardZone;
 
-    private RectTransform leftZone;
-    private RectTransform rightZone;
-    private RectTransform discardZone;
-
-    private const float ROTATION_SPEED = 12f;
-    private const float SCALE_SPEED = 8f;
+    const float ROTATION_SPEED = 12f;
+    const float SCALE_SPEED = 8f;
 
     void Awake()
     {
@@ -45,14 +45,15 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
         }
         else
         {
-            if (Vector3.Distance(rectTransform.position, targetPosition) > 0.1f)
-                rectTransform.position = Vector3.Lerp(rectTransform.position, targetPosition, Time.deltaTime * 10f);
-            else rectTransform.position = targetPosition;
+            if (Vector3.Distance(rectTransform.position, _targetPosition) > 0.1f)
+                rectTransform.position = Vector3.Lerp(rectTransform.position, _targetPosition, Time.deltaTime * 10f);
+            else rectTransform.position = _targetPosition;
 
-            rectTransform.rotation = Quaternion.Slerp(rectTransform.rotation, targetRotation, Time.deltaTime * ROTATION_SPEED);
+            rectTransform.rotation = Quaternion.Slerp(rectTransform.rotation, _targetRotation, Time.deltaTime * ROTATION_SPEED);
         }
 
-        float targetScale = isHovered || isDragging ? hoverScaleMultiplier : 1f;
+        float targetScale = isHovered || isDragging ? _hoverScaleMultiplier : 1f;
+
         Vector3 newScale = Vector3.one * Mathf.Lerp(rectTransform.localScale.x, targetScale, Time.deltaTime * SCALE_SPEED);
         rectTransform.localScale = newScale;
     }
@@ -60,7 +61,7 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public void OnPointerUp(PointerEventData eventData)
     {
         isDragging = false;
-        
+
         if (ActionPointSystem.Instance != null && !ActionPointSystem.Instance.CanUseActionPoints(1))
         {
             CardManager.Instance.MoveToZone(Card, DropType.Hand);
@@ -87,30 +88,30 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
         }
     }
 
-    public void OnPointerEnter(PointerEventData eventData) 
-    { 
-        if (isDragging) 
-            return; 
-        isHovered = true; 
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (isDragging)
+            return;
+        isHovered = true;
         defaultSortOrder = rectTransform.GetSiblingIndex();
-        rectTransform.SetAsLastSibling(); 
+        rectTransform.SetAsLastSibling();
     }
-    public void OnPointerExit(PointerEventData eventData) 
-    { 
-        if (isDragging) 
-            return; 
-        isHovered = false; 
-        rectTransform.SetSiblingIndex(defaultSortOrder); 
-    }
-    public void OnPointerDown(PointerEventData eventData) 
-    { 
-        isDragging = true; 
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (isDragging)
+            return;
         isHovered = false;
-        dragStartPositionOffset = (Vector2)rectTransform.position - eventData.position; 
-        rectTransform.SetAsLastSibling(); 
+        rectTransform.SetSiblingIndex(defaultSortOrder);
     }
-    public bool IsBeingDragged() 
-    { 
-        return isDragging; 
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        isDragging = true;
+        isHovered = false;
+        dragStartPositionOffset = (Vector2)rectTransform.position - eventData.position;
+        rectTransform.SetAsLastSibling();
+    }
+    public bool IsBeingDragged()
+    {
+        return isDragging;
     }
 }
