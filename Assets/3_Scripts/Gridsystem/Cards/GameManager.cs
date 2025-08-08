@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     [Header("Game Over")] [SerializeField] private CanvasGroup gameOverCanvasGroup;
     [SerializeField] private float gameOverFadeDuration = 1.5f;
     [SerializeField] private string mainMenuSceneName = "MainMenu";
+    public Animator animDead;
 
     private bool isFirstTurn = true;
     public bool IsPlayerTurn { get; private set; } = false;
@@ -918,6 +919,7 @@ public class GameManager : MonoBehaviour
         {
             UnitManager.Instance.ClearOldSelection();
         }
+        
 
         StopAllCoroutines();
 
