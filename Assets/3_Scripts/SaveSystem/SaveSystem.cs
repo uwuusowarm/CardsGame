@@ -21,7 +21,7 @@ public static class SaveSystem
         {
             string json = File.ReadAllText(path);
             DeckSaveData data = JsonUtility.FromJson<DeckSaveData>(json);
-            Debug.Log("Decks loaded from: " + path);
+            Debug.Log("Decks loaded from " + path);
             return data.playerDecks;
         }
         else
