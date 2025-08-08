@@ -17,14 +17,14 @@ public class CardManager : MonoBehaviour
 {
     public static CardManager Instance { get; private set; }
 
-    [Header("Zentrale Kartendatenbank")]
+    [Header("Databese")]
     [SerializeField] private CardDatabaseSO cardDatabase;
 
-    [Header("Einstellungen")]
+    [Header("Settings")]
     [SerializeField, Min(1)] private int drawCount = 4;
     public int DrawCount => drawCount;
 
-    [Header("Hand Layout Einstellungen")]
+    [Header("Hand Layout Settings")]
     [SerializeField] private Transform handTransform;
 
     [SerializeField] private HandLayoutSettings layout4Cards;
@@ -32,7 +32,7 @@ public class CardManager : MonoBehaviour
     [SerializeField] private HandLayoutSettings layout2Cards;
     [SerializeField] private HandLayoutSettings layout1Card;
 
-    [Header("Spielzonen Referenzen")]
+    [Header("Playzones")]
     [SerializeField] private Transform leftGrid;
     [SerializeField] private Transform rightGrid;
     [SerializeField] private Transform discardGrid;
@@ -47,13 +47,15 @@ public class CardManager : MonoBehaviour
     private List<CardData> rightZone = new List<CardData>();
     private List<CardData> discardPile = new List<CardData>();
     private List<CardDragHandler> handCardObjects = new List<CardDragHandler>();
-    private bool hasDrawnInitialHand = false;
+    private bool hasDrawnHand = false;
     private bool isPlayingCard = false;
 
-    public RectTransform HandGridRect => handTransform as RectTransform;
-    public RectTransform LeftGridRect => leftGrid as RectTransform;
-    public RectTransform RightGridRect => rightGrid as RectTransform;
-    public RectTransform DiscardGridRect => discardGrid as RectTransform;
+    public RectTransform HandGrid => handTransform as RectTransform;
+    public RectTransform LeftGrid => leftGrid as RectTransform;
+    public RectTransform RightGrid => rightGrid as RectTransform;
+    public RectTransform DiscardGrid => discardGrid as RectTransform;
+
+
 
     private void Awake()
     {
@@ -73,7 +75,7 @@ public class CardManager : MonoBehaviour
         {
             if (cardDatabase == null) 
             {
-                Debug.LogError(" CardDatabaseSO wurde nicht im CardManager zugewiesen!"); 
+//                Debug.LogError(" CardDatabaseSO ist nicht zugewiesen"); 
                 return; 
             }
             deck.Clear();
@@ -109,12 +111,12 @@ public class CardManager : MonoBehaviour
         if (currentSettings == null) 
             return;
 
-        float totalWidthOfHand = (handCardObjects.Count - 1) * currentSettings.cardSpacing;
-        float startX = -(totalWidthOfHand / 2f);
+        float HandWidth = (handCardObjects.Count - 1) * currentSettings.cardSpacing;
+        float start = -(HandWidth / 2f);
 
-        for (int i = 0; i < handCardObjects.Count; i++)
+        for (int abc123 = 0; abc123 < handCardObjects.Count; abc123++)
         {
-            CardDragHandler cardHandler = handCardObjects[i];
+            CardDragHandler cardHandler = handCardObjects[abc123];
             if (cardHandler == null) 
                 continue;
 
@@ -123,16 +125,16 @@ public class CardManager : MonoBehaviour
             if (cardHandler.IsBeingDragged()) 
                 continue;
 
-            float horizontalPosition = startX + (i * currentSettings.cardSpacing);
-            float normalizedPosition = (handCardObjects.Count > 1) ? (float)i / (handCardObjects.Count - 1) : 0.5f;
+            float horizontPosition = start + (abc123 * currentSettings.cardSpacing);
+            float normalPosition = (handCardObjects.Count > 1) ? (float)abc123 / (handCardObjects.Count - 1) : 0.5f;
 
-            float verticalPosition = Mathf.Sin(normalizedPosition * Mathf.PI) * currentSettings.cardHeightDisplacement;
-            float fanAngle = Mathf.Lerp(currentSettings.maxCardRotation, -currentSettings.maxCardRotation, normalizedPosition);
+            float verticPosition = Mathf.Sin(normalPosition * Mathf.PI) * currentSettings.cardHeightDisplacement;
+            float Angle = Mathf.Lerp(currentSettings.maxCardRotation, -currentSettings.maxCardRotation, normalPosition);
             if (handCardObjects.Count <= 1) 
-                fanAngle = 0;
+                Angle = 0;
 
-            cardHandler.targetPosition = handTransform.position + new Vector3(horizontalPosition, verticalPosition, 0);
-            cardHandler.targetRotation = Quaternion.Euler(0, 0, fanAngle);
+            cardHandler.targetPosition = handTransform.position + new Vector3(horizontPosition, verticPosition, 0);
+            cardHandler.targetRotation = Quaternion.Euler(0, 0, Angle);
         }
     }
 
@@ -142,7 +144,8 @@ public class CardManager : MonoBehaviour
             return;
 
         CardDragHandler handlerToRemove = handCardObjects.FirstOrDefault(h => h.Card == card);
-        if (handlerToRemove == null) return;
+        if (handlerToRemove == null) 
+            return;
 
         hand.Remove(card);
         handCardObjects.Remove(handlerToRemove);
@@ -228,9 +231,9 @@ public class CardManager : MonoBehaviour
     }
     public void DrawInitialCards() 
     { 
-        if (hasDrawnInitialHand) 
+        if (hasDrawnHand) 
             return; 
-        hasDrawnInitialHand = true; 
+        hasDrawnHand = true; 
         DrawExtraCards(drawCount); 
     }
 
@@ -279,9 +282,12 @@ public class CardManager : MonoBehaviour
             foreach (var cardObj in handCardObjects) 
                 Destroy(cardObj.gameObject);
             handCardObjects.Clear();
+//Sound Manager
             if (Sound_Manager.instance != null) 
                 Sound_Manager.instance.Play("Discard");
+
             DrawExtraCards(drawCount);
+//Sound Manager
             if (Sound_Manager.instance != null) 
                 Sound_Manager.instance.Play("Deck_Shuffel");
         }
@@ -289,6 +295,7 @@ public class CardManager : MonoBehaviour
 
     private void Shuffle(List<CardData> cardList) 
     { 
+//Sound Manager
         if (Sound_Manager.instance != null) 
             Sound_Manager.instance.Play("Deck_Shuffel"); 
         for (int card = 0; card < cardList.Count; card++) 

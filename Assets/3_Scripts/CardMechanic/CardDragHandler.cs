@@ -30,9 +30,9 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         if (CardManager.Instance != null)
         {
-            leftZone = CardManager.Instance.LeftGridRect;
-            rightZone = CardManager.Instance.RightGridRect;
-            discardZone = CardManager.Instance.DiscardGridRect;
+            leftZone = CardManager.Instance.LeftGrid;
+            rightZone = CardManager.Instance.RightGrid;
+            discardZone = CardManager.Instance.DiscardGrid;
         }
     }
 
@@ -97,7 +97,8 @@ public class CardDragHandler : MonoBehaviour, IPointerEnterHandler, IPointerExit
     }
     public void OnPointerExit(PointerEventData eventData) 
     { 
-        if (isDragging) return; 
+        if (isDragging) 
+            return; 
         isHovered = false; 
         rectTransform.SetSiblingIndex(defaultSortOrder); 
     }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EnemyCardManager : MonoBehaviour
 {
-    [Header("UI-Referenzen")]
+    [Header("UI")]
     [SerializeField] private Transform handGrid;
     [SerializeField] private GameObject cardPrefab;
 
