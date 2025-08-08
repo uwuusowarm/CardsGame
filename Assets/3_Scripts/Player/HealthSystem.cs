@@ -1,19 +1,21 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
 public class HealthSystem : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private int maxBaseHealth = 5;
+    [Header("Settings")] [SerializeField] private int maxBaseHealth = 5;
     [SerializeField] private int maxExtraHealth = 10;
 
-    [Header("Assigned UI Images")]
-    [SerializeField] private List<Image> healthIcons = new List<Image>();
+    [Header("Assigned UI Images")] [SerializeField]
+    private List<Image> healthIcons = new List<Image>();
 
     private int currentHealth;
     private bool[] extraHealthUnlocked;
     public static HealthSystem Instance { get; private set; }
+    public Animator animDamage;
+    
 
     private void Awake()
     {
@@ -25,15 +27,15 @@ public class HealthSystem : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
+
         extraHealthUnlocked = new bool[maxExtraHealth];
     }
-    
+
     private void Start()
     {
         InitializeHealth(maxBaseHealth);
     }
-    
+
     public void InitializeHealth(int startingHealth)
     {
         currentHealth = startingHealth;
@@ -43,12 +45,12 @@ public class HealthSystem : MonoBehaviour
     public void UpdateMaxHealth()
     {
         int totalMaxHealth = maxBaseHealth;
-    
+
         if (EquipmentManager.Instance != null)
         {
             totalMaxHealth += EquipmentManager.Instance.GetTotalMaxHPBonus();
         }
-    
+
         if (extraHealthUnlocked != null)
         {
             for (int i = 0; i < extraHealthUnlocked.Length; i++)
@@ -79,16 +81,16 @@ public class HealthSystem : MonoBehaviour
     {
         return currentHealth;
     }
-    
+
     public int GetMaxHealth()
     {
         int maxPossibleHealth = maxBaseHealth;
-    
+
         if (EquipmentManager.Instance != null)
         {
             maxPossibleHealth += EquipmentManager.Instance.GetTotalMaxHPBonus();
         }
-    
+
         if (extraHealthUnlocked != null)
         {
             for (int i = 0; i < maxExtraHealth; i++)
@@ -99,11 +101,11 @@ public class HealthSystem : MonoBehaviour
                     break;
             }
         }
-    
+
         return maxPossibleHealth;
     }
 
-    
+
     public int GetUnlockedExtraHealthCount()
     {
         int count = 0;
@@ -117,6 +119,7 @@ public class HealthSystem : MonoBehaviour
                 }
             }
         }
+
         return count;
     }
 
@@ -128,7 +131,7 @@ public class HealthSystem : MonoBehaviour
         {
             int healAmount = Mathf.Min(amount, maxPossibleHealth - currentHealth);
             currentHealth += healAmount;
-        
+
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null && playerObj.TryGetComponent<Unit>(out var playerUnit))
             {
@@ -139,6 +142,7 @@ public class HealthSystem : MonoBehaviour
                     VFXManager.Instance.PlayHealVFX(playerObj.transform);
                 }
             }
+
             UpdateHealthDisplay();
             Debug.Log($"Heal {healAmount}. Now: {currentHealth}/{maxPossibleHealth}");
         }
@@ -162,6 +166,7 @@ public class HealthSystem : MonoBehaviour
                     break;
                 }
             }
+
             if (nextSlot != -1)
             {
                 extraHealthUnlocked[nextSlot] = true;
@@ -173,6 +178,7 @@ public class HealthSystem : MonoBehaviour
                 break;
             }
         }
+
         UpdateMaxHealth();
     }
 
@@ -199,6 +205,12 @@ public class HealthSystem : MonoBehaviour
         currentHealth = Mathf.Max(currentHealth - amount, 0);
         UpdateHealthDisplay();
 
+        if (animDamage != null)
+        {
+            animDamage.SetBool("Take Damage", true);
+            StartCoroutine(ResetDamageAnimation());
+        }
+        
         if (currentHealth <= 0)
         {
             Debug.Log("Player health depleted. Signaling game over.");
@@ -208,7 +220,16 @@ public class HealthSystem : MonoBehaviour
             }
         }
     }
-
+    
+    private IEnumerator ResetDamageAnimation()
+    {
+        yield return new WaitForSeconds(0.5f); 
+        if (animDamage != null)
+        {
+            animDamage.SetBool("Take Damage", false);
+        }
+    }
+    
     private void UpdateHealthDisplay()
     {
         for (int i = 0; i < healthIcons.Count; i++)

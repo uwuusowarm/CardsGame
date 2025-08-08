@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
     private bool poisonAttackActive = false;
     private int pendingPoisonDuration = 0;
 
+    public Animator animDead;
+    
     private Unit playerUnit;
     public Unit PlayerUnit => playerUnit;
 
@@ -877,6 +879,15 @@ public class GameManager : MonoBehaviour
         isGameOver = true;
         IsPlayerTurn = false;
         Debug.Log("Game Over sequence initiated.");
+
+        if (animDead != null)
+        {
+            animDead.SetBool("Dead", true);
+        }
+        else
+        {
+            Debug.LogWarning("animDead is not assigned in the GameManager inspector!");
+        }
 
         if (UnitManager.Instance?.SelectedUnit != null)
         {

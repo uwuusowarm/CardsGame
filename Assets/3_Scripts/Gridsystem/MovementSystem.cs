@@ -165,7 +165,7 @@ public class MovementSystem : MonoBehaviour
         selectedUnit.SetIntendedEndPosition(endWorldPos);
         selectedUnit.MovementFinished += OnMovementFinished;
         selectedUnit.MoveTroughPath(new List<Vector3> { endWorldPos });
-
+        
         if (animator != null)
         {
             animator.SetBool("IsWalking", true);
