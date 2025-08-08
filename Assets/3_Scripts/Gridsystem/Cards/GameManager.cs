@@ -213,6 +213,16 @@ public class GameManager : MonoBehaviour
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
         }
+        UpdateExhaustLevel();;
+    }
+    
+    private void UpdateExhaustLevel()
+    {
+        if (PlayerStatusUI.Instance != null && ExhaustionSystem.Instance != null)
+        {
+            int exhaustionStacks = ExhaustionSystem.Instance.GetExhaustionStacks();
+            PlayerStatusUI.Instance.UpdateExhaustLevel(exhaustionStacks);
+        }
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
@@ -828,7 +838,6 @@ public class GameManager : MonoBehaviour
             AttackManager.Instance.TryPrepareAttack();
         }
     }
-
 
     public void PlayerEndsTurn()
     {

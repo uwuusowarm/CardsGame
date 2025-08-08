@@ -8,6 +8,8 @@ public class PlayerStatusUI : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI movementPointsText;
     [SerializeField] private TextMeshProUGUI attackInfoText;
+    [SerializeField] private TextMeshProUGUI exhaustLevelText;
+
 
     private void Awake()
     {
@@ -32,6 +34,13 @@ public class PlayerStatusUI : MonoBehaviour
         if (movementPointsText != null)
         {
             movementPointsText.text = $"{points}";
+        }
+    }
+    public void UpdateExhaustLevel(int level)
+    {
+        if (movementPointsText != null)
+        {
+            movementPointsText.text = $"{level}";
         }
     }
     
