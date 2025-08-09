@@ -5,16 +5,16 @@ using System;
 
 public class DeckUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI deckNameText;
-    [SerializeField] private GameObject editButtonObject;
-    [SerializeField] private GameObject deleteButtonObject;
-    [SerializeField] private GameObject highlightOverlay;
-    [SerializeField] private Button editButton;
-    [SerializeField] private Button deleteButton;
+    [SerializeField] TextMeshProUGUI deckNameText;
+    [SerializeField] GameObject editButtonObject;
+    [SerializeField] GameObject deleteButtonObject;
+    [SerializeField] GameObject highlightOverlay;
+    [SerializeField] Button editButton;
+    [SerializeField] Button deleteButton;
 
-    private Deck assignedDeck;
-    private CardMenuManager cardMenuManager;
-    private Action<DeckUI> onDeckSelectedCallback;
+    Deck assignedDeck;
+    CardMenuManager cardMenuManager;
+    Action<DeckUI> onDeckSelectedCallback;
 
     public void Initialize(Deck deck, CardMenuManager menuManager)
     {
@@ -50,7 +50,7 @@ public class DeckUI : MonoBehaviour
         });
     }
 
-    private void InternalSetup(Deck deck)
+    void InternalSetup(Deck deck)
     {
         this.assignedDeck = deck;
         if (deckNameText != null && assignedDeck != null)
@@ -61,7 +61,7 @@ public class DeckUI : MonoBehaviour
         SetHighlight(false);
     }
 
-    private void OnDeckSelectedForEdit()
+    void OnDeckSelectedForEdit()
     {
         if (cardMenuManager != null)
         {
@@ -69,7 +69,7 @@ public class DeckUI : MonoBehaviour
         }
     }
 
-    private void OnEditButtonClicked()
+    void OnEditButtonClicked()
     {
         if (cardMenuManager != null)
         {
@@ -77,7 +77,7 @@ public class DeckUI : MonoBehaviour
         }
     }
 
-    private void OnDeleteButtonClicked()
+    void OnDeleteButtonClicked()
     {
         if (cardMenuManager != null)
         {

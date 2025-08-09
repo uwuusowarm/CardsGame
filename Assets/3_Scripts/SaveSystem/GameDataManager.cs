@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class GameDataManager : MonoBehaviour
 {
-    public static GameDataManager Instance { get; private set; }
+    public static GameDataManager Instance { get; set; }
 
     public Deck selectedDeck;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance == null)
         {

@@ -207,6 +207,16 @@ public class GameManager : MonoBehaviour
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
         }
+        UpdateExhaustLevel();;
+    }
+    
+    private void UpdateExhaustLevel()
+    {
+        if (PlayerStatusUI.Instance != null && ExhaustionSystem.Instance != null)
+        {
+            int exhaustionStacks = ExhaustionSystem.Instance.GetExhaustionStacks();
+            PlayerStatusUI.Instance.UpdateExhaustLevel(exhaustionStacks);
+        }
     }
 
     public void ProcessPlayedCard(CardData cardData, bool isLeftEffectChosen)
@@ -785,7 +795,6 @@ private void ApplyBurnEffect(int cardValue, int range)
 
         Debug.Log($"Player action resolved. Attack available reset to: {attackAvailable}");
     }
-
 
     public void PlayerEndsTurn()
     {
