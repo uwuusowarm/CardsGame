@@ -27,10 +27,11 @@ public class CardManager : MonoBehaviour
     [Header("Hand Layout Settings")]
     [SerializeField] Transform handTransform;
 
-    [SerializeField] HandLayoutSettings layout4Cards;
-    [SerializeField] HandLayoutSettings layout3Cards;
-    [SerializeField] HandLayoutSettings layout2Cards;
-    [SerializeField] HandLayoutSettings layout1Card;
+    // DIESE ZEILEN WURDEN ENTFERNT, DA SIE JETZT IM CODE STEHEN
+    // [SerializeField] HandLayoutSettings layout4Cards;
+    // [SerializeField] HandLayoutSettings layout3Cards;
+    // [SerializeField] HandLayoutSettings layout2Cards;
+    // [SerializeField] HandLayoutSettings layout1Card;
 
     [Header("Playzones")]
     [SerializeField] Transform leftGrid;
@@ -97,21 +98,47 @@ public class CardManager : MonoBehaviour
             return;
 
         HandLayoutSettings currentSettings = null;
+
         switch (handCardObjects.Count)
         {
             case 4:
-                currentSettings = layout4Cards;
+                currentSettings = new HandLayoutSettings
+                {
+                    _maxCardRotation = 20f,
+                    _cardHeightDisplacement = 15f,
+                    _cardSpacing = 70f,
+                    _hoverScaleMultiplier = 1.5f
+                };
                 break;
             case 3:
-                currentSettings = layout3Cards;
+                currentSettings = new HandLayoutSettings
+                {
+                    _maxCardRotation = 20f,
+                    _cardHeightDisplacement = 15f,
+                    _cardSpacing = 70f,
+                    _hoverScaleMultiplier = 1.5f
+                };
                 break;
             case 2:
-                currentSettings = layout2Cards;
+                currentSettings = new HandLayoutSettings
+                {
+                    _maxCardRotation = 10f,
+                    _cardHeightDisplacement = 0f,
+                    _cardSpacing = 70f,
+                    _hoverScaleMultiplier = 1.5f
+                };
                 break;
             case 1:
-                currentSettings = layout1Card;
+                currentSettings = new HandLayoutSettings
+                {
+                    _maxCardRotation = 0f,
+                    _cardHeightDisplacement = 0f,
+                    _cardSpacing = 0f,
+                    _hoverScaleMultiplier = 1.5f
+                };
                 break;
         }
+
 
         if (currentSettings == null)
             return;
