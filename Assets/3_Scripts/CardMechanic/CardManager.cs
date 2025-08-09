@@ -27,12 +27,6 @@ public class CardManager : MonoBehaviour
     [Header("Hand Layout Settings")]
     [SerializeField] Transform handTransform;
 
-    // DIESE ZEILEN WURDEN ENTFERNT, DA SIE JETZT IM CODE STEHEN
-    // [SerializeField] HandLayoutSettings layout4Cards;
-    // [SerializeField] HandLayoutSettings layout3Cards;
-    // [SerializeField] HandLayoutSettings layout2Cards;
-    // [SerializeField] HandLayoutSettings layout1Card;
-
     [Header("Playzones")]
     [SerializeField] Transform leftGrid;
     [SerializeField] Transform rightGrid;
