@@ -589,7 +589,7 @@ RectTransform:
   m_Father: {fileID: 612183075}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1023,7 +1023,7 @@ GameObject:
   - component: {fileID: 302309235}
   - component: {fileID: 302309234}
   m_Layer: 5
-  m_Name: Image
+  m_Name: IMG_Kyryl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1361,7 +1361,7 @@ GameObject:
   - component: {fileID: 345087253}
   - component: {fileID: 345087252}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Save
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2346,7 +2346,7 @@ GameObject:
   - component: {fileID: 405361489}
   - component: {fileID: 405361488}
   m_Layer: 5
-  m_Name: Image (2)
+  m_Name: IMG_Elija
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2932,7 +2932,7 @@ GameObject:
   - component: {fileID: 504490609}
   - component: {fileID: 504490608}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: IMG_Keanu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3007,7 +3007,7 @@ GameObject:
   - component: {fileID: 512285830}
   - component: {fileID: 512285829}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Credits
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3256,7 +3256,7 @@ GameObject:
   - component: {fileID: 579338432}
   - component: {fileID: 579338431}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Deck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3832,7 +3832,7 @@ RectTransform:
   m_Father: {fileID: 1202073910}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3909,9 +3909,9 @@ RectTransform:
   m_Father: {fileID: 1298559526}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &676097322
 MonoBehaviour:
@@ -4015,7 +4015,7 @@ GameObject:
   - component: {fileID: 725742499}
   - component: {fileID: 725742498}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: IMG_Adrian
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4093,7 +4093,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &742701776
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4147,7 +4147,7 @@ RectTransform:
   m_Father: {fileID: 1672386589}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4420,7 +4420,7 @@ GameObject:
   - component: {fileID: 861125449}
   - component: {fileID: 861125448}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Start
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4975,7 +4975,7 @@ GameObject:
   - component: {fileID: 973647059}
   - component: {fileID: 973647058}
   m_Layer: 5
-  m_Name: Image (2)
+  m_Name: IMG_Simon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5215,7 +5215,7 @@ GameObject:
   - component: {fileID: 995088521}
   - component: {fileID: 995088520}
   m_Layer: 5
-  m_Name: TXT_Max Fps
+  m_Name: TMP_Max Fps
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5350,7 +5350,7 @@ GameObject:
   - component: {fileID: 995463859}
   - component: {fileID: 995463858}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_NewDeck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5781,7 +5781,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1034765008
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6195,7 +6195,7 @@ RectTransform:
   m_Father: {fileID: 424241848}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -6351,7 +6351,7 @@ GameObject:
   - component: {fileID: 1136668934}
   - component: {fileID: 1136668933}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Art
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7128,8 +7128,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1809045830}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.3333336}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 45.5}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -7446,7 +7446,7 @@ GameObject:
   - component: {fileID: 1328682441}
   - component: {fileID: 1328682440}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Save
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7581,7 +7581,7 @@ GameObject:
   - component: {fileID: 1336966937}
   - component: {fileID: 1336966936}
   m_Layer: 5
-  m_Name: Image (2)
+  m_Name: IMG_Illia
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7731,7 +7731,7 @@ GameObject:
   - component: {fileID: 1389876705}
   - component: {fileID: 1389876704}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Quit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7945,7 +7945,7 @@ GameObject:
   - component: {fileID: 1399083515}
   - component: {fileID: 1399083514}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_GameDesign
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8080,7 +8080,7 @@ GameObject:
   - component: {fileID: 1404973505}
   - component: {fileID: 1404973504}
   m_Layer: 5
-  m_Name: Music Slider
+  m_Name: TMP_Music Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8343,7 +8343,7 @@ GameObject:
   - component: {fileID: 1515949220}
   - component: {fileID: 1515949219}
   m_Layer: 5
-  m_Name: Image
+  m_Name: IMG_Andreas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8418,7 +8418,7 @@ GameObject:
   - component: {fileID: 1545308297}
   - component: {fileID: 1545308296}
   m_Layer: 5
-  m_Name: Image
+  m_Name: IMG_Philipp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8568,7 +8568,7 @@ GameObject:
   - component: {fileID: 1561954356}
   - component: {fileID: 1561954355}
   m_Layer: 5
-  m_Name: Image
+  m_Name: IMG_Nick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9071,7 +9071,7 @@ GameObject:
   - component: {fileID: 1615505317}
   - component: {fileID: 1615505316}
   m_Layer: 5
-  m_Name: SFX Slider
+  m_Name: TMP_SFX Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9753,7 +9753,7 @@ GameObject:
   - component: {fileID: 1711904202}
   - component: {fileID: 1711904201}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: IMG_Jan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9912,7 +9912,7 @@ GameObject:
   - component: {fileID: 1734878599}
   - component: {fileID: 1734878598}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Production
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10254,7 +10254,7 @@ GameObject:
   - component: {fileID: 1805766084}
   - component: {fileID: 1805766083}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Programming
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10837,7 +10837,7 @@ GameObject:
   - component: {fileID: 1927789417}
   - component: {fileID: 1927789416}
   m_Layer: 5
-  m_Name: TXT_Resolution
+  m_Name: TMP_Resolution
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11562,7 +11562,7 @@ GameObject:
   - component: {fileID: 2080098002}
   - component: {fileID: 2080098001}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: IMG_Steven
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11637,7 +11637,7 @@ GameObject:
   - component: {fileID: 2104511991}
   - component: {fileID: 2104511990}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TMP_Options
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
