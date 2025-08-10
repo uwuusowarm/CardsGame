@@ -15,6 +15,9 @@ public class Sound_Manager : MonoBehaviour
     public SoundMusic[] sounds;
     public SoundPicker[] soundPicker;
 
+
+#region bin mir fast sicher 100% GPT code von Adrian oder Jan
+
     private void Awake()
     {
         if (instance == null) { instance = this; }
@@ -41,6 +44,7 @@ public class Sound_Manager : MonoBehaviour
         }
     }
 
+   
     public void PlayRandomFromGroup(string groupName)
     {
         SoundPicker picker = Array.Find(soundPicker, p => p.soundgroup == groupName);
@@ -59,8 +63,7 @@ public class Sound_Manager : MonoBehaviour
         tempSource.Play();
         Destroy(tempSource, clip.length);
     }
-
-    #region Unveränderter Code
+   
     private void Start()
     {
         if (SceneManager.GetActiveScene().name == "DefaultLevel")
@@ -83,5 +86,7 @@ public class Sound_Manager : MonoBehaviour
         }
         s.source.Play();
     }
+
     #endregion
+
 }

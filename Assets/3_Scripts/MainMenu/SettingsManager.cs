@@ -1,25 +1,25 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Audio; 
+using UnityEngine.Audio;
 using System.Collections.Generic;
 
 public class SettingsManager : MonoBehaviour
 {
-    public static SettingsManager Instance { get; private set; }
+    public static SettingsManager Instance { get; set; }
 
     [Header("Audio")]
-    [SerializeField] private AudioMixer mainAudioMixer; 
-    [SerializeField] private Slider musicVolumeSlider; 
-    [SerializeField] private Slider sfxVolumeSlider;  
+    [SerializeField] AudioMixer mainAudioMixer;
+    [SerializeField] Slider musicVolumeSlider;
+    [SerializeField] Slider sfxVolumeSlider;
 
     [Header("Options Panel")]
-    [SerializeField] private GameObject optionsPanel;
+    [SerializeField] GameObject optionsPanel;
 
     [Header("Display")]
-    [SerializeField] private TMP_Dropdown resolutionDropdown;
+    [SerializeField] TMP_Dropdown resolutionDropdown;
 
-    private Resolution[] resolutions;
+    Resolution[] resolutions;
 
     void Awake()
     {
@@ -37,9 +37,12 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
+    #region debug von gpt bin fast crashout gegangen
+
     public void SetMusicVolume(float volume)
     {
         float decibelValue = Mathf.Log10(volume) * 20;
+        
         Debug.Log("MUSIK-SLIDER: Setze MusicVolume auf " + decibelValue + " dB (Slider-Wert: " + volume + ")");
         mainAudioMixer.SetFloat("MusicVolume", decibelValue);
     }
@@ -47,15 +50,21 @@ public class SettingsManager : MonoBehaviour
     public void SetSFXVolume(float volume)
     {
         float decibelValue = Mathf.Log10(volume) * 20;
-        Debug.Log("SFX-SLIDER: Setze SFXVolume auf " + decibelValue + " dB (Slider-Wert: " + volume + ")");
+        
+        Debug.Log("SFX-SLIDERSFXVolume auf " + decibelValue + " dB (Slider-Wert: " + volume + ")");
         mainAudioMixer.SetFloat("SFXVolume", decibelValue);
     }
 
+    #endregion
+
     public void SaveSettings()
     {
-        if (resolutionDropdown != null) PlayerPrefs.SetInt("Resolution", resolutionDropdown.value);
-        if (musicVolumeSlider != null) PlayerPrefs.SetFloat("MusicVolume", musicVolumeSlider.value);
-        if (sfxVolumeSlider != null) PlayerPrefs.SetFloat("SFXVolume", sfxVolumeSlider.value);
+        if (resolutionDropdown != null) 
+            PlayerPrefs.SetInt("Resolution", resolutionDropdown.value);
+        if (musicVolumeSlider != null) 
+            PlayerPrefs.SetFloat("MusicVolume", musicVolumeSlider.value);
+        if (sfxVolumeSlider != null) 
+            PlayerPrefs.SetFloat("SFXVolume", sfxVolumeSlider.value);
 
         PlayerPrefs.Save();
     }
@@ -82,7 +91,6 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-    #region Unveränderter Code
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -135,9 +143,8 @@ public class SettingsManager : MonoBehaviour
             }
         }
         resolutionDropdown.AddOptions(options);
-        int savedResolutionIndex = PlayerPrefs.GetInt("Resolution", currentResolutionIndex);
-        resolutionDropdown.value = savedResolutionIndex;
+        int savedResolutions = PlayerPrefs.GetInt("Resolution", currentResolutionIndex);
+        resolutionDropdown.value = savedResolutions;
         resolutionDropdown.RefreshShownValue();
     }
-    #endregion
 }
