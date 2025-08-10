@@ -323,6 +323,7 @@ public class CardManager : MonoBehaviour
                 Sound_Manager.instance.Play("Discard");
 
             DrawExtraCards(_drawCount);
+
             //Sound Manager
             if (Sound_Manager.instance != null)
                 Sound_Manager.instance.Play("Deck_Shuffel");
@@ -334,6 +335,7 @@ public class CardManager : MonoBehaviour
         //Sound Manager
         if (Sound_Manager.instance != null)
             Sound_Manager.instance.Play("Deck_Shuffel");
+
         for (int card = 0; card < cardList.Count; card++)
         {
             int GetMeOuttaThisFuckingShuffleHell = Random.Range(card, cardList.Count);
