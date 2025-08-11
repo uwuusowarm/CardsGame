@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96a61ce38373274c97e49ef39b7eb27, type: 3}
+  m_Name: Card_37_Muddy Mash
+  m_EditorClassIdentifier: 
+  cardName: Muddy Mash
+  manaCost: 0
+  cardArt: {fileID: 0}
+  cardClass: 4
+  backgroundSprite: {fileID: 21300000, guid: cdb9deb755b573749ba0649aff9adba9, type: 3}
+  rarity: 0
+  borderSprite: {fileID: 21300000, guid: f27e6455f35991d43b1d632dbc02a8fe, type: 3}
+  leftEffects:
+  - effectType: 1
+    value: 2
+    isTemporary: 0
+    duration: 0
+    range: 0
+  rightEffects:
+  - effectType: 4
+    value: 2
+    isTemporary: 0
+    duration: 0
+    range: 0
+  alwaysEffects: []
+  leftEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
+  rightEffectIcon: {fileID: 21300000, guid: a3140e3babcf7c740b0fabd24226422c, type: 3}
+  cardPrefab: {fileID: 7000635845077388791, guid: 33fbae1f566db6945bb8cb57d62ffe17,
+    type: 3}
+  description: 
