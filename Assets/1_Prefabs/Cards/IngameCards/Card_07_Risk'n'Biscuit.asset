@@ -14,31 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Risk'n'Biscuit
   manaCost: 0
-  cardArt: {fileID: 0}
+  cardArt: {fileID: 21300000, guid: 46af7de6d52cf1c459c570cfe5170c2e, type: 3}
   cardClass: 0
   backgroundSprite: {fileID: 21300000, guid: 77a670940da9aba4ea7a0d9633558eaf, type: 3}
   rarity: 0
   borderSprite: {fileID: 21300000, guid: f27e6455f35991d43b1d632dbc02a8fe, type: 3}
   leftEffects:
-  - effectType: 0
-    value: 4
-    isTemporary: 0
-    duration: 0
-    range: 0
-  rightEffects:
   - effectType: 1
     value: 3
     isTemporary: 0
     duration: 0
     range: 0
+  rightEffects:
+  - effectType: 0
+    value: 3
+    isTemporary: 0
+    duration: 0
+    range: 0
   alwaysEffects:
-  - effectType: 6
+  - effectType: 7
     value: 1
     isTemporary: 0
     duration: 0
     range: 0
-  leftEffectIcon: {fileID: 21300000, guid: 8587820d2bca2ef429dec60d514637f5, type: 3}
-  rightEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
-  cardPrefab: {fileID: 7558490108403670900, guid: b83aeba7b6e119749a1848d4e10a782e,
+  leftEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
+  rightEffectIcon: {fileID: 21300000, guid: 8587820d2bca2ef429dec60d514637f5, type: 3}
+  cardPrefab: {fileID: 6119008284415605995, guid: b83aeba7b6e119749a1848d4e10a782e,
     type: 3}
   description: 

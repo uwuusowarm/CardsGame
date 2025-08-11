@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
@@ -66,14 +67,15 @@ public class Sound_Manager : MonoBehaviour
    
     private void Start()
     {
-        if (SceneManager.GetActiveScene().name == "DefaultLevel")
-        {
-            Play("Level_Music");
-        }
         if (SceneManager.GetActiveScene().name == "MainMenu")
         {
             Play("Main_Menu_Music");
         }
+        if (SceneManager.GetActiveScene().name == "Level1")
+        {
+            Play("Level_Music");
+        }
+        
     }
 
     public void Play(string name)
@@ -88,5 +90,18 @@ public class Sound_Manager : MonoBehaviour
     }
 
     #endregion
+
+    public void SoundPlay()
+    {
+        if (SceneManager.GetActiveScene().name == "Level3")
+        {
+            Play("Level_Music");
+        }
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+            Play("Main_Menu_Music");
+        }
+    }
+
 
 }
