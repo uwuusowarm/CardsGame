@@ -158,6 +158,7 @@ public class CardMenuManager : MonoBehaviour
         int currentDeckCount = allDecks.Count;
         int emptySlots = maxDeckCount - currentDeckCount;
 
+        //Tote Hose brauchen wir nich
         /*
         if (emptyDeckSlotPrefab != null)
         {
@@ -240,6 +241,7 @@ public class CardMenuManager : MonoBehaviour
         }
     }
 
+    //nicht anfassen danke
     void PopulateAllCardsList()
     {
         foreach (Transform child in CardsContainer)
