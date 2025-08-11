@@ -2825,6 +2825,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1165818145}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &376995238 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6295329446786773719, guid: db91694dccffe224ba6abd437549a4cb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1132971012}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &399448583
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7766,7 +7772,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 138549920546049762, guid: 300174d50ee720f4b801604303867876,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1753298248}
+      addedObject: {fileID: 1753298260}
     - targetCorrespondingSourceObject: {fileID: 138549920546049762, guid: 300174d50ee720f4b801604303867876,
         type: 3}
       insertIndex: -1
@@ -13940,28 +13946,6 @@ MonoBehaviour:
     delayBetweenMultiple: 0
   audioSource: {fileID: 0}
   maxSimultaneousSounds: 3
---- !u!114 &1753298248
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 541412168}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44c9fdc49f264ffe8fc5282ca992aa2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tooltips: []
-  tooltipCanvas: {fileID: 1373346835}
-  tooltipPrefab: {fileID: 1994029546955829255, guid: c04715c8396a38e46b3d96853a6e3249,
-    type: 3}
-  skipTutorialButton: {fileID: 0}
-  startAutomatically: 1
-  delayBetweenTooltips: 0.4
-  pauseGameDuringTutorial: 1
-  tooltipAppearSound: {fileID: 0}
-  tooltipAdvanceSound: {fileID: 0}
 --- !u!114 &1753298254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13984,6 +13968,141 @@ MonoBehaviour:
   legendaryChancePerKill: 1
   minKillsForRareBonus: 3
   minKillsForLegendaryBonus: 8
+--- !u!114 &1753298260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 541412168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44c9fdc49f264ffe8fc5282ca992aa2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tooltips:
+  - title: Welcome,
+    description: "Well met, adventurer! I\u2019m Sir Deckster, master of cards and
+      questionable life choices. I\u2019ll be your guide for your first steps."
+    backgroundSprite: {fileID: 0}
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    position: {x: 0, y: 0}
+    size: {x: 600, y: 600}
+    targetObject: {fileID: 0}
+    highlightTarget: 1
+    targetOffset: {x: 0, y: 0}
+    customHighlightMaterial: {fileID: 2100000, guid: a1d5ba0bb9134df4785ba2bc5c32b414,
+      type: 2}
+    highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    fadeInDuration: 0.3
+    fadeOutDuration: 0.2
+    waitForSpecificClick: 0
+  - title: This is you
+    description: With holding right you can turn you camera around
+    backgroundSprite: {fileID: 0}
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    position: {x: 0, y: 0}
+    size: {x: 600, y: 600}
+    targetObject: {fileID: 376995238}
+    highlightTarget: 1
+    targetOffset: {x: 400, y: 0}
+    customHighlightMaterial: {fileID: 2100000, guid: a1d5ba0bb9134df4785ba2bc5c32b414,
+      type: 2}
+    highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    fadeInDuration: 0.1
+    fadeOutDuration: 0.2
+    waitForSpecificClick: 0
+  - title: Hand
+    description: Here are your cards. You can drag them left or right to activate
+      the effect on that side. The effect underneath is always activated if needed.
+    backgroundSprite: {fileID: 0}
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    position: {x: 0, y: 100}
+    size: {x: 600, y: 600}
+    targetObject: {fileID: 376995238}
+    highlightTarget: 1
+    targetOffset: {x: 0, y: 100}
+    customHighlightMaterial: {fileID: 2100000, guid: a1d5ba0bb9134df4785ba2bc5c32b414,
+      type: 2}
+    highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    fadeInDuration: 0.1
+    fadeOutDuration: 0.2
+    waitForSpecificClick: 0
+  - title: Deck
+    description: Clicking on your Deck costs you one Actionpoint but refreshes you
+      4 new Cards in Hand.
+    backgroundSprite: {fileID: 0}
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    position: {x: 400, y: 0}
+    size: {x: 600, y: 600}
+    targetObject: {fileID: 682853005}
+    highlightTarget: 1
+    targetOffset: {x: 0, y: 100}
+    customHighlightMaterial: {fileID: 2100000, guid: a1d5ba0bb9134df4785ba2bc5c32b414,
+      type: 2}
+    highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    fadeInDuration: 0.1
+    fadeOutDuration: 0.2
+    waitForSpecificClick: 0
+  - title: Discard Pile
+    description: Next to your Deck is your Discard Pile whenever your Deck empties
+      out you reshuffle this pile into your Deck.
+    backgroundSprite: {fileID: 0}
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    position: {x: 400, y: 0}
+    size: {x: 600, y: 600}
+    targetObject: {fileID: 836372841}
+    highlightTarget: 1
+    targetOffset: {x: 0, y: 100}
+    customHighlightMaterial: {fileID: 2100000, guid: a1d5ba0bb9134df4785ba2bc5c32b414,
+      type: 2}
+    highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    fadeInDuration: 0.3
+    fadeOutDuration: 0.2
+    waitForSpecificClick: 0
+  - title: Exhaustion
+    description: 'The more you reshuffle the higher your Exhaust Level. If it reaches
+      15,
+
+      you loose the run.'
+    backgroundSprite: {fileID: 0}
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    position: {x: 400, y: 0}
+    size: {x: 600, y: 600}
+    targetObject: {fileID: 836372841}
+    highlightTarget: 1
+    targetOffset: {x: 0, y: 100}
+    customHighlightMaterial: {fileID: 2100000, guid: a1d5ba0bb9134df4785ba2bc5c32b414,
+      type: 2}
+    highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    fadeInDuration: 0.3
+    fadeOutDuration: 0.2
+    waitForSpecificClick: 0
+  - title: Hp and Defense
+    description: Over here are your Vital Points, you will loose while fighting the
+      Dungeons threads.
+    backgroundSprite: {fileID: 0}
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    position: {x: 0, y: 0}
+    size: {x: 600, y: 600}
+    targetObject: {fileID: 1577063392}
+    highlightTarget: 1
+    targetOffset: {x: 0, y: -400}
+    customHighlightMaterial: {fileID: 2100000, guid: a1d5ba0bb9134df4785ba2bc5c32b414,
+      type: 2}
+    highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    fadeInDuration: 0.1
+    fadeOutDuration: 0.2
+    waitForSpecificClick: 0
+  tooltipCanvas: {fileID: 1373346835}
+  tooltipPrefab: {fileID: 1994029546955829255, guid: c04715c8396a38e46b3d96853a6e3249,
+    type: 3}
+  skipTutorialButton: {fileID: 0}
+  startAutomatically: 1
+  delayBetweenTooltips: 0.4
+  pauseGameDuringTutorial: 1
+  tooltipAppearSound: {fileID: 0}
+  tooltipAdvanceSound: {fileID: 0}
 --- !u!4 &1755342678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4621907154294210400, guid: 945d2eceaf823fe49a9b09df8c1b6773,
@@ -14002,6 +14121,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ItemTooltipText
+      objectReference: {fileID: 0}
+    - target: {fileID: 6166926855489271865, guid: 48e94db8c6e178749a6071bbd3d4bf5a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7704449860527938775, guid: 48e94db8c6e178749a6071bbd3d4bf5a,
         type: 3}
