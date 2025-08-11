@@ -104,7 +104,7 @@ public class CardManager : MonoBehaviour
                 {
                     _maxCardRotation = 20f,
                     _cardHeightDisplacement = 15f,
-                    _cardSpacing = 70f,
+                    _cardSpacing = 100f,
                     _hoverScaleMultiplier = 1.5f
                 };
                 break;
@@ -113,7 +113,7 @@ public class CardManager : MonoBehaviour
                 {
                     _maxCardRotation = 20f,
                     _cardHeightDisplacement = 15f,
-                    _cardSpacing = 70f,
+                    _cardSpacing = 100f,
                     _hoverScaleMultiplier = 1.5f
                 };
                 break;
@@ -122,7 +122,7 @@ public class CardManager : MonoBehaviour
                 {
                     _maxCardRotation = 10f,
                     _cardHeightDisplacement = 0f,
-                    _cardSpacing = 70f,
+                    _cardSpacing = 100f,
                     _hoverScaleMultiplier = 1.5f
                 };
                 break;
