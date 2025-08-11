@@ -10,6 +10,8 @@ public class MainMenu : MonoBehaviour
     [Header("UI Panels")]
     [SerializeField] GameObject cardMenuPanel;
     [SerializeField] GameObject creditsPanel;
+    [SerializeField] GameObject creditsPanel2;
+    [SerializeField] GameObject creditsPanel3;
     [SerializeField] GameObject deckSelectionPanel;
 
     [Header("Main Buttons")]
@@ -23,6 +25,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] CardMenuManager cardMenuManager;
     [SerializeField] Transform deckSelectionContainer;
     [SerializeField] Button playGameButton;
+    [SerializeField]
 
     GameObject settingsPanel;
     GameObject currentlyActivePanel;
@@ -131,6 +134,11 @@ public class MainMenu : MonoBehaviour
             deckSelectionPanel.SetActive(false);
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
+        if (creditsPanel2 != null) 
+            creditsPanel2.SetActive(false);
+        if (creditsPanel3 != null)        
+            creditsPanel3.SetActive(false);
+        
         currentlyActivePanel = null;
     }
 
@@ -143,6 +151,17 @@ public class MainMenu : MonoBehaviour
     {
         TogglePanel(creditsPanel);
     }
+
+    public void OnCreditsNextButtonPressed1()
+    {
+        TogglePanel(creditsPanel2);
+    }
+
+    public void OnCreditsNextButtonPressed2()
+    {
+        TogglePanel(creditsPanel3);
+    }
+
 
     public void OnSettingsButtonPressed()
     {
