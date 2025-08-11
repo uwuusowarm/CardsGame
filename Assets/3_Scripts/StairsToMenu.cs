@@ -7,6 +7,8 @@ public class StairsToMenu : MonoBehaviour
     private Hex myHex;
     private bool isInitialized = false;
     
+    public static StairsToMenu Instance { get; private set; }
+
     public int scene;
 
     private IEnumerator Start()

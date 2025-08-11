@@ -236,6 +236,6 @@ public class LevelRewardUI : MonoBehaviour
             LevelRewardSystem.Instance.ResetKillCount();
         
         Debug.Log("Continuing to next level...");
-        StairsToMenu.NextLevel();
+        StairsToMenu.Instance.NextLevel();
     }
 }
