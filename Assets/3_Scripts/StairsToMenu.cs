@@ -13,7 +13,9 @@ public class StairsToMenu : MonoBehaviour
 
     private IEnumerator Start()
     {
-        yield return new WaitUntil(() => HexGrid.Instance != null);
+        Instance = this;
+
+        yield return new WaitUntil(() => HexGrid.Instance != null && HexGrid.Instance.GetAllHexes().Count > 0);
 
         myHex = GetHexBelow();
 

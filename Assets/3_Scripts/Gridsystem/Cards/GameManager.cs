@@ -213,7 +213,7 @@ public class GameManager : MonoBehaviour
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
         }
-        UpdateExhaustLevel();;
+        PlayerStatusUI.Instance.UpdateExhaustLevel(ExhaustionSystem.Instance.GetExhaustionStacks());
     }
     
     private void UpdateExhaustLevel()
