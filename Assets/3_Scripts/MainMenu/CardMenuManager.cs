@@ -5,13 +5,49 @@ using TMPro;
 
 public class CardMenuManager : MonoBehaviour
 {
+
+    public void OpenEditDeckEditor()
+    {
+        if (currentlyEditingDeck == null)
+            return;
+
+        if (MainMenu.Instance != null)
+        {
+            MainMenu.Instance.CloseAllPanels();
+        }
+
+        SetMainMenuButtonsInteractable(false);
+        SelectedCards = new List<CardData>(currentlyEditingDeck.Cards);
+        if (deckEditorSlideout != null)
+            deckEditorSlideout.SetActive(true);
+        PopulateAllCardsList();
+        UpdateSaveButtonState();
+        UpdateCardCounter();
+    }
+
+    public void OpenNewDeckEditor()
+    {
+        if (MainMenu.Instance != null)
+        {
+            MainMenu.Instance.CloseAllPanels();
+        }
+
+        currentlyEditingDeck = null;
+        SetMainMenuButtonsInteractable(false);
+        SelectedCards.Clear();
+        if (deckEditorSlideout != null)
+            deckEditorSlideout.SetActive(true);
+        PopulateAllCardsList();
+        UpdateSaveButtonState();
+        UpdateCardCounter();
+    }
+
     [Header("UI Panels")]
     [SerializeField] GameObject deckEditorSlideout;
 
     [Header("Deck Display")]
     [SerializeField] Transform decksDisplayContainer;
     [SerializeField] public GameObject deckDisplayPrefab;
-    [SerializeField] GameObject emptyDeckPrefab;
     [SerializeField] Button newDeck;
     [SerializeField] TextMeshProUGUI deckCounter;
 
@@ -38,6 +74,69 @@ public class CardMenuManager : MonoBehaviour
         PopulateDeckDisplay();
     }
 
+    public void ReloadDecksFromFile()
+    {
+        allDecks = SaveSystem.LoadDecks();
+        if (allDecks == null)
+        {
+            allDecks = new List<Deck>();
+        }
+    }
+
+    void UpdateSaveButtonState()
+    {
+        if (saveDeck != null)
+        {
+            saveDeck.interactable = (SelectedCards.Count == 15);
+        }
+    }
+
+    void SetMainMenuButtonsInteractable(bool isInteractable)
+    {
+        if (MainMenu.Instance != null)
+        {
+            MainMenu.Instance.SetMainMenuButtonsInteractable(isInteractable);
+        }
+        if (newDeck != null)
+            newDeck.interactable = isInteractable;
+        if (saveDeck != null)
+            saveDeck.interactable = false;
+    }
+
+    public void SaveDeckAndCloseEditor()
+    {
+        if (currentlyEditingDeck != null)
+        {
+            currentlyEditingDeck.Cards = new List<CardData>(SelectedCards);
+        }
+        else
+        {
+            if (allDecks.Count >= maxDeckCount)
+                return;
+
+            Deck newDeck = new Deck();
+            newDeck.DeckName = "" + (allDecks.Count + 1);
+            newDeck.Cards = new List<CardData>(SelectedCards);
+            allDecks.Add(newDeck);
+        }
+        SaveSystem.SaveDecks(allDecks);
+        if (deckEditorSlideout != null)
+            deckEditorSlideout.SetActive(false);
+        PopulateDeckDisplay();
+        SetMainMenuButtonsInteractable(true);
+    }
+
+    public void DeleteSelectedDeck()
+    {
+        if (currentlyEditingDeck == null)
+            return;
+        allDecks.Remove(currentlyEditingDeck);
+        SaveSystem.SaveDecks(allDecks);
+        currentlyEditingDeck = null;
+        DeckUI = null;
+        PopulateDeckDisplay();
+    }
+
     public void PopulateDeckDisplay()
     {
         if (decksDisplayContainer == null)
@@ -59,95 +158,17 @@ public class CardMenuManager : MonoBehaviour
         int currentDeckCount = allDecks.Count;
         int emptySlots = maxDeckCount - currentDeckCount;
 
-        if (emptyDeckPrefab != null)
+        /*
+        if (emptyDeckSlotPrefab != null)
         {
             for (int i = 0; i < emptySlots; i++)
             {
-                Instantiate(emptyDeckPrefab, decksDisplayContainer);
+                Instantiate(emptyDeckSlotPrefab, decksDisplayContainer);
             }
         }
+        */
 
         UpdateDeckCounterAndNewButton();
-    }
-
-    public void ReloadDecksFromFile()
-    {
-        allDecks = SaveSystem.LoadDecks();
-        if (allDecks == null)
-        {
-            allDecks = new List<Deck>();
-        }
-    }
-
-    public void OpenEditDeckEditor()
-    {
-        if (currentlyEditingDeck == null) return;
-        SetMainMenuButtonsInteractable(false);
-        SelectedCards = new List<CardData>(currentlyEditingDeck.Cards);
-        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
-        PopulateAllCardsList();
-        UpdateSaveButtonState();
-        UpdateCardCounter();
-    }
-
-    public void OpenNewDeckEditor()
-    {
-        currentlyEditingDeck = null;
-        SetMainMenuButtonsInteractable(false);
-        SelectedCards.Clear();
-        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(true);
-        PopulateAllCardsList();
-        UpdateSaveButtonState();
-        UpdateCardCounter();
-    }
-
-    void UpdateSaveButtonState()
-    {
-        if (saveDeck != null)
-        {
-            saveDeck.interactable = (SelectedCards.Count == 15);
-        }
-    }
-
-    void SetMainMenuButtonsInteractable(bool isInteractable)
-    {
-        if (MainMenu.Instance != null)
-        {
-            MainMenu.Instance.SetMainMenuButtonsInteractable(isInteractable);
-        }
-        if (newDeck != null) newDeck.interactable = isInteractable;
-        if (saveDeck != null) saveDeck.interactable = false;
-    }
-
-    public void SaveDeckAndCloseEditor()
-    {
-        if (currentlyEditingDeck != null)
-        {
-            currentlyEditingDeck.Cards = new List<CardData>(SelectedCards);
-        }
-        else
-        {
-            if (allDecks.Count >= maxDeckCount) return;
-
-            Deck newDeck = new Deck();
-            newDeck.DeckName = "" + (allDecks.Count + 1);
-            newDeck.Cards = new List<CardData>(SelectedCards);
-            allDecks.Add(newDeck);
-        }
-        SaveSystem.SaveDecks(allDecks);
-        if (deckEditorSlideout != null) deckEditorSlideout.SetActive(false);
-        PopulateDeckDisplay();
-        SetMainMenuButtonsInteractable(true);
-    }
-
-    public void DeleteSelectedDeck()
-    {
-        if (currentlyEditingDeck == null) return;
-        allDecks.Remove(currentlyEditingDeck);
-        SaveSystem.SaveDecks(allDecks);
-        currentlyEditingDeck = null;
-        DeckUI = null;
-        PopulateDeckDisplay();
     }
 
     void UpdateDeckCounterAndNewButton()
@@ -170,6 +191,7 @@ public class CardMenuManager : MonoBehaviour
         if (SelectedCards.Contains(card))
         {
             SelectedCards.Remove(card);
+
         }
         else
         {
@@ -196,7 +218,13 @@ public class CardMenuManager : MonoBehaviour
         return allDecks;
     }
 
-    public GameObject DeckDisplayPrefab { get { return deckDisplayPrefab; } }
+    public GameObject DeckDisplayPrefab
+    {
+        get
+        {
+            return deckDisplayPrefab;
+        }
+    }
 
     public void SelectDeckForEditing(DeckUI selectedUI)
     {
@@ -214,16 +242,19 @@ public class CardMenuManager : MonoBehaviour
 
     void PopulateAllCardsList()
     {
-        foreach (Transform child in CardsContainer) Destroy(child.gameObject);
+        foreach (Transform child in CardsContainer)
+            Destroy(child.gameObject);
         spawnedCardUI.Clear();
-        if (cardDatabase._allCards == null) return;
+        if (cardDatabase._allCards == null)
+            return;
 
         GridLayoutGroup gridLayout = CardsContainer.GetComponent<GridLayoutGroup>();
         Vector2 targetCellSize = (gridLayout != null) ? gridLayout.cellSize : new Vector2(100, 150);
 
         foreach (var cardData in cardDatabase._allCards)
         {
-            if (cardData.cardPrefab == null) continue;
+            if (cardData.cardPrefab == null)
+                continue;
             GameObject wrapperGameObject = Instantiate(cardInListPrefab, CardsContainer);
             CardSelectorUI cardUI = wrapperGameObject.GetComponent<CardSelectorUI>();
             if (cardUI != null)
