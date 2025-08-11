@@ -31,7 +31,9 @@ public class CardManager : MonoBehaviour
     [SerializeField] Transform leftGrid;
     [SerializeField] Transform rightGrid;
     [SerializeField] Transform discardGrid;
-    [SerializeField] GameObject cardPrefab;
+    [SerializeField] public GameObject cardPrefab;
+
+    public GameObject CardPrefab => cardPrefab;
 
     [Header("Gameplay")]
     [SerializeField] float autoDiscardDelay = 1f;
