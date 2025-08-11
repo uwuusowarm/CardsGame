@@ -13111,6 +13111,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1549458550830430638, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: musicMixerGroup
+      value: 
+      objectReference: {fileID: -2903960994475835150, guid: b788ec92d24ca94429cb927012cf1beb,
+        type: 2}
+    - target: {fileID: 1549458550830430638, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      propertyPath: sounds.Array.data[28].loop
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7356424615175957051, guid: 59f832ea27e436145b66e1640f9a9536,
         type: 3}
       propertyPath: m_Name
@@ -17193,7 +17204,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 1, y: 0}
-  m_SizeDelta: {x: 0, y: -100}
+  m_SizeDelta: {x: -90, y: -100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2066669737
 MonoBehaviour:
