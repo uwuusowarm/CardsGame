@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 public class MainMenu : MonoBehaviour
 {
-    public static MainMenu Instance { get; set; }
+    public static MainMenu Instance { get; private set; } 
 
     [Header("UI Panels")]
     [SerializeField] GameObject cardMenuPanel;
     [SerializeField] GameObject creditsPanel;
     [SerializeField] GameObject creditsPanel2;
-    // [SerializeField] GameObject creditsPanel3;
     [SerializeField] GameObject deckSelectionPanel;
+    [SerializeField] GameObject deckPanelBackground;
 
     [Header("Main Buttons")]
     [SerializeField] Button startButton;
@@ -25,7 +25,6 @@ public class MainMenu : MonoBehaviour
     [SerializeField] CardMenuManager cardMenuManager;
     [SerializeField] Transform deckSelectionContainer;
     [SerializeField] Button playGameButton;
-    [SerializeField]
 
     GameObject settingsPanel;
     GameObject currentlyActivePanel;
@@ -51,6 +50,24 @@ public class MainMenu : MonoBehaviour
             settingsPanel = SettingsManager.Instance.GetOptionsPanelObject();
         }
         CloseAllPanels();
+    }
+
+    public void CloseAllPanels()
+    {
+        if (cardMenuPanel != null)
+            cardMenuPanel.SetActive(false);
+        if (creditsPanel != null)
+            creditsPanel.SetActive(false);
+        if (deckSelectionPanel != null)
+            deckSelectionPanel.SetActive(false);
+        if (settingsPanel != null)
+            settingsPanel.SetActive(false);
+        if (creditsPanel2 != null)
+            creditsPanel2.SetActive(false);
+        if (deckPanelBackground != null)
+            deckPanelBackground.SetActive(false); 
+
+        currentlyActivePanel = null;
     }
 
     public void OnStartButtonPressed()
@@ -119,27 +136,13 @@ public class MainMenu : MonoBehaviour
 
         if (!isAlreadyActive)
         {
+            if (panelToToggle == cardMenuPanel && deckPanelBackground != null)
+            {
+                deckPanelBackground.SetActive(true);
+            }
             panelToToggle.SetActive(true);
             currentlyActivePanel = panelToToggle;
         }
-    }
-
-    void CloseAllPanels()
-    {
-        if (cardMenuPanel != null)
-            cardMenuPanel.SetActive(false);
-        if (creditsPanel != null)
-            creditsPanel.SetActive(false);
-        if (deckSelectionPanel != null)
-            deckSelectionPanel.SetActive(false);
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
-        if (creditsPanel2 != null)
-            creditsPanel2.SetActive(false);
-        /*    if (creditsPanel3 != null)        
-                creditsPanel3.SetActive(false);
-            */
-        currentlyActivePanel = null;
     }
 
     public void OnDeckMenuButtonPressed()
@@ -213,5 +216,4 @@ public class MainMenu : MonoBehaviour
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
     }
-
 }
