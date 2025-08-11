@@ -343,7 +343,7 @@ public class CardManager : MonoBehaviour
             int GetMeOuttaThisFuckingShuffleHell = Random.Range(card, cardList.Count);
             var tmp = cardList[card];
             cardList[card] = cardList[GetMeOuttaThisFuckingShuffleHell];
-            cardList[card] = tmp;
+            cardList[GetMeOuttaThisFuckingShuffleHell] = tmp;
         }
     }
 }
