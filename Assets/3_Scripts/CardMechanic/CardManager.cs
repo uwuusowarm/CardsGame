@@ -95,6 +95,8 @@ public class CardManager : MonoBehaviour
 
         HandLayoutSettings currentSettings = null;
 
+        #region DESGINER HIER HAND LAYOUT ANPASSEN WENN NÖTIG
+
         switch (handCardObjects.Count)
         {
             case 4:
@@ -135,6 +137,7 @@ public class CardManager : MonoBehaviour
                 break;
         }
 
+        #endregion
 
         if (currentSettings == null)
             return;
@@ -142,6 +145,7 @@ public class CardManager : MonoBehaviour
         float HandWidth = (handCardObjects.Count - 1) * currentSettings._cardSpacing;
         float start = -(HandWidth / 2f);
 
+        //anordnung für hand 
         for (int abc123 = 0; abc123 < handCardObjects.Count; abc123++)
         {
             CardDragHandler cardHandler = handCardObjects[abc123];
