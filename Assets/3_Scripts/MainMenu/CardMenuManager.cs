@@ -10,7 +10,7 @@ public class CardMenuManager : MonoBehaviour
 
     [Header("Deck Display")]
     [SerializeField] Transform decksDisplayContainer;
-    [SerializeField] public GameObject deckDisplayPrefab; //Lasst den scheiss public ihr cocks
+    [SerializeField] public GameObject deckDisplayPrefab; //Lasst den scheiss public amk
     [SerializeField] Button newDeck;
     [SerializeField] TextMeshProUGUI deckCounter;
 
@@ -42,6 +42,7 @@ public class CardMenuManager : MonoBehaviour
         allDecks = SaveSystem.LoadDecks();
         if (allDecks == null)
         {
+            //wie auch immer keine da sein sollten zur sicherheit
             allDecks = new List<Deck>();
         }
     }
@@ -124,6 +125,7 @@ public class CardMenuManager : MonoBehaviour
         currentlyEditingDeck = null;
         DeckUI = null;
         PopulateDeckDisplay();
+        //Garbage Collect auf wish
     }
 
     public void PopulateDeckDisplay()
@@ -214,6 +216,7 @@ public class CardMenuManager : MonoBehaviour
         }
     }
 
+    //nichmehr anfassen danke
     void PopulateAllCardsList()
     {
         foreach (Transform child in CardsContainer) 

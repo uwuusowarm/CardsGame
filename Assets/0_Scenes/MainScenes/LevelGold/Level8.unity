@@ -6530,6 +6530,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 421388308}
     m_Modifications:
+    - target: {fileID: -8426433675378792983, guid: bcff4f3bb2be0f949b55646b3feffe5a,
+        type: 3}
+      propertyPath: scene
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 5037261234380186017, guid: bcff4f3bb2be0f949b55646b3feffe5a,
         type: 3}
       propertyPath: m_Name
@@ -7911,34 +7916,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1049244928}
   m_CullTransparentMesh: 1
---- !u!1 &1068285592 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7356424615175957051, guid: 59f832ea27e436145b66e1640f9a9536,
-    type: 3}
-  m_PrefabInstance: {fileID: 1685423264}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1068285595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1068285592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d303ab900f034bca8e2fc08a4539b8ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
-  rewardCardsCount: 3
-  commonChance: 70
-  rareChance: 25
-  legendaryChance: 5
-  monsterChance: 0
-  rareChancePerKill: 2
-  legendaryChancePerKill: 1
-  minKillsForRareBonus: 3
-  minKillsForLegendaryBonus: 8
 --- !u!1 &1073897401
 GameObject:
   m_ObjectHideFlags: 0
@@ -8225,6 +8202,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1753298248}
+    - targetCorrespondingSourceObject: {fileID: 138549920546049762, guid: 300174d50ee720f4b801604303867876,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1753298249}
   m_SourcePrefab: {fileID: 100100000, guid: 300174d50ee720f4b801604303867876, type: 3}
 --- !u!1001 &1141889227
 PrefabInstance:
@@ -12434,7 +12415,6 @@ GameObject:
   - component: {fileID: 1487355500}
   - component: {fileID: 1487355501}
   - component: {fileID: 1487355502}
-  - component: {fileID: 1487355503}
   m_Layer: 5
   m_Name: RewardPanel
   m_TagString: Untagged
@@ -12497,28 +12477,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &1487355503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1487355499}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d303ab900f034bca8e2fc08a4539b8ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
-  rewardCardsCount: 3
-  commonChance: 70
-  rareChance: 25
-  legendaryChance: 5
-  monsterChance: 0
-  rareChancePerKill: 2
-  legendaryChancePerKill: 1
-  minKillsForRareBonus: 3
-  minKillsForLegendaryBonus: 8
 --- !u!1 &1499199049
 GameObject:
   m_ObjectHideFlags: 0
@@ -14885,11 +14843,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7356424615175957051, guid: 59f832ea27e436145b66e1640f9a9536,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1068285595}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 59f832ea27e436145b66e1640f9a9536, type: 3}
 --- !u!1001 &1689816033
 PrefabInstance:
@@ -15618,6 +15572,28 @@ MonoBehaviour:
   pauseGameDuringTutorial: 1
   tooltipAppearSound: {fileID: 0}
   tooltipAdvanceSound: {fileID: 0}
+--- !u!114 &1753298249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 541412168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d303ab900f034bca8e2fc08a4539b8ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
+  rewardCardsCount: 3
+  commonChance: 70
+  rareChance: 25
+  legendaryChance: 5
+  monsterChance: 0
+  rareChancePerKill: 2
+  legendaryChancePerKill: 1
+  minKillsForRareBonus: 3
+  minKillsForLegendaryBonus: 8
 --- !u!1001 &1756651039
 PrefabInstance:
   m_ObjectHideFlags: 0
