@@ -60,7 +60,9 @@ public class TutorialTooltipManager : MonoBehaviour
     {
         if (tutorialActive && waitingForClick)
         {
-            if (Input.GetMouseButtonDown(0))
+            TooltipData currentData = tooltips[currentTooltipIndex];
+        
+            if (!currentData.waitForSpecificClick && Input.GetMouseButtonDown(0))
             {
                 HandleMouseClick();
             }
@@ -436,11 +438,6 @@ public class TutorialTooltipManager : MonoBehaviour
         if (!waitingForClick) return;
 
         TooltipData currentData = tooltips[currentTooltipIndex];
-
-        if (currentData.waitForSpecificClick)
-        {
-            return;
-        }
 
         waitingForClick = false;
         PlaySound(tooltipAdvanceSound);
