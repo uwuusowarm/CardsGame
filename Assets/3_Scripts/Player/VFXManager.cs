@@ -11,6 +11,7 @@ public class VFXManager : MonoBehaviour
         Block,
         Attack,
         Death,
+        Stun,
         LevelUp,
         Poison,
         Shield,
@@ -273,6 +274,10 @@ public class VFXManager : MonoBehaviour
     public void PlayBlockVFX(Transform target) => PlayVFX(VFXType.Block, target);
     public void PlayAttackVFX(Vector3 position) => PlayVFX(VFXType.Attack, position);
     public void PlayDeathVFX(Transform target) => PlayVFX(VFXType.Death, target);
+    
+    public void PlayStunVFX(Vector3 position) => PlayVFX(VFXType.Stun, position);
+    public void PlayStunVFX(Transform target) => PlayVFX(VFXType.Stun, target);
+    public void PlayStunVFX(GameObject target) => PlayVFX(VFXType.Stun, target);
     #endregion
 
     #region Editor Helpers

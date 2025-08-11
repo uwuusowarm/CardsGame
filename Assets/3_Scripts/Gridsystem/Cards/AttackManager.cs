@@ -209,7 +209,6 @@ public class AttackManager : MonoBehaviour
         return result;
     }
 
-
     public void HandleEnemyClick(EnemyUnit enemy)
     {
         if (!GameManager.Instance.IsAttackAvailable()) return;
@@ -224,6 +223,19 @@ public class AttackManager : MonoBehaviour
                 enemy.ApplyPoison(poisonDuration);
                 Debug.Log($"Applied poison to {enemy.name} for {poisonDuration} turns from poisoned attack");
                 GameManager.Instance.ClearPoisonAttack();
+            }
+
+            if (GameManager.Instance.IsStunAttackActive())
+            {
+                var stunDuration = GameManager.Instance.GetPendingStunDuration();
+                enemy.ApplyStun(stunDuration);
+                Debug.Log($"Applied stun to {enemy.name} for {stunDuration} turns from stunned attack");
+                GameManager.Instance.ClearStunAttack();
+                
+                if (VFXManager.Instance != null)
+                {
+                    VFXManager.Instance.PlayVFX(VFXManager.VFXType.Stun, enemy.transform);
+                }
             }
 
             ClearHighlights();
