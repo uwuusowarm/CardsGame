@@ -6,19 +6,19 @@ using System.Collections;
 
 public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private GameObject highlightOverlay;
-    [SerializeField] private Transform cardParent;
-    [SerializeField] private float hoverScaleFactor = 1.1f;
-    [SerializeField] private float scaleDuration = 0.1f;
+    [SerializeField] GameObject highlightOverlay;
+    [SerializeField] Transform cardParent;
+    [SerializeField] float hoverScaleFactor = 1.1f;
+    [SerializeField] float scaleDuration = 0.1f;
 
-    private CardData assignedCard;
-    private CardMenuManager cardMenuManager;
-    private bool isCurrentlySelected = false;
-    private Vector3 originalScale;
-    private Coroutine scaleCoroutine;
-    private LayoutElement layoutElement;
+    CardData assignedCard;
+    CardMenuManager cardMenuManager;
+    bool isSelected = false;
+    Vector3 originalScale;
+    Coroutine scaleCoroutine;
+    LayoutElement layoutElement;
 
-    private void Awake()
+    void Awake()
     {
         originalScale = transform.localScale;
         layoutElement = GetComponent<LayoutElement>();
@@ -28,7 +28,7 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         this.assignedCard = card;
         this.cardMenuManager = menuManager;
-        this.isCurrentlySelected = isSelected;
+        this.isSelected = isSelected;
 
         Graphic raycastTargetGraphic = GetComponent<Graphic>();
         if (raycastTargetGraphic != null)
@@ -59,7 +59,7 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         GetComponent<Button>().onClick.AddListener(OnCardClicked);
     }
 
-    private void TameCardInstance(GameObject cardInstance)
+    void TameCardInstance(GameObject cardInstance)
     {
         if (cardInstance.TryGetComponent<CardDragHandler>(out var dragHandler))
         {
@@ -71,21 +71,21 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             canvasGroup.blocksRaycasts = false;
         }
 
-        TextMeshProUGUI[] allTextComponents = cardInstance.GetComponentsInChildren<TextMeshProUGUI>(true);
-        foreach (var textComponent in allTextComponents)
+        TextMeshProUGUI[] allText = cardInstance.GetComponentsInChildren<TextMeshProUGUI>(true);
+        foreach (var text in allText)
         {
-            if (textComponent.fontMaterial.name.Contains("_Masked"))
+            if (text.fontMaterial.name.Contains("_Masked"))
             {
                 continue;
             }
 
-            Material editableMaterial = new Material(textComponent.fontMaterial);
+            Material editableMaterial = new Material(text.fontMaterial);
             editableMaterial.EnableKeyword("MASK_HARD");
-            textComponent.fontMaterial = editableMaterial;
+            text.fontMaterial = editableMaterial;
         }
     }
 
-    private void ScaleCardToFit(GameObject cardInstance, Transform parentContainer, Vector2 targetSize)
+    void ScaleCardToFit(GameObject cardInstance, Transform parentContainer, Vector2 targetSize)
     {
         RectTransform cardRect = cardInstance.GetComponent<RectTransform>();
         RectTransform parentRect = parentContainer.GetComponent<RectTransform>();
@@ -116,17 +116,17 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         cardRect.anchoredPosition = Vector2.zero;
     }
 
-    private void OnCardClicked()
+    void OnCardClicked()
     {
         cardMenuManager.ToggleCardSelection(assignedCard);
     }
 
     public void SetHighlight(bool isHighlighted)
     {
-        this.isCurrentlySelected = isHighlighted;
+        this.isSelected = isHighlighted;
         if (highlightOverlay != null)
         {
-            highlightOverlay.SetActive(this.isCurrentlySelected);
+            highlightOverlay.SetActive(this.isSelected);
         }
     }
 
@@ -148,12 +148,12 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         if (highlightOverlay != null)
         {
-            highlightOverlay.SetActive(this.isCurrentlySelected);
+            highlightOverlay.SetActive(this.isSelected);
         }
         StartScaling(originalScale);
     }
 
-    private void StartScaling(Vector3 targetScale, System.Action onComplete = null)
+    void StartScaling(Vector3 targetScale, System.Action onComplete = null)
     {
         if (scaleCoroutine != null)
         {
@@ -162,7 +162,7 @@ public class CardSelectorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         scaleCoroutine = StartCoroutine(ScaleRoutine(targetScale, onComplete));
     }
 
-    private IEnumerator ScaleRoutine(Vector3 targetScale, System.Action onComplete)
+    IEnumerator ScaleRoutine(Vector3 targetScale, System.Action onComplete)
     {
         float elapsedTime = 0f;
         Vector3 startingScale = transform.localScale;

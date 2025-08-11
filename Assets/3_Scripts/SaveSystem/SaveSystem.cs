@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public static class SaveSystem
 {
-    private static readonly string SAVE_FILE_NAME = "CardsAgainstDungeonsSave.json";
+    static readonly string SAVE_FILE_NAME = "CardsAgainstDungeonsSave.json";
 
     public static void SaveDecks(List<Deck> decks)
     {
@@ -21,7 +21,7 @@ public static class SaveSystem
         {
             string json = File.ReadAllText(path);
             DeckSaveData data = JsonUtility.FromJson<DeckSaveData>(json);
-            Debug.Log("Decks loaded from: " + path);
+            Debug.Log("Decks loaded from " + path);
             return data.playerDecks;
         }
         else
@@ -31,7 +31,7 @@ public static class SaveSystem
         }
     }
 
-    private static string GetSavePath()
+    static string GetSavePath()
     {
         return Path.Combine(Application.persistentDataPath, SAVE_FILE_NAME);
     }

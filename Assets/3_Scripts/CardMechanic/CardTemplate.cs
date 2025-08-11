@@ -5,44 +5,45 @@ using UnityEngine.UI;
 
 public class CardTemplate : MonoBehaviour
 {
-    [Header("Class")] 
+    [Header("Class")]
     public String cardClass;
 
-    [Header("Card Name")] 
+    [Header("Card Name")]
 
     public String cardName;
     [Header("Left Action")]
 
-    public ActionList actionLeft = ActionList.Attack; 
-      
+    public ActionList actionLeft = ActionList.Attack;
+
     public int leftVal = 1;
     [Header("Right Action")]
 
-    public ActionList actionRight = ActionList.Attack; 
-    
+    public ActionList actionRight = ActionList.Attack;
+
     public int rightVal = 1;
-    
-    [Header("Range Value")] [Range(1, 3)] 
+
+    [Header("Range Value")]
+    [Range(1, 3)]
     public int rangeVal = 1;
 
-    [Header("Effect")] 
+    [Header("Effect")]
     public String effectName;
 
-    [Header("Illustration")] 
+    [Header("Illustration")]
     public Sprite illustrationBig;
 
-    [Header("Icons")] 
-    public Sprite iconLeft; 
+    [Header("Icons")]
+    public Sprite iconLeft;
     public Sprite iconRight;
-    
-    private TextMeshProUGUI valLeftText;
-    private TextMeshProUGUI valRightText;
-    private TextMeshProUGUI effectNameText;
-    private TextMeshProUGUI cardNameText;
-    private Image leftIconImage;
-    private Image rightIconImage;
-    private Image illustrationImage;
-    
+
+    TextMeshProUGUI valLeftText;
+    TextMeshProUGUI valRightText;
+    TextMeshProUGUI effectNameText;
+    TextMeshProUGUI cardNameText;
+    Image leftIconImage;
+    Image rightIconImage;
+    Image illustrationImage;
+
     void Awake()
     {
         valLeftText = transform.Find("valLeft").GetComponent<TextMeshProUGUI>();
@@ -56,25 +57,25 @@ public class CardTemplate : MonoBehaviour
 
     void Start()
     {
-        if (valLeftText != null) 
+        if (valLeftText != null)
             valLeftText.text = leftVal.ToString();
 
-        if (valRightText != null) 
+        if (valRightText != null)
             valRightText.text = rightVal.ToString();
 
-        if (effectNameText != null) 
+        if (effectNameText != null)
             effectNameText.text = effectName;
 
-        if (leftIconImage != null) 
+        if (leftIconImage != null)
             leftIconImage.sprite = iconLeft;
 
-        if (rightIconImage != null) 
+        if (rightIconImage != null)
             rightIconImage.sprite = iconRight;
 
-        if (illustrationImage != null) 
+        if (illustrationImage != null)
             illustrationImage.sprite = illustrationBig;
 
-        if (cardNameText != null) 
+        if (cardNameText != null)
             cardNameText.text = cardName;
     }
 }

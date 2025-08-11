@@ -7,11 +7,15 @@ public class StairsToMenu : MonoBehaviour
     private Hex myHex;
     private bool isInitialized = false;
     
+    public static StairsToMenu Instance { get; private set; }
+
     public int scene;
 
     private IEnumerator Start()
     {
-        yield return new WaitUntil(() => HexGrid.Instance != null);
+        Instance = this;
+
+        yield return new WaitUntil(() => HexGrid.Instance != null && HexGrid.Instance.GetAllHexes().Count > 0);
 
         myHex = GetHexBelow();
 
@@ -37,6 +41,21 @@ public class StairsToMenu : MonoBehaviour
         
         Debug.Log("Player is close enough and clicked the exit. Loading scene: " + scene);
         PlayerDataManager.Instance.SavePlayerState();
+        
+        LevelRewardUI rewardUI = FindObjectOfType<LevelRewardUI>(true);
+        if (rewardUI != null)
+        {
+            Debug.Log("Showing rewards");
+            rewardUI.ShowRewards();
+        }
+        else
+        {
+            Debug.Log("No rewards found");
+        }
+    }
+
+    public void NextLevel()
+    {
         SceneManager.LoadScene(scene);
     }
 

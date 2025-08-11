@@ -6,30 +6,30 @@ using TMPro;
 public class CardMenuManager : MonoBehaviour
 {
     [Header("UI Panels")]
-    [SerializeField] private GameObject deckEditorSlideout;
+    [SerializeField] GameObject deckEditorSlideout;
 
     [Header("Deck Display")]
-    [SerializeField] private Transform decksDisplayContainer;
-    [SerializeField] public GameObject deckDisplayPrefab;
-    [SerializeField] private Button newDeck;
-    [SerializeField] private TextMeshProUGUI deckCounter;
+    [SerializeField] Transform decksDisplayContainer;
+    [SerializeField] public GameObject deckDisplayPrefab; //Lasst den scheiss public ihr cocks
+    [SerializeField] Button newDeck;
+    [SerializeField] TextMeshProUGUI deckCounter;
 
     [Header("Deck Editor")]
-    [SerializeField] private Transform CardsContainer;
-    [SerializeField] private GameObject cardInListPrefab;
-    [SerializeField] private Button saveDeck;
-    [SerializeField] private TextMeshProUGUI cardCounter;
+    [SerializeField] Transform CardsContainer;
+    [SerializeField] GameObject cardInListPrefab;
+    [SerializeField] Button saveDeck;
+    [SerializeField] TextMeshProUGUI cardCounter;
 
     [Header("Data")]
-    [SerializeField] private CardDatabaseSO cardDatabase;
+    [SerializeField] CardDatabaseSO cardDatabase;
 
-    private List<Deck> allDecks = new List<Deck>();
-    private List<CardData> SelectedCards = new List<CardData>();
-    private Deck currentlyEditingDeck;
-    private DeckUI DeckUI;
-    private List<CardSelectorUI> spawnedCardUI = new List<CardSelectorUI>();
+    List<Deck> allDecks = new List<Deck>();
+    List<CardData> SelectedCards = new List<CardData>();
+    Deck currentlyEditingDeck;
+    DeckUI DeckUI;
+    List<CardSelectorUI> spawnedCardUI = new List<CardSelectorUI>();
 
-    private const int maxDeckCount = 12;
+    const int maxDeckCount = 12;
 
     void Start()
     {
@@ -72,16 +72,15 @@ public class CardMenuManager : MonoBehaviour
     }
 
 
-    private void UpdateSaveButtonState()
+    void UpdateSaveButtonState()
     {
         if (saveDeck != null)
         {
             saveDeck.interactable = (SelectedCards.Count == 15);
         }
     }
-
-    #region Unchanged Code
-    private void SetMainMenuButtonsInteractable(bool isInteractable)
+ 
+    void SetMainMenuButtonsInteractable(bool isInteractable)
     {
         if (MainMenu.Instance != null)
         {
@@ -148,7 +147,7 @@ public class CardMenuManager : MonoBehaviour
         UpdateDeckCounterAndNewButton();
     }
 
-    private void UpdateDeckCounterAndNewButton()
+    void UpdateDeckCounterAndNewButton()
     {
         int currentDeckCount = allDecks.Count;
 
@@ -181,7 +180,7 @@ public class CardMenuManager : MonoBehaviour
         UpdateCardCounter();
     }
 
-    private void UpdateCardCounter()
+    void UpdateCardCounter()
     {
         if (cardCounter != null)
         {
@@ -215,18 +214,18 @@ public class CardMenuManager : MonoBehaviour
         }
     }
 
-    private void PopulateAllCardsList()
+    void PopulateAllCardsList()
     {
         foreach (Transform child in CardsContainer) 
             Destroy(child.gameObject);
         spawnedCardUI.Clear();
-        if (cardDatabase.allCards == null) 
+        if (cardDatabase._allCards == null) 
             return;
 
         GridLayoutGroup gridLayout = CardsContainer.GetComponent<GridLayoutGroup>();
         Vector2 targetCellSize = (gridLayout != null) ? gridLayout.cellSize : new Vector2(100, 150);
 
-        foreach (var cardData in cardDatabase.allCards)
+        foreach (var cardData in cardDatabase._allCards)
         {
             if (cardData.cardPrefab == null) 
                 continue;
@@ -242,7 +241,7 @@ public class CardMenuManager : MonoBehaviour
         UpdateAllCardHighlights();
     }
 
-    private void UpdateAllCardHighlights()
+    void UpdateAllCardHighlights()
     {
         foreach (var cardUI in spawnedCardUI)
         {
@@ -253,5 +252,5 @@ public class CardMenuManager : MonoBehaviour
             }
         }
     }
-    #endregion
+  
 }
