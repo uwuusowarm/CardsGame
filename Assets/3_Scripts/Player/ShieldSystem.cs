@@ -7,6 +7,10 @@ public class ShieldSystem : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private int maxShields = 11;
 
+    [SerializeField] private GameObject shieldVFXPrefab;
+    [SerializeField] private Vector3 shieldVFXOffset = new Vector3(0, -1, 0); // Offset for VFX position
+    [SerializeField] private float vfxDuration;
+
     [Header("Assigned UI Images")]
     [SerializeField] private List<Image> shieldIcons = new List<Image>();
 
@@ -50,6 +54,7 @@ public class ShieldSystem : MonoBehaviour
 
     public void AddShields(int amount)
     {
+
         int newShields = Mathf.Min(currentShields + amount, maxShields);
         for (int i = currentShields; i < newShields; i++)
         {
@@ -61,6 +66,19 @@ public class ShieldSystem : MonoBehaviour
 
         currentShields = newShields;
         UpdateShieldDisplay();
+    }
+
+    public void ShieldVFX(Vector3 position)
+    {
+        if (shieldVFXPrefab != null)
+        {
+            GameObject vfx = Instantiate(shieldVFXPrefab, position + shieldVFXOffset, Quaternion.identity);
+            Destroy(vfx, vfxDuration);
+        }
+        else
+        {
+            Debug.LogWarning("Shield VFX prefab is not assigned!");
+        }
     }
 
     public void LoseShields(int amount)

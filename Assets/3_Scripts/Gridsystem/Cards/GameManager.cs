@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     [Header("Game Over")] [SerializeField] private CanvasGroup gameOverCanvasGroup;
     [SerializeField] private float gameOverFadeDuration = 1.5f;
     [SerializeField] private string mainMenuSceneName = "MainMenu";
+    public Animator animDead;
 
     private bool isFirstTurn = true;
     public bool IsPlayerTurn { get; private set; } = false;
@@ -33,7 +34,7 @@ public class GameManager : MonoBehaviour
     private int pendingStunDuration = 0;
 
 
-    public Animator animDead;
+    
     
     private Unit playerUnit;
     public Unit PlayerUnit => playerUnit;
@@ -211,6 +212,16 @@ public class GameManager : MonoBehaviour
             Debug.Log("First turn of the game.");
             isFirstTurn = false;
             CardManager.Instance.DrawInitialCards();
+        }
+        UpdateExhaustLevel();;
+    }
+    
+    private void UpdateExhaustLevel()
+    {
+        if (PlayerStatusUI.Instance != null && ExhaustionSystem.Instance != null)
+        {
+            int exhaustionStacks = ExhaustionSystem.Instance.GetExhaustionStacks();
+            PlayerStatusUI.Instance.UpdateExhaustLevel(exhaustionStacks);
         }
     }
 
@@ -828,7 +839,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     public void PlayerEndsTurn()
     {
         if (isGameOver) return;
@@ -918,6 +928,7 @@ public class GameManager : MonoBehaviour
         {
             UnitManager.Instance.ClearOldSelection();
         }
+        
 
         StopAllCoroutines();
 
