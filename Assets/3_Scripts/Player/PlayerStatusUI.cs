@@ -27,6 +27,7 @@ public class PlayerStatusUI : MonoBehaviour
     {
         UpdateMovementPoints(0);
         ClearAttackInfo();
+        UpdateExhaustLevel(0);
     }
     
     public void UpdateMovementPoints(int points)
@@ -38,9 +39,9 @@ public class PlayerStatusUI : MonoBehaviour
     }
     public void UpdateExhaustLevel(int level)
     {
-        if (movementPointsText != null)
+        if (exhaustLevelText != null)
         {
-            movementPointsText.text = $"{level}";
+            exhaustLevelText.text = $"{level}";
         }
     }
     
