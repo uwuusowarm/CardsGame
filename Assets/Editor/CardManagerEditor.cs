@@ -1,4 +1,7 @@
-﻿using UnityEditor;
+﻿
+//LASST DAS SCRIPT IN ASSETS/EDITOR !!!
+
+using UnityEditor;
 using UnityEngine;
 using System.Reflection;
 using System.Collections.Generic;
@@ -6,11 +9,11 @@ using System.Collections.Generic;
 [CustomEditor(typeof(CardManager))]
 public class CardManagerEditor : Editor
 {
-    private bool showDeckList = true;
-    private bool showHandList = true;
-    private bool showDiscardPileList = true;
-    private bool showLeftZoneList = true;
-    private bool showRightZoneList = true;
+    bool showDeckList = true;
+    bool showHandList = true;
+    bool showDiscardPileList = true;
+    bool showLeftZoneList = true;
+    bool showRightZoneList = true;
 
     public override void OnInspectorGUI()
     {
@@ -63,7 +66,7 @@ public class CardManagerEditor : Editor
             List<CardData> discardPileCardList = (List<CardData>)discardPileField.GetValue(cardManager);
             if (discardPileCardList != null)
             {
-                showDiscardPileList = EditorGUILayout.Foldout(showDiscardPileList, "Discard Pile (" + discardPileCardList.Count + ")");
+                showDiscardPileList = EditorGUILayout.Foldout(showDiscardPileList, "discard Pile (" + discardPileCardList.Count + ")");
                 if (showDiscardPileList)
                 {
                     EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
@@ -82,7 +85,7 @@ public class CardManagerEditor : Editor
             List<CardData> leftZoneCardList = (List<CardData>)leftZoneField.GetValue(cardManager);
             if (leftZoneCardList != null)
             {
-                showLeftZoneList = EditorGUILayout.Foldout(showLeftZoneList, "Left Zone (" + leftZoneCardList.Count + ")");
+                showLeftZoneList = EditorGUILayout.Foldout(showLeftZoneList, "left Zone (" + leftZoneCardList.Count + ")");
                 if (showLeftZoneList)
                 {
                     EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
@@ -101,7 +104,7 @@ public class CardManagerEditor : Editor
             List<CardData> rightZoneCardList = (List<CardData>)rightZoneField.GetValue(cardManager);
             if (rightZoneCardList != null)
             {
-                showRightZoneList = EditorGUILayout.Foldout(showRightZoneList, "Right Zone (" + rightZoneCardList.Count + ")");
+                showRightZoneList = EditorGUILayout.Foldout(showRightZoneList, "right Zone (" + rightZoneCardList.Count + ")");
                 if (showRightZoneList)
                 {
                     EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
