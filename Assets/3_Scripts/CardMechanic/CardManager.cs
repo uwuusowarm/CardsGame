@@ -244,7 +244,15 @@ public class CardManager : MonoBehaviour
             deck.AddRange(discardPile);
             discardPile.Clear();
             Shuffle(deck);
+            
+            if (ExhaustionSystem.Instance != null)
+            {
+                ExhaustionSystem.Instance.AddExhaustionStack();
+                ExhaustionSystem.Instance.ExhaustCards(deck);
+                Debug.Log($"Applied exhaustion to reshuffled deck. Deck now has {deck.Count} cards");
+            }
         }
+        
         int cardsToDraw = Mathf.Min(amountToDraw, deck.Count);
         for (int i = 0; i < cardsToDraw; i++)
         {
