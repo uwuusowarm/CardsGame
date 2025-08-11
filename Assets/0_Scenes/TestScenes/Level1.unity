@@ -7855,6 +7855,34 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1065064072}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1068285592 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7356424615175957051, guid: 59f832ea27e436145b66e1640f9a9536,
+    type: 3}
+  m_PrefabInstance: {fileID: 1685423264}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1068285595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068285592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d303ab900f034bca8e2fc08a4539b8ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
+  rewardCardsCount: 3
+  commonChance: 70
+  rareChance: 25
+  legendaryChance: 5
+  monsterChance: 0
+  rareChancePerKill: 2
+  legendaryChancePerKill: 1
+  minKillsForRareBonus: 3
+  minKillsForLegendaryBonus: 8
 --- !u!1 &1073897401
 GameObject:
   m_ObjectHideFlags: 0
@@ -11163,6 +11191,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1487355500}
   - component: {fileID: 1487355501}
+  - component: {fileID: 1487355502}
+  - component: {fileID: 1487355503}
   m_Layer: 5
   m_Name: RewardPanel
   m_TagString: Untagged
@@ -11210,11 +11240,43 @@ MonoBehaviour:
   titleText: {fileID: 1323698121}
   killCountText: {fileID: 1196727714}
   cardContainer: {fileID: 2066669736}
-  rewardCardPrefab: {fileID: 5023809833648921849, guid: 721ca12277cd76745b148fb32da44af6,
-    type: 3}
   continueButton: {fileID: 357692860}
   cardRevealDelay: 0.3
   animationDuration: 0.5
+--- !u!225 &1487355502
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487355499}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1487355503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487355499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d303ab900f034bca8e2fc08a4539b8ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardDatabase: {fileID: 11400000, guid: 09d53a489e56b4a4cab2655f711c54f8, type: 2}
+  rewardCardsCount: 3
+  commonChance: 70
+  rareChance: 25
+  legendaryChance: 5
+  monsterChance: 0
+  rareChancePerKill: 2
+  legendaryChancePerKill: 1
+  minKillsForRareBonus: 3
+  minKillsForLegendaryBonus: 8
 --- !u!1001 &1496154286
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13103,7 +13165,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7356424615175957051, guid: 59f832ea27e436145b66e1640f9a9536,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1068285595}
   m_SourcePrefab: {fileID: 100100000, guid: 59f832ea27e436145b66e1640f9a9536, type: 3}
 --- !u!1001 &1698600975
 PrefabInstance:
@@ -16816,6 +16882,7 @@ GameObject:
   - component: {fileID: 2066669739}
   - component: {fileID: 2066669738}
   - component: {fileID: 2066669737}
+  - component: {fileID: 2066669740}
   m_Layer: 5
   m_Name: CardContainer
   m_TagString: Untagged
@@ -16840,7 +16907,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 1, y: 0}
-  m_SizeDelta: {x: -1451, y: 600}
+  m_SizeDelta: {x: 0, y: -100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2066669737
 MonoBehaviour:
@@ -16859,13 +16926,13 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 0
+  m_ChildAlignment: 4
+  m_Spacing: 150
   m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 1
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
 --- !u!114 &2066669738
@@ -16906,6 +16973,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2066669735}
   m_CullTransparentMesh: 1
+--- !u!114 &2066669740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066669735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 2
+  m_VerticalFit: 0
 --- !u!1001 &2075371450
 PrefabInstance:
   m_ObjectHideFlags: 0
