@@ -27,11 +27,6 @@ public class CardManager : MonoBehaviour
     [Header("Hand Layout Settings")]
     [SerializeField] Transform handTransform;
 
-    [SerializeField] HandLayoutSettings layout4Cards;
-    [SerializeField] HandLayoutSettings layout3Cards;
-    [SerializeField] HandLayoutSettings layout2Cards;
-    [SerializeField] HandLayoutSettings layout1Card;
-
     [Header("Playzones")]
     [SerializeField] Transform leftGrid;
     [SerializeField] Transform rightGrid;
@@ -97,21 +92,47 @@ public class CardManager : MonoBehaviour
             return;
 
         HandLayoutSettings currentSettings = null;
+
         switch (handCardObjects.Count)
         {
             case 4:
-                currentSettings = layout4Cards;
+                currentSettings = new HandLayoutSettings
+                {
+                    _maxCardRotation = 20f,
+                    _cardHeightDisplacement = 15f,
+                    _cardSpacing = 70f,
+                    _hoverScaleMultiplier = 1.5f
+                };
                 break;
             case 3:
-                currentSettings = layout3Cards;
+                currentSettings = new HandLayoutSettings
+                {
+                    _maxCardRotation = 20f,
+                    _cardHeightDisplacement = 15f,
+                    _cardSpacing = 70f,
+                    _hoverScaleMultiplier = 1.5f
+                };
                 break;
             case 2:
-                currentSettings = layout2Cards;
+                currentSettings = new HandLayoutSettings
+                {
+                    _maxCardRotation = 10f,
+                    _cardHeightDisplacement = 0f,
+                    _cardSpacing = 70f,
+                    _hoverScaleMultiplier = 1.5f
+                };
                 break;
             case 1:
-                currentSettings = layout1Card;
+                currentSettings = new HandLayoutSettings
+                {
+                    _maxCardRotation = 0f,
+                    _cardHeightDisplacement = 0f,
+                    _cardSpacing = 0f,
+                    _hoverScaleMultiplier = 1.5f
+                };
                 break;
         }
+
 
         if (currentSettings == null)
             return;
@@ -302,6 +323,7 @@ public class CardManager : MonoBehaviour
                 Sound_Manager.instance.Play("Discard");
 
             DrawExtraCards(_drawCount);
+
             //Sound Manager
             if (Sound_Manager.instance != null)
                 Sound_Manager.instance.Play("Deck_Shuffel");
@@ -313,6 +335,7 @@ public class CardManager : MonoBehaviour
         //Sound Manager
         if (Sound_Manager.instance != null)
             Sound_Manager.instance.Play("Deck_Shuffel");
+
         for (int card = 0; card < cardList.Count; card++)
         {
             int GetMeOuttaThisFuckingShuffleHell = Random.Range(card, cardList.Count);
