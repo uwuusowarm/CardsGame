@@ -20,20 +20,25 @@ MonoBehaviour:
   rarity: 0
   borderSprite: {fileID: 21300000, guid: f27e6455f35991d43b1d632dbc02a8fe, type: 3}
   leftEffects:
-  - effectType: 0
+  - effectType: 1
     value: 3
     isTemporary: 0
     duration: 0
     range: 0
   rightEffects:
-  - effectType: 1
-    value: 2
+  - effectType: 4
+    value: 1
     isTemporary: 0
     duration: 0
     range: 0
-  alwaysEffects: []
-  leftEffectIcon: {fileID: 21300000, guid: 8587820d2bca2ef429dec60d514637f5, type: 3}
-  rightEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
-  cardPrefab: {fileID: 6813769332096644227, guid: 82bdb37007e21f843ba8417c3e035940,
+  alwaysEffects:
+  - effectType: 0
+    value: 1
+    isTemporary: 0
+    duration: 0
+    range: 0
+  leftEffectIcon: {fileID: 21300000, guid: 3eaa2a9e7b48f9d48a01297d99f8bd0e, type: 3}
+  rightEffectIcon: {fileID: 21300000, guid: a3140e3babcf7c740b0fabd24226422c, type: 3}
+  cardPrefab: {fileID: 1942259717092418272, guid: 82bdb37007e21f843ba8417c3e035940,
     type: 3}
   description: 
