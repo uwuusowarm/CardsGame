@@ -96,6 +96,11 @@ public class EnemyUnit : MonoBehaviour
     {
         stunTurnsRemaining = turns;
         Debug.Log($"{name} has been stunned for {turns} turn(s)");
+        
+        if (TryGetComponent<Renderer>(out var renderer))
+        {
+            StartCoroutine(StunVisualEffect());
+        }
     }
     
     

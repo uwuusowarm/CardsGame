@@ -26,16 +26,10 @@ public class GameManager : MonoBehaviour
     private bool attackAvailable = false;
     private int pendingAttackDamage = 0;
     private int pendingAttackRange = 0;
-
+    
     private bool poisonAttackActive = false;
     private int pendingPoisonDuration = 0;
-    
-    private bool stunAttackActive = false; 
-    private int pendingStunDuration = 0;
 
-
-    
-    
     private Unit playerUnit;
     public Unit PlayerUnit => playerUnit;
 
@@ -289,31 +283,6 @@ public class GameManager : MonoBehaviour
         return attackAvailable;
     }
 
-    public void CheckForEnemiesInRange()
-    {
-        if (IsAttackAvailable() && AttackManager.Instance != null)
-        {
-            AttackManager.Instance.TryPrepareAttack();
-        }
-    }
-
-    public bool IsStunAttackActive()
-    {
-        return stunAttackActive;
-    }
-
-    public int GetPendingStunDuration()
-    {
-        return pendingStunDuration;
-    }
-
-    public void ClearStunAttack()
-    {
-        stunAttackActive = false;
-        pendingStunDuration = 0;
-        Debug.Log("Stun attack effect cleared");
-    }
-
     private void ApplyCachedEffects()
     {
         if (PlayedCardEffectCache.Instance == null || !PlayedCardEffectCache.Instance.HasPendingEffects) return;
@@ -354,8 +323,6 @@ public class GameManager : MonoBehaviour
             }
 
             UnitManager.Instance.HandleUnitSelected(targetForSelfEffects.gameObject);
-            
-            CheckForEnemiesInRange();
         }
 
         if (PlayedCardEffectCache.Instance.PendingDamage > 0)
@@ -437,11 +404,9 @@ public class GameManager : MonoBehaviour
             case CardEffect.EffectType.Burn:
                 ApplyBurnEffect(effect.value, effect.range);
                 return;
-
+            
             case CardEffect.EffectType.Stun:
-                stunAttackActive = true;
-                pendingStunDuration = effect.value;
-                Debug.Log($"Next attack will stun the target for {effect.value} turns");
+                ApplyStunEffect(effect.value);
                 return;
 
             case CardEffect.EffectType.Poison:
@@ -557,111 +522,108 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private void ApplyBurnEffect(int cardValue, int range)
+
+private void ApplyBurnEffect(int cardValue, int range)
+{
+    if (UnitManager.Instance == null || UnitManager.Instance.SelectedUnit == null)
     {
-        if (UnitManager.Instance == null || UnitManager.Instance.SelectedUnit == null)
-        {
-            Debug.LogError("Cannot apply burn effect: UnitManager or SelectedUnit is null");
-            return;
-        }
-
-        if (AttackManager.Instance == null)
-        {
-            Debug.LogError("Cannot apply burn effect: AttackManager.Instance is null");
-            return;
-        }
-
-        const int burnDamage = 2;
-        int burnRange = cardValue;
-
-        Vector3Int playerHexCoords;
-        if (UnitManager.Instance.SelectedUnit.currentHex != null)
-        {
-            playerHexCoords = UnitManager.Instance.SelectedUnit.currentHex.hexCoords;
-            Debug.Log($"Using Unit.currentHex: {playerHexCoords}");
-        }
-        else
-        {
-            playerHexCoords = HexGrid.Instance.GetClosestHex(
-                UnitManager.Instance.SelectedUnit.transform.position
-            );
-            Debug.Log($"Using calculated hex: {playerHexCoords}");
-        }
-
-        Debug.Log($"=== BURN EFFECT DEBUG ===");
-        Debug.Log($"Player at hex: {playerHexCoords}");
-        Debug.Log($"Burn damage: {burnDamage} (always 2)");
-        Debug.Log($"Burn range: {burnRange} (card value: {cardValue})");
-
-        HashSet<Vector3Int> hexesInRange = AttackManager.Instance.GetHexesInRange(playerHexCoords, burnRange);
-        Debug.Log($"Found {hexesInRange.Count} hexes in burn range using AttackManager logic");
-
-        List<EnemyUnit> enemiesInRange = AttackManager.Instance.GetEnemiesInRange(playerHexCoords, burnRange);
-        Debug.Log($"Found {enemiesInRange.Count} enemies in burn range");
-
-        List<Vector3> burnVFXPositions = new List<Vector3>();
-
-        foreach (Vector3Int hexCoord in hexesInRange)
-        {
-            Hex hex = HexGrid.Instance.GetTileAt(hexCoord);
-            if (hex != null)
-            {
-                Vector3 hexPosition = hex.transform.position;
-                burnVFXPositions.Add(hexPosition);
-                Debug.Log($"Adding burn VFX at hex {hexCoord} at position {hexPosition}");
-            }
-            else if (hex != null && hex.IsObstacle())
-            {
-                Debug.Log($"Skipping VFX at hex {hexCoord} - is obstacle");
-            }
-        }
-
-        if (VFXManager.Instance != null && burnVFXPositions.Count > 0)
-        {
-            Debug.Log($"Playing burn VFX at {burnVFXPositions.Count} hex positions");
-            foreach (Vector3 pos in burnVFXPositions)
-            {
-                VFXManager.Instance.PlayVFX(VFXManager.VFXType.Burn, pos);
-                Debug.Log($"  -> VFX played at {pos}");
-            }
-        }
-        else if (VFXManager.Instance == null)
-        {
-            Debug.LogError("VFXManager.Instance is null!");
-        }
-        else
-        {
-            Debug.Log("No valid hex positions for VFX");
-        }
-
-        int enemiesAffected = 0;
-        foreach (EnemyUnit enemy in enemiesInRange)
-        {
-            if (enemy != null && enemy.gameObject.activeInHierarchy)
-            {
-                enemy.TakeDamage(burnDamage);
-                enemiesAffected++;
-                Debug.Log($"Burn effect dealt {burnDamage} damage to {enemy.name}");
-            }
-        }
-
-        Debug.Log(
-            $"Burn effect completed: VFX shown on {burnVFXPositions.Count} hexes, {enemiesAffected} enemies damaged with {burnDamage} damage each");
-        Debug.Log($"==========================");
+        Debug.LogError("Cannot apply burn effect: UnitManager or SelectedUnit is null");
+        return;
     }
 
+    if (AttackManager.Instance == null)
+    {
+        Debug.LogError("Cannot apply burn effect: AttackManager.Instance is null");
+        return;
+    }
+
+    const int burnDamage = 2;
+    int burnRange = cardValue;
+
+    Vector3Int playerHexCoords;
+    if (UnitManager.Instance.SelectedUnit.currentHex != null)
+    {
+        playerHexCoords = UnitManager.Instance.SelectedUnit.currentHex.hexCoords;
+        Debug.Log($"Using Unit.currentHex: {playerHexCoords}");
+    }
+    else
+    {
+        playerHexCoords = HexGrid.Instance.GetClosestHex(
+            UnitManager.Instance.SelectedUnit.transform.position
+        );
+        Debug.Log($"Using calculated hex: {playerHexCoords}");
+    }
+
+    Debug.Log($"=== BURN EFFECT DEBUG ===");
+    Debug.Log($"Player at hex: {playerHexCoords}");
+    Debug.Log($"Burn damage: {burnDamage} (always 2)");
+    Debug.Log($"Burn range: {burnRange} (card value: {cardValue})");
+
+    HashSet<Vector3Int> hexesInRange = AttackManager.Instance.GetHexesInRange(playerHexCoords, burnRange);
+    Debug.Log($"Found {hexesInRange.Count} hexes in burn range using AttackManager logic");
+
+    List<EnemyUnit> enemiesInRange = AttackManager.Instance.GetEnemiesInRange(playerHexCoords, burnRange);
+    Debug.Log($"Found {enemiesInRange.Count} enemies in burn range");
+
+    List<Vector3> burnVFXPositions = new List<Vector3>();
+    
+    foreach (Vector3Int hexCoord in hexesInRange)
+    {
+        Hex hex = HexGrid.Instance.GetTileAt(hexCoord);
+        if (hex != null)
+        {
+            Vector3 hexPosition = hex.transform.position;
+            burnVFXPositions.Add(hexPosition);
+            Debug.Log($"Adding burn VFX at hex {hexCoord} at position {hexPosition}");
+        }
+        else if (hex != null && hex.IsObstacle())
+        {
+            Debug.Log($"Skipping VFX at hex {hexCoord} - is obstacle");
+        }
+    }
+
+    if (VFXManager.Instance != null && burnVFXPositions.Count > 0)
+    {
+        Debug.Log($"Playing burn VFX at {burnVFXPositions.Count} hex positions");
+        foreach (Vector3 pos in burnVFXPositions)
+        {
+            VFXManager.Instance.PlayVFX(VFXManager.VFXType.Burn, pos);
+            Debug.Log($"  -> VFX played at {pos}");
+        }
+    }
+    else if (VFXManager.Instance == null)
+    {
+        Debug.LogError("VFXManager.Instance is null!");
+    }
+    else
+    {
+        Debug.Log("No valid hex positions for VFX");
+    }
+
+    int enemiesAffected = 0;
+    foreach (EnemyUnit enemy in enemiesInRange)
+    {
+        if (enemy != null && enemy.gameObject.activeInHierarchy)
+        {
+            enemy.TakeDamage(burnDamage);
+            enemiesAffected++;
+            Debug.Log($"Burn effect dealt {burnDamage} damage to {enemy.name}");
+        }
+    }
+
+    Debug.Log($"Burn effect completed: VFX shown on {burnVFXPositions.Count} hexes, {enemiesAffected} enemies damaged with {burnDamage} damage each");
+    Debug.Log($"==========================");
+}
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.G))
         {
             TestBurnEffect();
         }
-
         if (Input.GetKeyDown(KeyCode.H))
         {
             TestStunEffect();
         }
-
         if (Input.GetKeyDown(KeyCode.J))
         {
             TestPoisonEffect();
@@ -811,13 +773,13 @@ public class GameManager : MonoBehaviour
         {
             effectType = CardEffect.EffectType.Poison,
             value = 3,
-            range = 0
+            range = 0   
         };
 
         ApplyImmediateEffect(testPoisonEffect, UnitManager.Instance.SelectedUnit);
         Debug.Log("Poison effect activated! Next attack will poison the target.");
     }
-
+    
     public void PlayerActionResolved(bool actionWasCompleted)
     {
         isWaitingForPlayerActionResolution = false;
@@ -832,11 +794,6 @@ public class GameManager : MonoBehaviour
         }
 
         Debug.Log($"Player action resolved. Attack available reset to: {attackAvailable}");
-    
-        if (AttackManager.Instance != null)
-        {
-            AttackManager.Instance.TryPrepareAttack();
-        }
     }
 
     public void PlayerEndsTurn()
@@ -861,10 +818,8 @@ public class GameManager : MonoBehaviour
         }
 
         ClearPoisonAttack();
-        ClearStunAttack();
-
-        ResetAttackAvailability();
-
+        ResetAttackAvailability(); 
+        
         if (isWaitingForPlayerActionResolution)
         {
             Debug.LogWarning("Cannot end turn while waiting for action resolution.");

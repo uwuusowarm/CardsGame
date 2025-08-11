@@ -5,17 +5,21 @@ using System.Collections;
 
 public class HealthSystem : MonoBehaviour
 {
-    [Header("Settings")] [SerializeField] private int maxBaseHealth = 5;
+    [Header("Settings")]
+    [SerializeField] private int maxBaseHealth = 5;
     [SerializeField] private int maxExtraHealth = 10;
+    [SerializeField] private GameObject healVFXPrefab;
+    [SerializeField] private float vfxDuration;
+    [SerializeField] private Vector3 healVFXOffset = new Vector3(0, -1, 0); // Offset for VFX position
+    public Animator animDamage;
+    
 
-    [Header("Assigned UI Images")] [SerializeField]
-    private List<Image> healthIcons = new List<Image>();
+    [Header("Assigned UI Images")]
+    [SerializeField] private List<Image> healthIcons = new List<Image>();
 
     private int currentHealth;
     private bool[] extraHealthUnlocked;
     public static HealthSystem Instance { get; private set; }
-    public Animator animDamage;
-    
 
     private void Awake()
     {
@@ -27,15 +31,15 @@ public class HealthSystem : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
+        
         extraHealthUnlocked = new bool[maxExtraHealth];
     }
-
+    
     private void Start()
     {
         InitializeHealth(maxBaseHealth);
     }
-
+    
     public void InitializeHealth(int startingHealth)
     {
         currentHealth = startingHealth;
@@ -45,12 +49,12 @@ public class HealthSystem : MonoBehaviour
     public void UpdateMaxHealth()
     {
         int totalMaxHealth = maxBaseHealth;
-
+    
         if (EquipmentManager.Instance != null)
         {
             totalMaxHealth += EquipmentManager.Instance.GetTotalMaxHPBonus();
         }
-
+    
         if (extraHealthUnlocked != null)
         {
             for (int i = 0; i < extraHealthUnlocked.Length; i++)
@@ -81,16 +85,16 @@ public class HealthSystem : MonoBehaviour
     {
         return currentHealth;
     }
-
+    
     public int GetMaxHealth()
     {
         int maxPossibleHealth = maxBaseHealth;
-
+    
         if (EquipmentManager.Instance != null)
         {
             maxPossibleHealth += EquipmentManager.Instance.GetTotalMaxHPBonus();
         }
-
+    
         if (extraHealthUnlocked != null)
         {
             for (int i = 0; i < maxExtraHealth; i++)
@@ -101,11 +105,11 @@ public class HealthSystem : MonoBehaviour
                     break;
             }
         }
-
+    
         return maxPossibleHealth;
     }
 
-
+    
     public int GetUnlockedExtraHealthCount()
     {
         int count = 0;
@@ -119,19 +123,18 @@ public class HealthSystem : MonoBehaviour
                 }
             }
         }
-
         return count;
     }
 
     public void Heal(int amount)
     {
         int maxPossibleHealth = GetMaxHealth();
-
+        HealVFX(GameObject.FindGameObjectWithTag("Player").transform.position);
         if (currentHealth < maxPossibleHealth)
         {
             int healAmount = Mathf.Min(amount, maxPossibleHealth - currentHealth);
             currentHealth += healAmount;
-
+        
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null && playerObj.TryGetComponent<Unit>(out var playerUnit))
             {
@@ -142,13 +145,23 @@ public class HealthSystem : MonoBehaviour
                     VFXManager.Instance.PlayHealVFX(playerObj.transform);
                 }
             }
-
             UpdateHealthDisplay();
             Debug.Log($"Heal {healAmount}. Now: {currentHealth}/{maxPossibleHealth}");
         }
         else
         {
             Debug.Log("Full!");
+        }
+        
+    }
+
+    public void HealVFX(Vector3 playerPos)
+    {
+        if (healVFXPrefab != null)
+        {
+            GameObject vfxInstance = Instantiate(healVFXPrefab, playerPos + healVFXOffset, Quaternion.identity);
+            Destroy(vfxInstance, vfxDuration); // Destroy after a set duration
+            
         }
     }
 
@@ -166,7 +179,6 @@ public class HealthSystem : MonoBehaviour
                     break;
                 }
             }
-
             if (nextSlot != -1)
             {
                 extraHealthUnlocked[nextSlot] = true;
@@ -178,7 +190,6 @@ public class HealthSystem : MonoBehaviour
                 break;
             }
         }
-
         UpdateMaxHealth();
     }
 
@@ -211,6 +222,7 @@ public class HealthSystem : MonoBehaviour
             StartCoroutine(ResetDamageAnimation());
         }
         
+
         if (currentHealth <= 0)
         {
             Debug.Log("Player health depleted. Signaling game over.");
@@ -219,17 +231,18 @@ public class HealthSystem : MonoBehaviour
                 GameManager.Instance.HandlePlayerDeath();
             }
         }
+
     }
-    
     private IEnumerator ResetDamageAnimation()
     {
-        yield return new WaitForSeconds(0.5f); 
+        yield return new WaitForSeconds(0.5f); // Adjust the duration as needed
         if (animDamage != null)
         {
             animDamage.SetBool("Take Damage", false);
         }
     }
-    
+
+
     private void UpdateHealthDisplay()
     {
         for (int i = 0; i < healthIcons.Count; i++)
