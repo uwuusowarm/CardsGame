@@ -8,7 +8,7 @@ public class AttackManager : MonoBehaviour
 
     private int currentAttackDamage;
     private int currentAttackRange;
-    private readonly List<EnemyUnit> highlightedEnemies = new();
+    private List<EnemyUnit> highlightedEnemies = new List<EnemyUnit>();
 
     private void Awake()
     {
@@ -18,7 +18,10 @@ public class AttackManager : MonoBehaviour
 
     public void TryPrepareAttack()
     {
-        if (GameManager.Instance != null && GameManager.Instance.IsAttackAvailable()) HighlightEnemiesInRange();
+        if (GameManager.Instance != null && GameManager.Instance.IsAttackAvailable())
+        {
+            HighlightEnemiesInRange();
+        }
     }
 
     public void PrepareAttack(int damage, int range)
@@ -48,47 +51,57 @@ public class AttackManager : MonoBehaviour
 
     public List<EnemyUnit> GetEnemiesInRange(Vector3Int centerHex, int range)
     {
-        var enemiesInRange = new List<EnemyUnit>();
+        List<EnemyUnit> enemiesInRange = new List<EnemyUnit>();
 
-        var centerHexTile = HexGrid.Instance.GetTileAt(centerHex);
+        Hex centerHexTile = HexGrid.Instance.GetTileAt(centerHex);
         if (centerHexTile == null)
         {
             Debug.LogError($"No hex found at position {centerHex}");
             return enemiesInRange;
         }
 
-        var maxDistance = range + 1;
+        int maxDistance = range + 1;
 
-        var hexesInRange = new HashSet<Vector3Int>();
-        var queue = new Queue<Vector3Int>();
-        var distances = new Dictionary<Vector3Int, int>();
+        HashSet<Vector3Int> hexesInRange = new HashSet<Vector3Int>();
+        Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        Dictionary<Vector3Int, int> distances = new Dictionary<Vector3Int, int>();
 
         queue.Enqueue(centerHex);
         distances[centerHex] = 0;
 
         while (queue.Count > 0)
         {
-            var current = queue.Dequeue();
-            var currentDistance = distances[current];
+            Vector3Int current = queue.Dequeue();
+            int currentDistance = distances[current];
 
             if (currentDistance < maxDistance)
-                foreach (var neighbor in HexGrid.Instance.GetNeighborsFor(current))
+            {
+                foreach (Vector3Int neighbor in HexGrid.Instance.GetNeighborsFor(current))
+                {
                     if (!distances.ContainsKey(neighbor))
                     {
                         distances[neighbor] = currentDistance + 1;
                         queue.Enqueue(neighbor);
 
-                        if (neighbor != centerHex) hexesInRange.Add(neighbor);
+                        if (neighbor != centerHex)
+                        {
+                            hexesInRange.Add(neighbor);
+                        }
                     }
+                }
+            }
         }
 
-        foreach (var hexCoord in hexesInRange)
+        foreach (Vector3Int hexCoord in hexesInRange)
         {
-            var hex = HexGrid.Instance.GetTileAt(hexCoord);
+            Hex hex = HexGrid.Instance.GetTileAt(hexCoord);
             if (hex != null && hex.HasEnemyUnit())
             {
-                var enemy = hex.EnemyUnitOnHex;
-                if (enemy != null && enemy.gameObject.activeInHierarchy) enemiesInRange.Add(enemy);
+                EnemyUnit enemy = hex.EnemyUnitOnHex;
+                if (enemy != null && enemy.gameObject.activeInHierarchy)
+                {
+                    enemiesInRange.Add(enemy);
+                }
             }
         }
 
@@ -111,56 +124,63 @@ public class AttackManager : MonoBehaviour
             return;
         }
 
-        Debug.Log("=== ATTACK RANGE DEBUG ===");
+        Debug.Log($"=== ATTACK RANGE DEBUG ===");
         Debug.Log($"Player at hex: {playerHexCoords}");
         Debug.Log($"Attack damage: {currentAttackDamage}");
         Debug.Log($"Attack range: {currentAttackRange}");
-        Debug.Log("============================");
+        Debug.Log($"============================");
 
-        var playerHex = HexGrid.Instance.GetTileAt(playerHexCoords);
+        Hex playerHex = HexGrid.Instance.GetTileAt(playerHexCoords);
         if (playerHex == null)
         {
             Debug.LogError($"No hex found at player position {playerHexCoords}");
             return;
         }
 
-        var maxDistance = currentAttackRange + 1;
+        int maxDistance = currentAttackRange + 1;
 
-        var hexesInRange = new HashSet<Vector3Int>();
-        var queue = new Queue<Vector3Int>();
-        var distances = new Dictionary<Vector3Int, int>();
+        HashSet<Vector3Int> hexesInRange = new HashSet<Vector3Int>();
+        Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        Dictionary<Vector3Int, int> distances = new Dictionary<Vector3Int, int>();
 
         queue.Enqueue(playerHexCoords);
         distances[playerHexCoords] = 0;
 
         while (queue.Count > 0)
         {
-            var current = queue.Dequeue();
-            var currentDistance = distances[current];
+            Vector3Int current = queue.Dequeue();
+            int currentDistance = distances[current];
 
             if (currentDistance < maxDistance)
-                foreach (var neighbor in HexGrid.Instance.GetNeighborsFor(current))
+            {
+                foreach (Vector3Int neighbor in HexGrid.Instance.GetNeighborsFor(current))
+                {
                     if (!distances.ContainsKey(neighbor))
                     {
                         distances[neighbor] = currentDistance + 1;
                         queue.Enqueue(neighbor);
 
-                        if (neighbor != playerHexCoords) hexesInRange.Add(neighbor);
+                        if (neighbor != playerHexCoords)
+                        {
+                            hexesInRange.Add(neighbor);
+                        }
                     }
+                }
+            }
         }
 
-        var enemiesFound = false;
-        var enemiesInRange = 0;
+        bool enemiesFound = false;
+        int enemiesInRange = 0;
 
-        foreach (var hexCoord in hexesInRange)
+        foreach (Vector3Int hexCoord in hexesInRange)
         {
-            var hex = HexGrid.Instance.GetTileAt(hexCoord);
+            Hex hex = HexGrid.Instance.GetTileAt(hexCoord);
             if (hex != null && hex.HasEnemyUnit())
             {
-                var enemy = hex.EnemyUnitOnHex;
+                EnemyUnit enemy = hex.EnemyUnitOnHex;
                 if (enemy != null && enemy.gameObject.activeInHierarchy)
                 {
-                    var distance = distances[hexCoord];
+                    int distance = distances[hexCoord];
                     Debug.Log($"Enemy '{enemy.name}' at {hexCoord} - Distance: {distance} - HIGHLIGHTED");
 
                     enemy.ToggleHighlight(true);
@@ -173,7 +193,10 @@ public class AttackManager : MonoBehaviour
 
         Debug.Log($"Found {enemiesInRange} enemies in range {currentAttackRange}");
 
-        if (!enemiesFound) Debug.LogWarning("No enemies found in attack range!");
+        if (!enemiesFound)
+        {
+            Debug.LogWarning("No enemies found in attack range!");
+        }
     }
 
     private int HexDistance(Vector3Int a, Vector3Int b)
@@ -183,35 +206,41 @@ public class AttackManager : MonoBehaviour
 
     public HashSet<Vector3Int> GetHexesInRange(Vector3Int center, int range)
     {
-        var result = new HashSet<Vector3Int>();
-        var queue = new Queue<Vector3Int>();
-        var distances = new Dictionary<Vector3Int, int>();
+        HashSet<Vector3Int> result = new HashSet<Vector3Int>();
+        Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        Dictionary<Vector3Int, int> distances = new Dictionary<Vector3Int, int>();
 
         queue.Enqueue(center);
         distances[center] = 0;
 
         while (queue.Count > 0)
         {
-            var current = queue.Dequeue();
-            var currentDist = distances[current];
+            Vector3Int current = queue.Dequeue();
+            int currentDist = distances[current];
 
             if (currentDist >= range) continue;
 
-            foreach (var neighbor in HexGrid.Instance.GetNeighborsFor(current))
+            foreach (Vector3Int neighbor in HexGrid.Instance.GetNeighborsFor(current))
+            {
                 if (!distances.ContainsKey(neighbor))
                 {
                     distances[neighbor] = currentDist + 1;
                     queue.Enqueue(neighbor);
                     result.Add(neighbor);
                 }
+            }
         }
 
         return result;
     }
 
+
     public void HandleEnemyClick(EnemyUnit enemy)
     {
-        if (!GameManager.Instance.IsAttackAvailable()) return;
+        if (!GameManager.Instance.IsAttackAvailable())
+        {
+            return;
+        }
 
         if (highlightedEnemies.Contains(enemy))
         {
@@ -219,23 +248,10 @@ public class AttackManager : MonoBehaviour
 
             if (GameManager.Instance.IsPoisonAttackActive())
             {
-                var poisonDuration = GameManager.Instance.GetPendingPoisonDuration();
+                int poisonDuration = GameManager.Instance.GetPendingPoisonDuration();
                 enemy.ApplyPoison(poisonDuration);
                 Debug.Log($"Applied poison to {enemy.name} for {poisonDuration} turns from poisoned attack");
                 GameManager.Instance.ClearPoisonAttack();
-            }
-
-            if (GameManager.Instance.IsStunAttackActive())
-            {
-                var stunDuration = GameManager.Instance.GetPendingStunDuration();
-                enemy.ApplyStun(stunDuration);
-                Debug.Log($"Applied stun to {enemy.name} for {stunDuration} turns from stunned attack");
-                GameManager.Instance.ClearStunAttack();
-                
-                if (VFXManager.Instance != null)
-                {
-                    VFXManager.Instance.PlayVFX(VFXManager.VFXType.Stun, enemy.transform);
-                }
             }
 
             ClearHighlights();
@@ -254,9 +270,13 @@ public class AttackManager : MonoBehaviour
 
     public void ClearHighlights()
     {
-        foreach (var enemy in highlightedEnemies)
+        foreach (EnemyUnit enemy in highlightedEnemies)
+        {
             if (enemy != null)
+            {
                 enemy.ToggleHighlight(false);
+            }
+        }
 
         highlightedEnemies.Clear();
     }
