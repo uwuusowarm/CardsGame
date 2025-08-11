@@ -182,7 +182,11 @@ public class EnemyUnit : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-           Destroy(gameObject);
+            if (LevelRewardSystem.Instance != null)
+            {
+                LevelRewardSystem.Instance.AddEnemyKill();
+            }
+            Destroy(gameObject);
         }
     }
 

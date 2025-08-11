@@ -32,9 +32,18 @@ public class SelectionManager : MonoBehaviour
 
     public void HandleClick(Vector3 mousePosition)
     {
+        
         GameObject result;
         if (FindTarget(mousePosition, out result))
         {
+            StairsToMenu stairs = result.GetComponent<StairsToMenu>();
+            if (stairs != null)
+            {
+                Debug.Log("Clicked on stairs!");
+                stairs.OnStairsClicked();
+                return;
+            }
+            
             ChestController chest = result.GetComponent<ChestController>();
             if (chest != null)
             {
