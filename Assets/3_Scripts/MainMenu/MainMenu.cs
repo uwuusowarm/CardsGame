@@ -13,10 +13,11 @@ public class MainMenu : MonoBehaviour
     [SerializeField] GameObject creditsPanel2;
     // [SerializeField] GameObject creditsPanel3;
     [SerializeField] GameObject deckSelectionPanel;
+    [SerializeField] GameObject deckPanelBackground;
 
     [Header("Main Buttons")]
     [SerializeField] Button startButton;
-    [SerializeField] Button deckMenuButton;
+    [SerializeField] Button deckMenuButton; 
     [SerializeField] Button settingsButton;
     [SerializeField] Button creditsButton;
     [SerializeField] Button quitButton;
@@ -139,6 +140,7 @@ public class MainMenu : MonoBehaviour
         /*    if (creditsPanel3 != null)        
                 creditsPanel3.SetActive(false);
             */
+        if (deckPanelBackground != null)
         currentlyActivePanel = null;
     }
 
