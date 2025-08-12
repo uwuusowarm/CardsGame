@@ -563,8 +563,8 @@ MonoBehaviour:
   hexGrid: {fileID: 1816494365}
   movementSystem: {fileID: 1611851148}
   enemyUnits:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 155297119}
+  - {fileID: 826233092}
   selectedUnit: {fileID: 0}
   animator: {fileID: 0}
 --- !u!4 &124161441
@@ -834,6 +834,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 155297117}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &155297119 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -80155794431596756, guid: 81a018fef9537d74a93483f7f5783f67,
+    type: 3}
+  m_PrefabInstance: {fileID: 155297117}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a15df5a09b360084cae4de4a71ac4830, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &170867375
 GameObject:
   m_ObjectHideFlags: 0
@@ -3630,6 +3642,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 826233090}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &826233092 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -8908571159573592039, guid: c817ddd7ef4157448b685337e0c3d5ca,
+    type: 3}
+  m_PrefabInstance: {fileID: 826233090}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a15df5a09b360084cae4de4a71ac4830, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
