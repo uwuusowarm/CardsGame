@@ -34,14 +34,7 @@ public class PlayerStatusUI : MonoBehaviour
     {
         if (movementPointsText != null)
         {
-            if (points > 0)
-            {
-                movementPointsText.text = $"{points}";
-            }
-            else
-            {
-                movementPointsText.text = " ";
-            }
+            movementPointsText.text = $"{points}";
         }
     }
 
