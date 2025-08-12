@@ -5,12 +5,13 @@ using System.Collections.Generic;
 
 public class MainMenu : MonoBehaviour
 {
-    public static MainMenu Instance { get; private set; } 
+    public static MainMenu Instance { get; set; }
 
     [Header("UI Panels")]
     [SerializeField] GameObject cardMenuPanel;
     [SerializeField] GameObject creditsPanel;
     [SerializeField] GameObject creditsPanel2;
+    // [SerializeField] GameObject creditsPanel3;
     [SerializeField] GameObject deckSelectionPanel;
     [SerializeField] GameObject deckPanelBackground;
 
@@ -65,7 +66,7 @@ public class MainMenu : MonoBehaviour
         if (creditsPanel2 != null)
             creditsPanel2.SetActive(false);
         if (deckPanelBackground != null)
-            deckPanelBackground.SetActive(false); 
+            deckPanelBackground.SetActive(false);
 
         currentlyActivePanel = null;
     }
@@ -160,7 +161,12 @@ public class MainMenu : MonoBehaviour
         TogglePanel(creditsPanel2);
     }
 
-
+    /*
+      public void OnCreditsNextButtonPressed2()
+    {
+        TogglePanel(creditsPanel3);
+    }
+    */
     public void OnSettingsButtonPressed()
     {
         bool isSettingsPanelActive = (settingsPanel != null && settingsPanel.activeSelf);
