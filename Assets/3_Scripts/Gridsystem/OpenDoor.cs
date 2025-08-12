@@ -6,7 +6,7 @@ public class OpenDoor : MonoBehaviour
 {
     public int roomID;
     public bool isOpen = false;
-    public int interactionRange = 10;
+    private int interactionRange = 2;
     
     //[Header("Verlinkte Hex-Felder")]
     //[SerializeField] private List<Hex> linkedHexes;
