@@ -50,7 +50,7 @@ public class LevelRewardUI : MonoBehaviour
         
         int killCount = LevelRewardSystem.Instance.GetEnemiesKilled();
         if (titleText != null)
-            titleText.text = "Level Complete! Choose Your Reward";
+            titleText.text = "You died! Choose Your Reward";
             
         if (killCountText != null)
             killCountText.text = $"Enemies Defeated: {killCount}";
@@ -231,11 +231,14 @@ public class LevelRewardUI : MonoBehaviour
     {
         if (rewardPanel != null)
             rewardPanel.SetActive(false);
-        
+    
         if (LevelRewardSystem.Instance != null)
             LevelRewardSystem.Instance.ResetKillCount();
-        
-        Debug.Log("Continuing to next level...");
-        StairsToMenu.Instance.NextLevel();
+    
+        Debug.Log("Continuing after reward selection...");
+ 
+        GameManager.Instance.DeathScreen();
+
     }
+
 }
