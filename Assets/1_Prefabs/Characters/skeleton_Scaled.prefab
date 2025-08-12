@@ -78,8 +78,76 @@ PrefabInstance:
       propertyPath: m_Name
       value: skeleton_Scaled
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 052f1008da3b6834baf9868dbd46b53c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 052f1008da3b6834baf9868dbd46b53c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7129302745113008254}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 052f1008da3b6834baf9868dbd46b53c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 155210131061635657}
   m_SourcePrefab: {fileID: 100100000, guid: 052f1008da3b6834baf9868dbd46b53c, type: 3}
+--- !u!1 &3108526358464973469 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 052f1008da3b6834baf9868dbd46b53c,
+    type: 3}
+  m_PrefabInstance: {fileID: 2874103128116131788}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7129302745113008254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3108526358464973469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a15df5a09b360084cae4de4a71ac4830, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 3
+  maxHealth: 6
+  normalMaterial: {fileID: -4395908932815041447, guid: 052f1008da3b6834baf9868dbd46b53c,
+    type: 3}
+  highlightMaterial: {fileID: 2100000, guid: c0522e59a202d4f489b546913d01a0eb, type: 2}
+  deck:
+  - {fileID: 11400000, guid: 4ae7426fdf0d7244cb99d75fa758adf1, type: 2}
+  - {fileID: 11400000, guid: fab4158f035048c4387eb1e251bb4f46, type: 2}
+  - {fileID: 11400000, guid: 2f12f023e4557b0449eab508eb97816a, type: 2}
+  - {fileID: 11400000, guid: a2e1245e7245fc6429a9b8fbf448013d, type: 2}
+  - {fileID: 11400000, guid: 5e34fc2c052f75549ada57694c6a2648, type: 2}
+  hand: []
+  handSize: 3
+  playerDetectRange: 1
+--- !u!136 &155210131061635657
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3108526358464973469}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.01671059
+  m_Height: 0.008890254
+  m_Direction: 1
+  m_Center: {x: 0.0000026565976, y: -0.00037019065, z: 0.000012689268}
