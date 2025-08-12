@@ -32,17 +32,12 @@ public class StairsToMenu : MonoBehaviour
     public void OnStairsClicked()
     {
         Debug.Log("StairsToMenu.OnStairsClicked() called!");
-    
-        if (!isInitialized)
-        {
-            Debug.Log("StairsToMenu not initialized yet!");
-            return;
-        }
-        
-        Debug.Log("Player completed the level. Loading scene: " + scene);
-        PlayerDataManager.Instance.SavePlayerState();
-        
-        NextLevel();
+
+            Debug.Log("Player completed the level. Loading scene: " + scene);
+            PlayerDataManager.Instance.SavePlayerState();
+
+            NextLevel();
+   
     }
 
     public void NextLevel()
@@ -52,24 +47,79 @@ public class StairsToMenu : MonoBehaviour
 
     private bool IsPlayerAdjacent()
     {
-        if (HexGrid.Instance == null) return false;
-
-        var player = GameObject.FindGameObjectWithTag("Player");
-        if (player == null)
+        Debug.Log("=== STAIRS ADJACENCY DEBUG ===");
+        
+        if (myHex == null)
         {
+            Debug.LogError("Stairs hex not initialized!");
+            return false;
+        }
+        Debug.Log($"Stairs is at hex: {myHex.hexCoords}");
+
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance is null in IsPlayerAdjacent!");
             return false;
         }
 
-        Vector3Int playerHexCoords = HexGrid.Instance.GetClosestHex(player.transform.position);
-
-        if (myHex.hexCoords == playerHexCoords)
+        Unit playerUnit = GameManager.Instance.PlayerUnit;
+        if (playerUnit == null)
         {
+            Debug.LogError("Player unit not found!");
+            return false;
+        }
+
+        if (HexGrid.Instance == null)
+        {
+            Debug.LogError("HexGrid.Instance is null!");
+            return false;
+        }
+
+        Debug.Log($"Player world position: {playerUnit.transform.position}");
+        Debug.Log($"Stairs world position: {transform.position}");
+
+        float worldDistance = Vector3.Distance(playerUnit.transform.position, transform.position);
+        Debug.Log($"World distance between player and stairs: {worldDistance:F2}");
+
+        if (worldDistance <= 3.0f) 
+        {
+            Debug.Log("WORLD DISTANCE CHECK: Player is close enough - ADJACENT!");
             return true;
         }
 
-        var neighbors = HexGrid.Instance.GetNeighborsFor(myHex.hexCoords);
-        return neighbors.Contains(playerHexCoords);
+        Vector3Int playerHexCoords = CalculateHexFromWorldPos(playerUnit.transform.position);
+        Vector3Int stairsHexCoords = CalculateHexFromWorldPos(transform.position);
+        
+        Debug.Log($"Manual calculation - Player hex: {playerHexCoords}, Stairs hex: {stairsHexCoords}");
+
+        int hexDistance = Mathf.Abs(playerHexCoords.x - stairsHexCoords.x) + 
+                         Mathf.Abs(playerHexCoords.z - stairsHexCoords.z);
+        Debug.Log($"Manual hex distance: {hexDistance}");
+
+        if (hexDistance <= 1)
+        {
+            Debug.Log("MANUAL HEX DISTANCE CHECK: Player is adjacent - ADJACENT!");
+            return true;
+        }
+
+        Debug.Log("Player is NOT adjacent to stairs.");
+        Debug.Log("===============================");
+        return false;
     }
+
+    private Vector3Int CalculateHexFromWorldPos(Vector3 worldPos)
+    {
+        float hexWidth = HexGrid.Instance.hexWidth;
+        float hexHeight = HexGrid.Instance.hexHeight;
+        float zSpacing = hexHeight * 0.75f;
+
+        int z = Mathf.RoundToInt(worldPos.z / zSpacing);
+        float xOffset = (z % 2 != 0) ? hexWidth / 2f : 0;
+        int x = Mathf.RoundToInt((worldPos.x - xOffset) / hexWidth);
+
+        return new Vector3Int(x, 0, z);
+    }
+
 
     private Hex GetHexBelow()
     {

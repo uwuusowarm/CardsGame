@@ -854,6 +854,9 @@ private void ApplyBurnEffect(int cardValue, int range)
         ClearPoisonAttack();
         ClearStunAttack();
         ResetAttackAvailability(); 
+        MovementSystem.Instance.HideRange();
+        UnitManager.Instance.SelectedUnit.ResetMovementPoints();
+        AttackManager.Instance.ClearHighlights();
         
         if (isWaitingForPlayerActionResolution)
         {
@@ -872,7 +875,7 @@ private void ApplyBurnEffect(int cardValue, int range)
         IsPlayerTurn = false;
         StartCoroutine(EnemyTurnRoutine());
     }
-
+    
     private IEnumerator EnemyTurnRoutine()
     {
         if (isGameOver) yield break;
@@ -929,8 +932,10 @@ private void ApplyBurnEffect(int cardValue, int range)
         {
             UnitManager.Instance.ClearOldSelection();
         }
-        
+    }
 
+    public void DeathScreen()
+    {
         StopAllCoroutines();
 
         if (gameOverCanvasGroup != null)

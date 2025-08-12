@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class MovementSystem : MonoBehaviour
 {
+    public static MovementSystem Instance { get; private set; }
+
     private List<Vector3Int> currentPath = new List<Vector3Int>();
     private int remainingMovementPoints;
     private Unit selectedUnit;
@@ -37,6 +39,19 @@ public class MovementSystem : MonoBehaviour
         }
         
         ShowAvailableHexes();
+    }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Debug.LogWarning("Multiple MovementSystem instances found! Destroying duplicate.");
+            Destroy(gameObject);
+        }
     }
 
     private void ShowAvailableHexes()

@@ -66,6 +66,16 @@ public class ShieldSystem : MonoBehaviour
 
         currentShields = newShields;
         UpdateShieldDisplay();
+        
+        if (GameManager.Instance != null && GameManager.Instance.PlayerUnit != null)
+        {
+            Vector3 playerPosition = GameManager.Instance.PlayerUnit.transform.position;
+            ShieldVFX(playerPosition);
+        }
+        else
+        {
+            ShieldVFX(transform.position);
+        }
     }
 
     public void ShieldVFX(Vector3 position)
