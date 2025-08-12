@@ -254,6 +254,14 @@ public class AttackManager : MonoBehaviour
                 GameManager.Instance.ClearPoisonAttack();
             }
 
+            if (GameManager.Instance.IsStunAttackActive())
+            {
+                int stunDuration = GameManager.Instance.GetPendingStunDuration();
+                enemy.ApplyStun(stunDuration);
+                Debug.Log($"Stun effect applied to {enemy.name} for {stunDuration} turns");
+                GameManager.Instance.ClearStunAttack();
+            }
+
             ClearHighlights();
             GameManager.Instance.ResetAttackAvailability();
             GameManager.Instance.PlayerActionResolved(true);

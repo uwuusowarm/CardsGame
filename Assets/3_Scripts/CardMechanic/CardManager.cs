@@ -297,6 +297,53 @@ public class CardManager : MonoBehaviour
         }
     }
 
+    public void DiscardRandomCards(int count)
+    {
+        if (hand.Count == 0)
+        {
+            Debug.Log("Cannot discard cards: Hand is empty");
+            return;
+        }
+
+        int cardsToDiscard = Mathf.Min(count, hand.Count);
+    
+        for (int i = 0; i < cardsToDiscard; i++)
+        {
+            int randomIndex = Random.Range(0, hand.Count);
+            CardData randomCard = hand[randomIndex];
+        
+            CardDragHandler cardHandler = handCardObjects.FirstOrDefault(h => h.Card == randomCard);
+        
+            if (cardHandler != null)
+            {
+                hand.Remove(randomCard);
+                handCardObjects.Remove(cardHandler);
+            
+                discardPile.Add(randomCard);
+            
+                Destroy(cardHandler.gameObject);
+            
+                Debug.Log($"Discarded random card: {randomCard.name}");
+            }
+            else
+            {
+                hand.Remove(randomCard);
+                discardPile.Add(randomCard);
+                Debug.LogWarning($"Card handler not found for {randomCard.name}, discarded data only");
+            }
+        }
+    
+        UpdateAllUI();
+    
+        if (Sound_Manager.instance != null)
+        {
+            Sound_Manager.instance.Play("Discard");
+        }
+    
+        Debug.Log($"Successfully discarded {cardsToDiscard} random card(s) from hand");
+    }
+
+
     void InstantiateCardInHand(CardData cardData)
     {
         GameObject cardObject = (cardData.cardPrefab != null) ? Instantiate(cardData.cardPrefab, handTransform) : Instantiate(cardPrefab, handTransform);

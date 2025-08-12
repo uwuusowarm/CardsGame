@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour
     private bool attackAvailable = false;
     private int pendingAttackDamage = 0;
     private int pendingAttackRange = 0;
+    private bool stunAttackActive = false;
+    private int pendingStunDuration = 0;
     
     private bool poisonAttackActive = false;
     private int pendingPoisonDuration = 0;
@@ -282,6 +284,23 @@ public class GameManager : MonoBehaviour
     {
         return attackAvailable;
     }
+    
+    public bool IsStunAttackActive()
+    {
+        return stunAttackActive;
+    }
+    
+    public int GetPendingStunDuration()
+    {
+        return pendingStunDuration;
+    }
+
+    public void ClearStunAttack()
+    {
+        stunAttackActive = false;
+        pendingStunDuration = 0;
+        Debug.Log("Stun attack effect cleared");
+    }
 
     private void ApplyCachedEffects()
     {
@@ -400,13 +419,28 @@ public class GameManager : MonoBehaviour
                 }
 
                 return;
+            
+            case CardEffect.EffectType.Discard:
+                if (CardManager.Instance != null)
+                {
+                    Debug.Log($"Discarding {effect.value} random card(s) from hand.");
+                    CardManager.Instance.DiscardRandomCards(effect.value);
+                }
+                else
+                {
+                    Debug.LogError("CardManager.Instance is null. Cannot discard cards.");
+                }
+                return;
+
 
             case CardEffect.EffectType.Burn:
                 ApplyBurnEffect(effect.value, effect.range);
                 return;
             
             case CardEffect.EffectType.Stun:
-                ApplyStunEffect(effect.value);
+                stunAttackActive = true;
+                pendingStunDuration = effect.value;
+                Debug.Log($"Next attack will stun the target for {effect.value} turns");
                 return;
 
             case CardEffect.EffectType.Poison:
@@ -818,6 +852,7 @@ private void ApplyBurnEffect(int cardValue, int range)
         }
 
         ClearPoisonAttack();
+        ClearStunAttack();
         ResetAttackAvailability(); 
         
         if (isWaitingForPlayerActionResolution)
