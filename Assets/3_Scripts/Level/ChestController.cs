@@ -198,12 +198,5 @@ public class ChestController : MonoBehaviour
             Debug.Log($"Player opened a chest and found: {randomItem.name}!");
             EquipmentManager.Instance.EquipItem(randomItem);
         }
-
-        if (currentHex != null)
-        {
-            currentHex.ClearChest();
-        }
-        
-        Destroy(gameObject);
     }
 }

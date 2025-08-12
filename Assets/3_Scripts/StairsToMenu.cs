@@ -39,19 +39,10 @@ public class StairsToMenu : MonoBehaviour
             return;
         }
         
-        Debug.Log("Player is close enough and clicked the exit. Loading scene: " + scene);
+        Debug.Log("Player completed the level. Loading scene: " + scene);
         PlayerDataManager.Instance.SavePlayerState();
         
-        LevelRewardUI rewardUI = FindObjectOfType<LevelRewardUI>(true);
-        if (rewardUI != null)
-        {
-            Debug.Log("Showing rewards");
-            rewardUI.ShowRewards();
-        }
-        else
-        {
-            Debug.Log("No rewards found");
-        }
+        NextLevel();
     }
 
     public void NextLevel()
