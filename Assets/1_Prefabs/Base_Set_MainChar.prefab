@@ -1179,6 +1179,7 @@ MonoBehaviour:
   movementPoints: 0
   actionPoints: 4
   shieldPoints: 0
+  currentHex: {fileID: 0}
   IsEnemy: 0
   movementDuration: 1
   rotationDuration: 0.3
@@ -1195,6 +1196,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxShields: 11
+  shieldVFXPrefab: {fileID: 4249400481044730216, guid: ae6344a8279385840bbf11a7fac5d01f,
+    type: 3}
+  shieldVFXOffset: {x: 0, y: -1, z: 0}
+  vfxDuration: 0
   shieldIcons:
   - {fileID: 0}
   - {fileID: 0}
@@ -1221,6 +1226,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxBaseHealth: 5
   maxExtraHealth: 10
+  healVFXPrefab: {fileID: 6583513024389107550, guid: e67aa726203900e43acf418ed2c3c2df,
+    type: 3}
+  vfxDuration: 0
+  healVFXOffset: {x: 0, y: -1, z: 0}
+  animDamage: {fileID: 0}
   healthIcons:
   - {fileID: 0}
   - {fileID: 0}
@@ -1249,6 +1259,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9198328c13b276643a3fcb5ccdb30656, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemStatsDisplay: {fileID: 0}
+  statsDisplayDuration: 4
+  equipmentButtons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  equipmentSlots: 00000000000000000000000000000000
   playerClass: 2
 --- !u!114 &7082301914573697284
 MonoBehaviour:

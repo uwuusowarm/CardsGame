@@ -81,7 +81,7 @@ public class EnemyUnit : MonoBehaviour
 
         if (UnitManager.Instance.PlayersTurn && isHighlighted)
         {
-            Debug.Log("🎯 Calling AttackManager.HandleEnemyClick!");
+            Debug.Log("Calling AttackManager.HandleEnemyClick!");
             AttackManager.Instance?.HandleEnemyClick(this);
         }
         else

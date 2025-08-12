@@ -233,8 +233,7 @@ public class AttackManager : MonoBehaviour
 
         return result;
     }
-
-
+    
     public void HandleEnemyClick(EnemyUnit enemy)
     {
         if (!GameManager.Instance.IsAttackAvailable())
