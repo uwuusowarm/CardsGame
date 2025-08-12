@@ -65,7 +65,7 @@ public class PlayerStatusUI : MonoBehaviour
     {
         if (attackInfoText != null)
         {
-            attackInfoText.text = " ";
+            attackInfoText.text = "0";
         }
     }
     
