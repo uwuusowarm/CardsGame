@@ -28,7 +28,7 @@ public class SettingsManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             if (optionsPanel != null) optionsPanel.SetActive(false);
-            Resolutions();
+            //Resolutions();
             LoadSettings();
         }
         else
@@ -118,7 +118,7 @@ public class SettingsManager : MonoBehaviour
         if (optionsPanel.activeSelf) ToggleOptionsPanel();
     }
 
-    public void SetResolution(int resolutionIndex)
+    /*public void SetResolution(int resolutionIndex)
     {
         if (resolutions == null || resolutionIndex >= resolutions.Length) return;
         Resolution resolution = resolutions[resolutionIndex];
@@ -146,5 +146,5 @@ public class SettingsManager : MonoBehaviour
         int savedResolutions = PlayerPrefs.GetInt("Resolution", currentResolutionIndex);
         resolutionDropdown.value = savedResolutions;
         resolutionDropdown.RefreshShownValue();
-    }
+    }*/
 }
