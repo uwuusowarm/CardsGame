@@ -55,7 +55,7 @@ public class OpenDoor : MonoBehaviour
             }
         }
     }
-    private void HandleDoorClick()
+    /*private void HandleDoorClick()
     {
         if (!isInitialized || myHex == null) return;
 
@@ -71,6 +71,43 @@ public class OpenDoor : MonoBehaviour
         {
             Open();
         }
+    }*/
+    private void HandleDoorClick()
+    {
+        if (!isInitialized || myHex == null || isOpen) return;
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance is null!");
+            return;
+        }
+
+        if (!GameManager.Instance.IsPlayerTurn)
+        {
+            Debug.Log("Not player's turn.");
+            return;
+        }
+
+        if (ActionPointSystem.Instance == null)
+        {
+            Debug.LogError("ActionPointSystem.Instance is null!");
+            return;
+        }
+
+        if (ActionPointSystem.Instance.GetCurrentActionPoints() < 1)
+        {
+            Debug.Log("Not enough Action Points to open the door.");
+            return;
+        }
+
+        if (!IsPlayerInRange())
+        {
+            Debug.Log("Player not adjacent.");
+            return;
+        }
+
+        Debug.Log("Opening door!");
+        ActionPointSystem.Instance.UseActionPoints(1);
+        Open();
     }
     private bool IsPlayerInRange()
     {
@@ -78,7 +115,7 @@ public class OpenDoor : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) return false;
         float distance = Vector3.Distance(transform.position, player.transform.position);
-        float hexSize = 1.7f; 
+        float hexSize = 1.7f;
         float maxDistance = interactionRange * hexSize;
 
         Debug.Log($"Player direct distance: {distance} (Max: {maxDistance})");
