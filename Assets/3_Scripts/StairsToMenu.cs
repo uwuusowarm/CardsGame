@@ -37,7 +37,6 @@ public class StairsToMenu : MonoBehaviour
             PlayerDataManager.Instance.SavePlayerState();
 
             NextLevel();
-   
     }
 
     public void NextLevel()

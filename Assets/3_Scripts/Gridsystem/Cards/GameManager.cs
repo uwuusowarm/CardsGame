@@ -854,8 +854,12 @@ private void ApplyBurnEffect(int cardValue, int range)
         ClearPoisonAttack();
         ClearStunAttack();
         ResetAttackAvailability(); 
-        MovementSystem.Instance.HideRange();
-        UnitManager.Instance.SelectedUnit.ResetMovementPoints();
+        
+        if (MovementSystem.Instance != null)
+        {
+            MovementSystem.Instance.HideRange();
+        }
+
         AttackManager.Instance.ClearHighlights();
         
         if (isWaitingForPlayerActionResolution)

@@ -2389,7 +2389,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 732.0118, y: 36.31}
+  m_AnchoredPosition: {x: 732.0118, y: 106}
   m_SizeDelta: {x: 452.2563, y: 553.29}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6152254970067118936
@@ -2412,7 +2412,7 @@ MonoBehaviour:
   m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 100, y: 100}
+  m_CellSize: {x: 50, y: 50}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -6854,6 +6854,7 @@ GameObject:
   - component: {fileID: 4479459208605424872}
   - component: {fileID: 5245752688456633376}
   - component: {fileID: 586793717516240950}
+  - component: {fileID: 2968434961230406046}
   m_Layer: 5
   m_Name: UI_Canvas
   m_TagString: Untagged
@@ -6962,6 +6963,27 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &2968434961230406046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8051183538133069473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e364b98ece624f5aba234aaa29c7c51e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardDisplayContainer: {fileID: 3102434088299822911}
+  cardPrefab: {fileID: 5023809833648921849, guid: 721ca12277cd76745b148fb32da44af6,
+    type: 3}
+  displayDuration: 3
+  fadeInDuration: 0.5
+  fadeOutDuration: 0.5
+  slideInOffset: {x: 0, y: 100, z: 0}
+  enemyNameText: {fileID: 0}
+  actionText: {fileID: 0}
 --- !u!1 &8144641629352216048
 GameObject:
   m_ObjectHideFlags: 0
