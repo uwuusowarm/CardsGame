@@ -290,6 +290,11 @@ public class GameManager : MonoBehaviour
         return stunAttackActive;
     }
     
+    public int GetPendingStunDuration()
+    {
+        return pendingStunDuration;
+    }
+
     public void ClearStunAttack()
     {
         stunAttackActive = false;
@@ -834,6 +839,7 @@ private void ApplyBurnEffect(int cardValue, int range)
         }
 
         ClearPoisonAttack();
+        ClearStunAttack();
         ResetAttackAvailability(); 
         
         if (isWaitingForPlayerActionResolution)
