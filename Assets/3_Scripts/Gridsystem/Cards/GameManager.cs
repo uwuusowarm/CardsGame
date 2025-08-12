@@ -290,6 +290,11 @@ public class GameManager : MonoBehaviour
         return stunAttackActive;
     }
     
+    public int GetPendingStunDuration()
+    {
+        return pendingStunDuration;
+    }
+
     public void ClearStunAttack()
     {
         stunAttackActive = false;
@@ -414,6 +419,19 @@ public class GameManager : MonoBehaviour
                 }
 
                 return;
+            
+            case CardEffect.EffectType.Discard:
+                if (CardManager.Instance != null)
+                {
+                    Debug.Log($"Discarding {effect.value} random card(s) from hand.");
+                    CardManager.Instance.DiscardRandomCards(effect.value);
+                }
+                else
+                {
+                    Debug.LogError("CardManager.Instance is null. Cannot discard cards.");
+                }
+                return;
+
 
             case CardEffect.EffectType.Burn:
                 ApplyBurnEffect(effect.value, effect.range);
@@ -834,6 +852,7 @@ private void ApplyBurnEffect(int cardValue, int range)
         }
 
         ClearPoisonAttack();
+        ClearStunAttack();
         ResetAttackAvailability(); 
         
         if (isWaitingForPlayerActionResolution)
