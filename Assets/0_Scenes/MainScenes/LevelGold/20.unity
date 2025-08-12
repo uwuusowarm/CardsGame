@@ -7855,6 +7855,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 138549920546049762, guid: 300174d50ee720f4b801604303867876,
         type: 3}
+      insertIndex: 5
+      addedObject: {fileID: 1753298250}
+    - targetCorrespondingSourceObject: {fileID: 138549920546049762, guid: 300174d50ee720f4b801604303867876,
+        type: 3}
       insertIndex: -1
       addedObject: {fileID: 1753298247}
     - targetCorrespondingSourceObject: {fileID: 138549920546049762, guid: 300174d50ee720f4b801604303867876,
@@ -11593,6 +11597,27 @@ MonoBehaviour:
   legendaryChancePerKill: 1
   minKillsForRareBonus: 3
   minKillsForLegendaryBonus: 8
+--- !u!114 &1753298250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 541412168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e364b98ece624f5aba234aaa29c7c51e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardDisplayContainer: {fileID: 5592975286371542708}
+  cardPrefab: {fileID: 5023809833648921849, guid: 721ca12277cd76745b148fb32da44af6,
+    type: 3}
+  displayDuration: 3
+  fadeInDuration: 0.5
+  fadeOutDuration: 0.5
+  slideInOffset: {x: 0, y: 100, z: 0}
+  enemyNameText: {fileID: 0}
+  actionText: {fileID: 0}
 --- !u!1001 &1778410065
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14087,6 +14112,21 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1929117845}
+    - target: {fileID: 2619482500183798063, guid: a0b9f3db9489eb047b4640fde9f4de94,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 2619482500183798063, guid: a0b9f3db9489eb047b4640fde9f4de94,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 2619482500183798063, guid: a0b9f3db9489eb047b4640fde9f4de94,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 6254006011044077412, guid: a0b9f3db9489eb047b4640fde9f4de94,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -14212,6 +14252,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0b9f3db9489eb047b4640fde9f4de94, type: 3}
+--- !u!1 &5592975286371542708 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3102434088299822911, guid: a0b9f3db9489eb047b4640fde9f4de94,
+    type: 3}
+  m_PrefabInstance: {fileID: 5592975286371542707}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6103499295536480549
 PrefabInstance:
   m_ObjectHideFlags: 0
