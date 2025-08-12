@@ -870,6 +870,17 @@ private void ApplyBurnEffect(int cardValue, int range)
         IsPlayerTurn = false;
         Debug.Log("Game Over sequence initiated.");
 
+        LevelRewardUI rewardUI = FindObjectOfType<LevelRewardUI>(true);
+        if (rewardUI != null)
+        {
+            Debug.Log("Player died - showing death rewards");
+            rewardUI.ShowRewards();
+        }
+        else
+        {
+            Debug.Log("No reward UI found for death rewards");
+        }
+
         if (animDead != null)
         {
             animDead.SetBool("Dead", true);
