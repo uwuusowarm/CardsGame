@@ -351,8 +351,7 @@ MonoBehaviour:
   hexGrid: {fileID: 1816494365}
   movementSystem: {fileID: 1611851148}
   enemyUnits:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1608333473}
   selectedUnit: {fileID: 0}
   animator: {fileID: 0}
 --- !u!4 &124161441
@@ -7429,6 +7428,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1372224156}
     m_Modifications:
+    - target: {fileID: -80155794431596756, guid: 81a018fef9537d74a93483f7f5783f67,
+        type: 3}
+      propertyPath: deck.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -80155794431596756, guid: 81a018fef9537d74a93483f7f5783f67,
+        type: 3}
+      propertyPath: deck.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 9edf07c4e260ac249bb782d0306fa4f6,
+        type: 2}
     - target: {fileID: 1539810478213002956, guid: 81a018fef9537d74a93483f7f5783f67,
         type: 3}
       propertyPath: m_Name
@@ -7510,6 +7520,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1608333471}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1608333473 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -80155794431596756, guid: 81a018fef9537d74a93483f7f5783f67,
+    type: 3}
+  m_PrefabInstance: {fileID: 1608333471}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a15df5a09b360084cae4de4a71ac4830, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1611851147
 GameObject:
   m_ObjectHideFlags: 0
@@ -9011,13 +9033,21 @@ MonoBehaviour:
   - effectType: 0
     vfxPrefab: {fileID: 6583513024389107550, guid: e67aa726203900e43acf418ed2c3c2df,
       type: 3}
-    soundEffect: {fileID: 8300000, guid: 07aa1fe86d1dfb94e9ec61c233d8e2b7, type: 3}
+    soundEffect: {fileID: 8300000, guid: 6ed42d11a3802704ea2c8b7234d5cdaf, type: 3}
     duration: 1
     positionOffset: {x: 0, y: -0.3, z: 0}
     followTarget: 1
     delayBetweenMultiple: 0
   - effectType: 6
     vfxPrefab: {fileID: 7521275099537752449, guid: a482ce7a69b0efd4dbfa0695837fd235,
+      type: 3}
+    soundEffect: {fileID: 8300000, guid: 07aa1fe86d1dfb94e9ec61c233d8e2b7, type: 3}
+    duration: 1
+    positionOffset: {x: 0, y: -0.1, z: 0}
+    followTarget: 1
+    delayBetweenMultiple: 0
+  - effectType: 2
+    vfxPrefab: {fileID: 4249400481044730216, guid: ae6344a8279385840bbf11a7fac5d01f,
       type: 3}
     soundEffect: {fileID: 8300000, guid: 07aa1fe86d1dfb94e9ec61c233d8e2b7, type: 3}
     duration: 1

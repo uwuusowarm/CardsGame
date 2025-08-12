@@ -794,9 +794,8 @@ MonoBehaviour:
   hexGrid: {fileID: 1816494365}
   movementSystem: {fileID: 1611851148}
   enemyUnits:
-  - {fileID: 0}
   - {fileID: 152603752}
-  - {fileID: 0}
+  - {fileID: 980130382}
   selectedUnit: {fileID: 0}
   animator: {fileID: 0}
 --- !u!4 &124161441
@@ -4651,6 +4650,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 980130380}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &980130382 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7129302745113008254, guid: 7fde39f1ed3e6ec4ea02f3126dddb423,
+    type: 3}
+  m_PrefabInstance: {fileID: 980130380}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a15df5a09b360084cae4de4a71ac4830, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &990898847
 PrefabInstance:
   m_ObjectHideFlags: 0
