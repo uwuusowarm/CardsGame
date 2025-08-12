@@ -12,6 +12,10 @@ public class ChestController : MonoBehaviour
     [Header("Testing")]
     [SerializeField, Tooltip("If true, this chest will open on click regardless of player position, turn, or AP cost.")]
     private bool testMode = false;
+
+    [Header("Visuals")]
+    [SerializeField] private GameObject chestClosedObject;
+    [SerializeField] private GameObject chestOpenObject;
     
     private Hex currentHex;
     private bool isOpen = false;
@@ -176,13 +180,13 @@ public class ChestController : MonoBehaviour
 
         return new Vector3Int(x, 0, z);
     }
-    
-    
+
+
     private void OpenChestAndGiveLoot()
     {
         if (isOpen) return;
         isOpen = true;
-        
+
         if (Sound_Manager.instance != null)
         {
             Sound_Manager.instance.Play("Chest_Open");
@@ -198,12 +202,7 @@ public class ChestController : MonoBehaviour
             Debug.Log($"Player opened a chest and found: {randomItem.name}!");
             EquipmentManager.Instance.EquipItem(randomItem);
         }
-
-        if (currentHex != null)
-        {
-            currentHex.ClearChest();
-        }
-        
-        Destroy(gameObject);
+        if (chestClosedObject != null) chestClosedObject.SetActive(false);
+        if (chestOpenObject != null) chestOpenObject.SetActive(true);
     }
 }

@@ -181,8 +181,10 @@ public class TutorialTooltipManager : MonoBehaviour
             {
                 if (data.backgroundSprite != null)
                     prefabComponent.background.sprite = data.backgroundSprite;
+            
                 prefabComponent.background.color = data.backgroundColor;
             }
+
 
             if (prefabComponent.titleText != null)
             {
