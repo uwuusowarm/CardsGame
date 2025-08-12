@@ -1445,6 +1445,11 @@ PrefabInstance:
       propertyPath: RoomID
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4175147475596143735, guid: 945d2eceaf823fe49a9b09df8c1b6773,
+        type: 3}
+      propertyPath: hexType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8538374558415930803, guid: 945d2eceaf823fe49a9b09df8c1b6773,
         type: 3}
       propertyPath: m_Name
@@ -1452,22 +1457,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 4621907154294210400, guid: 945d2eceaf823fe49a9b09df8c1b6773,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 885495329}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 945d2eceaf823fe49a9b09df8c1b6773, type: 3}
 --- !u!4 &284291074 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 159103856306951126, guid: 945d2eceaf823fe49a9b09df8c1b6773,
-    type: 3}
-  m_PrefabInstance: {fileID: 284291073}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &284291075 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4621907154294210400, guid: 945d2eceaf823fe49a9b09df8c1b6773,
     type: 3}
   m_PrefabInstance: {fileID: 284291073}
   m_PrefabAsset: {fileID: 0}
@@ -3830,7 +3825,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 284291075}
+    m_TransformParent: {fileID: 1196959557}
     m_Modifications:
     - target: {fileID: 1539810478213002956, guid: 81a018fef9537d74a93483f7f5783f67,
         type: 3}
@@ -3845,17 +3840,17 @@ PrefabInstance:
     - target: {fileID: 2167728767261158518, guid: 81a018fef9537d74a93483f7f5783f67,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.4909518
+      value: 2.490952
       objectReference: {fileID: 0}
     - target: {fileID: 2167728767261158518, guid: 81a018fef9537d74a93483f7f5783f67,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 87.27687
+      value: 87.27688
       objectReference: {fileID: 0}
     - target: {fileID: 2167728767261158518, guid: 81a018fef9537d74a93483f7f5783f67,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.119999886
       objectReference: {fileID: 0}
     - target: {fileID: 2167728767261158518, guid: 81a018fef9537d74a93483f7f5783f67,
         type: 3}
@@ -3865,7 +3860,7 @@ PrefabInstance:
     - target: {fileID: 2167728767261158518, guid: 81a018fef9537d74a93483f7f5783f67,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.044099808
       objectReference: {fileID: 0}
     - target: {fileID: 2167728767261158518, guid: 81a018fef9537d74a93483f7f5783f67,
         type: 3}
@@ -5540,6 +5535,11 @@ PrefabInstance:
       propertyPath: RoomID
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4175147475596143735, guid: 945d2eceaf823fe49a9b09df8c1b6773,
+        type: 3}
+      propertyPath: hexType
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8538374558415930803, guid: 945d2eceaf823fe49a9b09df8c1b6773,
         type: 3}
       propertyPath: m_Name
@@ -5547,12 +5547,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4621907154294210400, guid: 945d2eceaf823fe49a9b09df8c1b6773,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 885495329}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 945d2eceaf823fe49a9b09df8c1b6773, type: 3}
 --- !u!4 &1196959556 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 159103856306951126, guid: 945d2eceaf823fe49a9b09df8c1b6773,
+    type: 3}
+  m_PrefabInstance: {fileID: 1196959555}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1196959557 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4621907154294210400, guid: 945d2eceaf823fe49a9b09df8c1b6773,
     type: 3}
   m_PrefabInstance: {fileID: 1196959555}
   m_PrefabAsset: {fileID: 0}
@@ -9654,6 +9664,11 @@ PrefabInstance:
         type: 3}
       propertyPath: RoomID
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4175147475596143735, guid: 945d2eceaf823fe49a9b09df8c1b6773,
+        type: 3}
+      propertyPath: hexType
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8538374558415930803, guid: 945d2eceaf823fe49a9b09df8c1b6773,
         type: 3}
