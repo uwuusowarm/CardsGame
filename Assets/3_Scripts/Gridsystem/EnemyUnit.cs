@@ -5,24 +5,20 @@ using UnityEngine;
 
 public class EnemyUnit : MonoBehaviour
 {
-    [Header("Health Settings")]
-    public int damage = 3;
+    [Header("Health Settings")] public int damage = 3;
     public int maxHealth = 3;
     public int currentHealth { get; private set; }
-    
-    [Header("Status Effects")]
-    private int stunTurnsRemaining = 0;
+
+    [Header("Status Effects")] private int stunTurnsRemaining = 0;
     private int poisonTurnsRemaining = 0;
 
-    [Header("Visuals")]
-    public Material normalMaterial;
+    [Header("Visuals")] public Material normalMaterial;
     public Material highlightMaterial;
     private Renderer enemyRenderer;
     private bool isHighlighted = false;
     public Hex currentHex { get; private set; }
 
-    [Header("Enemy Deck & Hand")]
-    public List<CardData> deck = new List<CardData>();
+    [Header("Enemy Deck & Hand")] public List<CardData> deck = new List<CardData>();
     public List<CardData> hand = new List<CardData>();
     public int handSize = 3;
     public int playerDetectRange = 1;
@@ -34,6 +30,7 @@ public class EnemyUnit : MonoBehaviour
         {
             Debug.LogError("Renderer not found on EnemyUnit!", this);
         }
+
         if (UnitManager.Instance != null)
         {
             UnitManager.Instance.RegisterEnemy(this);
@@ -43,6 +40,7 @@ public class EnemyUnit : MonoBehaviour
         {
             Debug.LogWarning("UnitManager.Instance ist noch nicht gesetzt beim EnemyUnit Awake.");
         }
+
         EnemyActivator.Instance?.RegisterEnemy(this);
         int distance = GetDistanceToPlayer();
         Debug.Log($"{name}: Distanz zum Spieler beim Awake = {distance}");
@@ -80,7 +78,7 @@ public class EnemyUnit : MonoBehaviour
         Debug.Log($"PlayersTurn: {UnitManager.Instance?.PlayersTurn}");
         Debug.Log($"AttackManager exists: {AttackManager.Instance != null}");
         Debug.Log($"========================");
-    
+
         if (UnitManager.Instance.PlayersTurn && isHighlighted)
         {
             Debug.Log("🎯 Calling AttackManager.HandleEnemyClick!");
@@ -97,13 +95,13 @@ public class EnemyUnit : MonoBehaviour
         stunTurnsRemaining = turns;
         Debug.Log($"{name} has been stunned for {turns} turn(s)");
     }
-    
-    
+
+
     public bool IsStunned()
     {
         return stunTurnsRemaining > 0;
     }
-    
+
     private void ReduceStunDuration()
     {
         if (stunTurnsRemaining > 0)
@@ -112,12 +110,12 @@ public class EnemyUnit : MonoBehaviour
             Debug.Log($"{name} stun duration reduced. Remaining: {stunTurnsRemaining}");
         }
     }
-    
+
     private IEnumerator StunVisualEffect()
     {
         Renderer renderer = GetComponent<Renderer>();
         Color originalColor = renderer.material.color;
-        
+
         for (int i = 0; i < 3; i++)
         {
             renderer.material.color = Color.yellow;
@@ -126,7 +124,7 @@ public class EnemyUnit : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
     }
-    
+
     public void ApplyPoison(int turns)
     {
         if (poisonTurnsRemaining <= 0)
@@ -163,8 +161,8 @@ public class EnemyUnit : MonoBehaviour
                 VFXManager.Instance.PlayVFX(VFXManager.VFXType.Poison, transform);
                 Debug.Log($"Playing poison VFX for {name}");
             }
-        
-            TakeDamage(1); 
+
+            TakeDamage(1);
             Debug.Log($"{name} takes 1 poison damage. Remaining HP: {currentHealth}");
             ReducePoisonDuration();
         }
@@ -181,6 +179,7 @@ public class EnemyUnit : MonoBehaviour
             {
                 LevelRewardSystem.Instance.AddEnemyKill();
             }
+
             Destroy(gameObject);
         }
     }
@@ -223,15 +222,15 @@ public class EnemyUnit : MonoBehaviour
     }
 
     public void DrawCards(int count)
-         {
-             for (int i = 0; i < count; i++)
-             {
-                 if (deck.Count == 0) break;
-                 var card = deck[0];
-                 deck.RemoveAt(0);
-                 hand.Add(card);
-             }
-         }
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (deck.Count == 0) break;
+            var card = deck[0];
+            deck.RemoveAt(0);
+            hand.Add(card);
+        }
+    }
 
     public void EnemyTurn()
     {
@@ -286,19 +285,19 @@ public class EnemyUnit : MonoBehaviour
         if (IsPoisoned())
         {
             ApplyPoisonDamage();
-            
+
             if (currentHealth <= 0)
             {
                 Debug.Log($"{name} died from poison!");
                 yield break;
             }
         }
-        
+
         if (IsStunned())
         {
             Debug.Log($"{name} is stunned and skips their turn!");
             ReduceStunDuration();
-            yield break; 
+            yield break;
         }
 
         if (hand.Count == 0)
@@ -321,7 +320,7 @@ public class EnemyUnit : MonoBehaviour
                 else if (card.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Attack))
                     playLeft = true;
                 else
-                    continue; 
+                    continue;
             }
             else
             {
@@ -330,7 +329,7 @@ public class EnemyUnit : MonoBehaviour
                 else if (card.leftEffects.Any(e => e.effectType == CardEffect.EffectType.Move))
                     playLeft = true;
                 else
-                    continue; 
+                    continue;
             }
 
             yield return new WaitForSeconds(0.5f);
@@ -355,22 +354,22 @@ public class EnemyUnit : MonoBehaviour
     {
         int dx = Mathf.Abs(a.x - b.x);
         int dz = Mathf.Abs(a.z - b.z);
-    
+
         if ((a.z % 2 == 1 && b.z % 2 == 0) || (a.z % 2 == 0 && b.z % 2 == 1))
         {
             if (a.x < b.x)
                 dx = Mathf.Max(0, dx - 1);
         }
-    
+
         return dx + Mathf.Max(0, dz - (dx + 1) / 2);
     }
 
-
     private void PlayCard(CardData card, bool isLeft)
     {
+        bool actionPerformed = false;
+
         var effects = new List<CardEffect>();
         if (card.leftEffects != null) effects.AddRange(card.leftEffects);
-        // if (card.bottomEffects != null) effects.AddRange(card.bottomEffects);
         if (card.rightEffects != null) effects.AddRange(card.rightEffects);
 
         foreach (var effect in effects)
@@ -380,28 +379,41 @@ public class EnemyUnit : MonoBehaviour
                 case CardEffect.EffectType.Move:
                     bool moved = MoveTowardsPlayer(effect.value);
                     if (moved)
+                    {
                         Debug.Log($"{name} move by {effect.value} to player.");
+                        actionPerformed = true;
+                    }
                     else
+                    {
                         Debug.Log($"{name} cant move.");
+                    }
+
                     break;
+
                 case CardEffect.EffectType.Attack:
                     if (IsPlayerInRange(2))
                     {
                         AttackPlayer(effect.value);
                         Debug.Log($"{name} attack player by {effect.value} damage.");
+                        actionPerformed = true;
                     }
                     else
                     {
                         Debug.Log($"{name} cant attack because of range.");
                     }
-                    break;
-                case CardEffect.EffectType.Block:
+
                     break;
             }
         }
+
+        if (actionPerformed && EnemyPlayedCardUI.Instance != null)
+        {
+            EnemyPlayedCardUI.Instance.ShowEnemyPlayedCard(card, name, "plays", true);
+        }
+
         Debug.Log($"{name} behält die Karte '{card.cardName}' in der Hand");
     }
-    
+
     public bool MoveTowardsPlayer(int steps)
     {
         var playerGO = GameObject.FindGameObjectWithTag("Player");
@@ -412,13 +424,14 @@ public class EnemyUnit : MonoBehaviour
         Vector3Int start = this.currentHex.hexCoords;
         Vector3Int target = playerUnit.currentHex.hexCoords;
         var bfsResult = GraphSearch.BFSGetPath(HexGrid.Instance, start, target, steps);
-        var path = bfsResult; 
+        var path = bfsResult;
 
-        if (path == null || path.Count <= 1)
+        if (path == null || path.Count <= 1 || path.Count > 5)
         {
             Debug.Log($"{name} kann sich nicht näher zum Spieler bewegen.");
             return false;
         }
+
         int moveCount = Mathf.Min(steps, path.Count - 1);
         Vector3Int nextHexCoords = path[moveCount];
         Hex nextHex = HexGrid.Instance.GetTileAt(nextHexCoords);
@@ -434,7 +447,8 @@ public class EnemyUnit : MonoBehaviour
         currentHex = nextHex;
         currentHex.SetEnemyUnit(this);
 
-        Debug.Log($"{name} bewegt sich zu {nextHex.hexCoords} (Distanz zum Spieler: {HexGrid.Instance.GetDistance(currentHex, playerUnit.currentHex)})");
+        Debug.Log(
+            $"{name} bewegt sich zu {nextHex.hexCoords} (Distanz zum Spieler: {HexGrid.Instance.GetDistance(currentHex, playerUnit.currentHex)})");
         return true;
     }
 
@@ -462,6 +476,7 @@ public class EnemyUnit : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
+
         end.y = originalY;
         transform.position = end;
 
@@ -479,6 +494,7 @@ public class EnemyUnit : MonoBehaviour
             path.Insert(0, current);
             current = bfsResult.visitedNodesDict[current] ?? start;
         }
+
         path.Insert(0, start);
         return path;
     }
@@ -486,17 +502,19 @@ public class EnemyUnit : MonoBehaviour
     public int GetDistanceToPlayer()
     {
         var playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO == null) 
+        if (playerGO == null)
         {
             Debug.LogWarning("Kein Spieler gefunden!");
             return -1;
         }
+
         var playerUnit = playerGO.GetComponent<Unit>();
         if (playerUnit == null || playerUnit.currentHex == null || this.currentHex == null)
         {
             Debug.LogWarning("Spieler oder Gegner nicht auf einem gültigen Hex!");
             return -1;
         }
+
         int dist = HexGrid.Instance.GetDistance(this.currentHex, playerUnit.currentHex);
         Debug.Log($"{name}: Distanz zum Spieler = {dist} Felder");
         return dist;

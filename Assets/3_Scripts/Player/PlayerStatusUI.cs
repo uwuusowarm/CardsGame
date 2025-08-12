@@ -34,9 +34,17 @@ public class PlayerStatusUI : MonoBehaviour
     {
         if (movementPointsText != null)
         {
-            movementPointsText.text = $"{points}";
+            if (points > 0)
+            {
+                movementPointsText.text = $"{points}";
+            }
+            else
+            {
+                movementPointsText.text = " ";
+            }
         }
     }
+
     public void UpdateExhaustLevel(int level)
     {
         if (exhaustLevelText != null)
